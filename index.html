@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SARV INDIA — Order Form</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════ TOKENS ═══════════════════════ */
+:root{
+  --navy:#1A3C5E;--blue:#2E6DA4;--lblue:#D6E8F7;
+  --amber:#D4870A;--green:#1B6B3A;--lgreen:#E6F4EC;
+  --red:#C0392B;--bg:#F2F5F9;--card:#fff;
+  --border:#E0E6ED;--text:#1A1A2E;--muted:#6B7897;--input:#F8FAFC;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);padding-bottom:90px;font-size:14px}
+
+/* ═══════════════════════ HEADER ═══════════════════════ */
+.hdr{background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(26,60,94,.3)}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;max-width:900px;margin:0 auto}
+.hdr h1{color:#fff;font-size:16px;font-weight:700;line-height:1.2}
+.hdr span{color:#9EC8E8;font-size:11px;display:block;margin-top:1px}
+.hdr-tag{background:rgba(212,135,10,.2);border:1px solid rgba(212,135,10,.5);color:#FFD580;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px}
+.meta-bar{background:rgba(0,0,0,.3);padding:6px 18px;display:flex;gap:16px;font-size:11px;color:#9EC8E8;max-width:900px;margin:0 auto;flex-wrap:wrap}
+.meta-bar b{color:#fff;font-family:'DM Mono',monospace}
+
+/* ═══════════════════════ LAYOUT ═══════════════════════ */
+.wrap{max-width:900px;margin:0 auto;padding:0 12px}
+.sl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin:20px 0 7px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:1px;background:var(--border)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(26,60,94,.05)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* ═══════════════════════ INPUTS ═══════════════════════ */
+.fg{margin-bottom:11px}
+.fg:last-child{margin-bottom:0}
+.fg label{display:block;font-size:11.5px;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:9px 12px;background:var(--input);border:1.5px solid var(--border);
+  border-radius:8px;font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--text);
+  transition:border .15s,box-shadow .15s;appearance:none;-webkit-appearance:none
+}
+.fg select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%236B7897' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;padding-right:28px
+}
+.fg input:read-only{background:#EEF2F7;color:var(--navy);font-weight:700;font-family:'DM Mono',monospace;font-size:12px;border-color:#D0DAE8}
+.fg textarea{resize:vertical;min-height:68px;line-height:1.5}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(46,109,164,.1)}
+
+/* combobox wrapper */
+.combo-wrap{position:relative}
+.combo-wrap input{padding-right:32px}
+.combo-arrow{position:absolute;right:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted)}
+.combo-list{
+  position:absolute;top:calc(100% + 3px);left:0;right:0;
+  background:#fff;border:1.5px solid var(--blue);border-radius:8px;
+  z-index:50;max-height:180px;overflow-y:auto;display:none;
+  box-shadow:0 4px 16px rgba(26,60,94,.15)
+}
+.combo-list.open{display:block}
+.combo-opt{padding:9px 12px;font-size:13px;cursor:pointer;transition:background .1s}
+.combo-opt:hover,.combo-opt.focused{background:var(--lblue);color:var(--navy)}
+.combo-opt.no-match{color:var(--muted);font-style:italic;cursor:default}
+
+/* ═══════════════════════ PRODUCT CARD ═══════════════════ */
+.pc{background:var(--card);border:1.5px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 10px rgba(26,60,94,.05)}
+.pc-hdr{background:linear-gradient(135deg,var(--navy),var(--blue));padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.pc-title{color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px}
+.btn-del{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:4px 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.pc-body{padding:14px 16px}
+.shd{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin:14px 0 8px;padding-bottom:5px;border-bottom:1.5px dashed var(--lblue)}
+.shd:first-child{margin-top:0}
+
+/* ═══════════════════════ TRIMS ═══════════════════════════ */
+.tt{width:100%;border-collapse:collapse}
+.tt th{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);padding:7px 9px;background:var(--input);border-bottom:2px solid var(--border);text-align:left}
+.tt th:last-child{text-align:right}
+.tt td{padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tt tr:last-child td{border-bottom:none}
+.trim-sel{width:100%;padding:6px 9px;border:1.5px solid var(--border);border-radius:7px;font-size:12.5px;font-family:'DM Sans',sans-serif;background:var(--input);appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B7897' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.trim-sel:focus{outline:none;border-color:var(--blue)}
+.trim-pi{width:84px;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:12.5px;font-family:'DM Mono',monospace;font-weight:600;text-align:right;background:var(--input);color:var(--navy)}
+.trim-pi:focus{outline:none;border-color:var(--blue);background:#fff}
+.trim-pi[disabled]{opacity:.4}
+
+/* ═══════════════════════ PRODUCT SUBTOTAL ══════════════ */
+.pst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;background:#F0F7FF;border:1px solid #C8DDED;border-radius:9px;padding:12px 14px;margin-top:14px}
+.pst-item{text-align:center}
+.pst-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px}
+.pst-val{font-size:15px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace}
+.pst-val.big{font-size:18px;color:var(--green)}
+
+/* ═══════════════════════ ADD PRODUCT ════════════════════ */
+.btn-add{width:100%;padding:14px;background:transparent;border:2px dashed #93c5fd;border-radius:11px;color:var(--blue);font-size:13.5px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:18px;transition:background .15s}
+.btn-add:hover{background:#EFF6FF}
+
+/* ═══════════════════════ BAGS SUMMARY ══════════════════ */
+.sum-title{font-size:12px;font-weight:700;color:#fff;background:var(--navy);padding:9px 16px;border-radius:9px 9px 0 0}
+.sum-tbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 9px 9px;overflow:hidden;margin-bottom:16px}
+.sum-tbl th{background:#F0F7FF;font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--navy);padding:8px 10px;text-align:center;border-bottom:2px solid var(--border)}
+.sum-tbl th:first-child{text-align:left}
+.sum-tbl td{padding:9px 10px;font-size:12.5px;text-align:center;border-bottom:1px solid var(--border);vertical-align:middle}
+.sum-tbl td:first-child{text-align:left;font-weight:600}
+.sum-tbl tr:last-child td{border-bottom:none}
+.bd-y{background:var(--lgreen);color:var(--green);padding:2px 7px;border-radius:4px;font-size:10.5px;font-weight:700;display:inline-block}
+.bd-n{background:#F1F3F7;color:var(--muted);padding:2px 7px;border-radius:4px;font-size:10.5px;display:inline-block}
+.bd-f{background:#FFFBEA;color:#92400E;padding:2px 7px;border-radius:4px;font-size:10.5px;font-weight:700;display:inline-block}
+
+/* ═══════════════════════ BILL BOX ═══════════════════════ */
+.bill{background:var(--navy);border-radius:14px;padding:18px 18px 14px;margin-bottom:18px;box-shadow:0 8px 28px rgba(26,60,94,.22)}
+.bill-ttl{color:#9EC8E8;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid rgba(255,255,255,.15)}
+.bill-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.bill-row:last-of-type{border-bottom:none}
+.bill-rl{font-size:12.5px;color:#9EC8E8}
+.bill-rv{font-size:14px;font-weight:700;color:#fff;font-family:'DM Mono',monospace}
+.bill-tot{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;margin-top:5px;border-top:1px dashed rgba(255,255,255,.3)}
+.bill-tl{font-size:14px;font-weight:700;color:#fff}
+.bill-tv{font-size:26px;font-weight:800;color:#FFD580;font-family:'DM Mono',monospace}
+.bill-tn{font-size:9.5px;color:rgba(158,200,232,.7);margin-top:3px}
+
+/* ═══════════════════════ TERMS/BANK ════════════════════ */
+.bank-box{background:var(--lgreen);border:1px solid #B7DFC8;border-radius:9px;padding:12px 14px;margin-top:10px}
+.bank-box h4{color:var(--green);font-size:12.5px;font-weight:700;margin-bottom:7px}
+.bank-box p{font-size:11.5px;color:#174A2B;margin:3px 0;line-height:1.5}
+.tlist{padding-left:16px;margin-top:7px;line-height:1.8;font-size:11.5px;color:var(--muted)}
+
+/* ═══════════════════════ SIGS ═══════════════════════════ */
+.sig-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:10px}
+.sig-box{border:1px dashed var(--border);border-radius:9px;padding:24px 10px 10px;text-align:center}
+.sig-line{border-bottom:1.5px solid var(--border);margin:0 14px 7px;height:36px}
+.sig-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+/* ═══════════════════════ API CONFIG ════════════════════ */
+.api-box{background:#FFF8E6;border:1.5px solid #FCD34D;border-radius:11px;padding:13px 14px;margin:12px 0}
+.api-box h4{color:#92400E;font-size:12.5px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.api-box input{width:100%;padding:8px 11px;border:1.5px solid #FCD34D;border-radius:7px;font-family:'DM Mono',monospace;font-size:11.5px;background:#fff;color:var(--text)}
+.api-box input:focus{outline:none;border-color:var(--amber)}
+.api-hint{font-size:11px;color:#78350F;margin-top:5px;line-height:1.5}
+.api-btns{display:flex;gap:7px;margin-top:8px}
+.btn-xs{padding:6px 13px;border-radius:6px;font-size:11.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none}
+.btn-test{background:var(--navy);color:#fff}
+.btn-sv{background:var(--amber);color:#fff}
+
+/* ═══════════════════════ BOTTOM NAV ════════════════════ */
+.bnav{position:fixed;bottom:0;left:0;width:100%;background:#fff;padding:11px 14px;border-top:1.5px solid var(--border);z-index:100;display:flex;gap:8px;max-width:100%}
+.btn-submit{
+  flex:1;background:linear-gradient(135deg,var(--green) 0%,#2D9E5A 100%);
+  color:#fff;border:none;padding:14px;font-size:15px;font-weight:700;
+  font-family:'DM Sans',sans-serif;border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 16px rgba(27,107,58,.3);transition:opacity .15s
+}
+.btn-submit:disabled{opacity:.6;cursor:wait}
+.btn-reset{background:var(--input);color:var(--muted);border:1.5px solid var(--border);padding:14px 12px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;border-radius:10px;cursor:pointer}
+
+/* ═══════════════════════ MODAL ══════════════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:26px 24px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-icon{width:56px;height:56px;border-radius:50%;background:var(--lgreen);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px}
+.modal h3{text-align:center;font-size:17px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.modal p{text-align:center;font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.modal-orderNo{text-align:center;font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--blue);background:var(--lblue);padding:7px 14px;border-radius:7px;margin-bottom:16px;display:block}
+.modal-btns{display:flex;flex-direction:column;gap:9px}
+.btn-open-pdf{
+  width:100%;background:var(--navy);color:#fff;border:none;padding:13px;font-size:14px;
+  font-weight:700;font-family:'DM Sans',sans-serif;border-radius:9px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px
+}
+.btn-open-pdf.green{background:linear-gradient(135deg,var(--green),#2D9E5A)}
+.btn-close-modal{width:100%;background:transparent;border:1.5px solid var(--border);color:var(--muted);padding:11px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;border-radius:9px;cursor:pointer}
+.modal-detail{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:12px;display:flex;flex-direction:column;gap:5px}
+.modal-detail span{display:flex;justify-content:space-between}
+.modal-detail span b{color:var(--navy)}
+.modal-detail span em{font-style:normal;color:var(--text);font-family:'DM Mono',monospace;font-size:11.5px}
+
+/* ═══════════════════════ TOAST ═══════════════════════ */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A1A2E;color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:300}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════ RESPONSIVE ════════════════════ */
+@media(max-width:600px){
+  .g2,.g3{grid-template-columns:1fr;gap:10px}
+  .sig-row{grid-template-columns:1fr}
+  .pst{grid-template-columns:1fr 1fr}
+  .bnav{padding:10px 12px}
+}
+
+/* ═══════════════════════ PRINT ═════════════════════════ */
+@media print{
+  @page{size:A4 landscape;margin:10mm 12mm}
+  body{background:#fff;padding:0;font-size:8pt;font-family:Arial,sans-serif}
+  .hdr,.bnav,.btn-add,.btn-del,.api-box,.pc-hdr .btn-del,.shd,.pst,.bill,.sum-title,.sum-tbl,.sl,.toast,.modal-bg{display:none!important}
+  .wrap{display:none!important}
+  .print-doc{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ PRINT DOCUMENT (hidden on screen) ════════════════ -->
+<div id="printDoc" style="display:none">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:6pt;margin-bottom:5pt;border-bottom:2pt solid #D4870A">
+    <div>
+      <div style="font-size:19pt;font-weight:700;color:#1A3C5E;font-family:Arial">SARV INDIA HOME FURNISHING</div>
+      <div style="font-size:7.5pt;color:#555;margin-top:2pt">Plot No. 166, Sector-25, Part-II, HUDA, Panipat – 132103 (Haryana)  |  GST: 06ADEPB4329A1ZC  |  HDFC Bank, Harmony Tower, G.T. Road, Panipat</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:13pt;font-weight:700;color:#D4870A">ORDER CONFIRMATION</div>
+      <div style="font-size:8pt;color:#2E6DA4;font-style:italic">www.sarvindia.com</div>
+      <div style="font-size:7pt;color:#555;font-style:italic">Premium Mink Blanket Manufacturer</div>
+    </div>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:5pt;font-size:8pt">
+    <tr>
+      <td style="width:50%;border:0.5pt solid #ccc;vertical-align:top">
+        <div style="background:#1A3C5E;color:#fff;font-weight:700;font-size:8pt;padding:4pt 8pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">BUYER DETAILS</div>
+        <div style="padding:6pt 8pt">
+          <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Buyer Name:</b> <span id="pdf-bn">—</span></div>
+          <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Mobile:</b> <span id="pdf-mob">—</span></div>
+          <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Address:</b> <span id="pdf-addr">—</span></div>
+          <div><b style="color:#1A3C5E">GST No.:</b> <span id="pdf-gst">—</span></div>
+        </div>
+      </td>
+      <td style="width:50%;border:0.5pt solid #ccc;vertical-align:top;border-left:none">
+        <div style="background:#1A3C5E;color:#fff;font-weight:700;font-size:8pt;padding:4pt 8pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">ORDER DETAILS</div>
+        <div style="padding:6pt 8pt">
+          <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Order No.:</b> <span id="pdf-on">—</span></div>
+          <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Order Date:</b> <span id="pdf-od">—</span></div>
+          <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Payment Terms:</b> <span id="pdf-pt">—</span></div>
+          <div><b style="color:#1A3C5E">Delivery Terms:</b> <span id="pdf-dt">—</span></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div style="font-size:8.5pt;font-weight:700;color:#1A3C5E;text-transform:uppercase;letter-spacing:.5px;margin:7pt 0 3pt;padding-bottom:2pt;border-bottom:1pt solid #1A3C5E">ORDER LINE ITEMS</div>
+  <table style="width:100%;border-collapse:collapse;font-size:7.5pt" id="pdf-items">
+    <thead>
+      <tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:3%">SR</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Fabric</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%">Category</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Wt(KG)</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">Size</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">DB/SB</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Ply</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Sattan</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:15%">Design Details</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">MOQ</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Emboss</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Qty</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">Price(₹/Qty)</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">GST%</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Delivery</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Amount</th>
+      </tr>
+    </thead>
+    <tbody id="pdf-items-body"></tbody>
+    <tfoot><tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <td colspan="15" style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:9pt">TOTAL AMOUNT (Incl. GST)</td>
+      <td style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:10pt" id="pdf-grand">₹0.00</td>
+    </tr></tfoot>
+  </table>
+
+  <div style="font-size:8.5pt;font-weight:700;color:#1A3C5E;text-transform:uppercase;letter-spacing:.5px;margin:6pt 0 3pt;padding-bottom:2pt;border-bottom:1pt solid #1A3C5E">PACKING MATERIALS &amp; PRICING SUMMARY</div>
+  <table style="width:100%;border-collapse:collapse;font-size:7pt" id="pdf-pack">
+    <thead>
+      <tr>
+        <th rowspan="2" style="background:#1A3C5E;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%;-webkit-print-color-adjust:exact;print-color-adjust:exact">SR</th>
+        <th colspan="5" style="background:#2E6DA4;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY BUYER</th>
+        <th colspan="5" style="background:#1B6B3A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY SELLER</th>
+        <th rowspan="2" style="background:#D4870A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%;-webkit-print-color-adjust:exact;print-color-adjust:exact">Final Price/KG</th>
+        <th rowspan="2" style="background:#1A3C5E;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%;-webkit-print-color-adjust:exact;print-color-adjust:exact">Net Payable</th>
+      </tr>
+      <tr>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label/Tag</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Outer Box</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Outer Box</th>
+      </tr>
+    </thead>
+    <tbody id="pdf-pack-body"></tbody>
+  </table>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7pt;margin-top:6pt">
+    <div style="border:0.5pt solid #ccc;border-radius:2pt;overflow:hidden">
+      <div style="background:#1A3C5E;color:#fff;font-size:8pt;font-weight:700;padding:4pt 7pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">TERMS &amp; CONDITIONS</div>
+      <div style="padding:5pt 7pt;font-size:7.5pt;line-height:1.7">
+        1. All prices are Ex-Factory Panipat &amp; taxes applicable @ 5% GST.<br>
+        2. Any dispute subject to Panipat (HR) jurisdiction only.<br>
+        3. Sizes &amp; weights subject to ±5% tolerance.<br>
+        4. Our responsibility ceases after goods leave the factory.<br>
+        5. Material once sold will not be taken back under any circumstances.
+      </div>
+    </div>
+    <div style="border:0.5pt solid #ccc;border-radius:2pt;overflow:hidden">
+      <div style="background:#1A3C5E;color:#fff;font-size:8pt;font-weight:700;padding:4pt 7pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">BANK DETAILS</div>
+      <div style="padding:5pt 7pt;font-size:7.5pt;line-height:1.8">
+        <b style="color:#1A3C5E">Bank Name:</b> HDFC BANK, PANIPAT<br>
+        <b style="color:#1A3C5E">Branch:</b> Harmony Tower, G.T. Road, Panipat<br>
+        <b style="color:#1A3C5E">Account No.:</b> 50200053404079<br>
+        <b style="color:#1A3C5E">IFSC Code:</b> HDFC0000171 &nbsp;|&nbsp; <b style="color:#1A3C5E">Type:</b> Current Account
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:8pt;font-weight:700;color:#1A3C5E;text-transform:uppercase;margin:6pt 0 3pt;padding-bottom:2pt;border-bottom:1pt solid #1A3C5E">ACKNOWLEDGEMENT &amp; SIGNATURES</div>
+  <table style="width:100%;border-collapse:collapse;font-size:7.5pt">
+    <tr>
+      <td style="border:0.5pt solid #ccc;text-align:center;width:33%">
+        <div style="background:#1A3C5E;color:#fff;padding:4pt;font-weight:700;font-size:7pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">BUYER'S SIGNATURE</div>
+        <div style="height:36pt;position:relative"><div style="position:absolute;bottom:10pt;left:12pt;right:12pt;border-bottom:0.5pt solid #aaa"></div><div style="position:absolute;bottom:3pt;left:10pt;font-size:6pt;color:#888">Date: ___________</div></div>
+      </td>
+      <td style="border:0.5pt solid #ccc;border-left:none;text-align:center;width:33%">
+        <div style="background:#1A3C5E;color:#fff;padding:4pt;font-weight:700;font-size:7pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">PREPARED BY</div>
+        <div style="height:36pt;position:relative"><div style="position:absolute;bottom:10pt;left:12pt;right:12pt;border-bottom:0.5pt solid #aaa"></div><div style="position:absolute;bottom:3pt;left:10pt;font-size:6pt;color:#888">Date: ___________</div></div>
+      </td>
+      <td style="border:0.5pt solid #ccc;border-left:none;text-align:center;width:34%">
+        <div style="background:#1A3C5E;color:#fff;padding:4pt;font-weight:700;font-size:7pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">AUTHORISED SIGN (SARV INDIA)</div>
+        <div style="padding:4pt 0 2pt;text-align:center">
+          <img src="data:image/jpeg;base64,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 tIjb3sUtzc Sx/bnZ3eGOMWzrIQL3wd/a48SfGj9r3x58BLv8Aag0PT9P8RT6tbeB9J8O65plxrfhqbRbiC1nVYXspEdbxfOvB9rLyKFlSOMpEZatYqm/vt0/z76d9djhlwvmEabqc0bKmqj+K6i7O1nG9+W8r/C4xlaTaSfpP7ffhfxD4c8LeG/2svh3LqkfiP4S65DqV3DpM0YbVPDctxbrrmnyJNIkLo9nGZl8wgJPZwOGQpuHn/wDwUB+E/wAPtF8W6f8AGay+A/wS1TVvEGjpo9x8QP2gPFhXQfD4t5Uks7aHT5g6yyTeddsBbmBt0ILuwIx2n7N/w68bfGP4TeOLT49/HPxh4w0/WNS8WeDb3w/rlrptpbCxttY1CwinU2VnbzCeS0SPfIJdjFiyoh27eD0mLx341/YI/Zh+Petfs8WfxZutO8M6DqvizQ4dH0q4ml3+FrjbNbjUNiwn+0XsjvhKyqpJx5YkU5y/eU3K3xJPvr369LfcelgubA4ynQc1KVGcoNqUoKUZJtR5m4NJTUmua0W5a3Wjo6Bp/wACviF+wTafsI/Db9pe3+IXiDU9N1TRfAfjKGzuhYNrunRLqtq8d1ZpJFbRWTtaGJlkbZ9mWNGeWJlH09+zd8Tbz46fs7+AvjVrnh1NKvfF3gvS9avNL3M32KW6tIp2gyyqx2NIVyVUnHIB4rjf2SrP9rjSP7X0n9qA6bdW9xpOl6po9xp9rawLpt3cpP8AbtFRIHbdBZtHAsUr7mkSb5pZWVivGf8ABHm11bTP+CeHgXw1q+uNqB0K+17RrO8aeSQyWdlrl/aWvzSBWOLeGJeVXAGAqgBRrRVnHpp+VvN92eZm1qlOs+ZS5aqd01JN1FJyaajBWahFW5d07WWi2/h3/wIX4I/4KVfFDwzZxSQ6z43+F/hfxDIzQyFbn7Hd6pYTFX2+WNiNZZXO7MucY5rz1/jJ+3fp/7UWsfBf4K+PND+J1jZeOoz4rk174Y3Gk2Pg3SZgt0bBdXivRHfXkdrPaBES3lkInEsmAGQd5+2TdeJvhJ8bfg5+1TpWo3Q0PQ/EVx4R8dWcMMHl/2TrrWsKXkskvzRx2+oWums2wg7Hck7VIPB/t4Dxn+znrutftK+J/8AgoN4g+HPwz1ZrJNU8IabpNvqWq6zqP2aaAadoz3e5bBpkjgkCwxsxkS4mZohukXGp7kXq9HfRpaPW+rStfTXs9Lnr5bGOKrUpuMJOtSVNKcXNe0p2pqKUISmpcnLJKLirtc0uW6PRvEcjfDr/gpT4f1m88UQxWPxS+E11oy6dNAwZ9R0S+F5bBJN21me21bUmKFQQtqWBPzAaWmfsM/DvQv2IG/YL8P/ABD8YWnhWTw3LoU2tnULa41aSymdjOhlnt3i/eI8kR/dfKjkJsIVl8r8PfEDxT+2B+zO2g/Cez1rQvi78KE0fxN4Nj8b3YuJdS3W7vpl3c3Fo8MNxDqdmLm1uPLbbE812n3oAx+hP2cv2gvBX7S/wttfiT4J8+1k86Sy1zQ9Sj8u+0LUovluNPvIj80NxC/ysjAHowyrKTpT9nUb89V6O119+55eZ0sfgacdWpUnGM7W+KPM6U9Lppwdou7vyvWzV+B+OP8AwTl/Z0+N0TQGx1HwksnhGDwzJ/wg8kGnbtMh1Ky1CGDiFtqpJZCNduAsVzcKMFlZKPx3/wCCaH7P/wC0J8V/Ffxc8ZahrtpqHjT4fxeEtdh0qa1SKa1S+t7zz/3ls7/aCbS3i3M7II4wFRW+c/RC7gvzHmitXQoveK/q/wDm/vPOp55nFHl5K8la9tX1cXv11hF6/wAq7HK/Dr4Q+GvhjrHi7WfD1zdySeM/Eza5qiXUiMIrlrO2tWWMhQ2wrao2HLlSzBSECRpx3w4/Yv8Agj8Ifhv8L/hl4D0q4sdM+EepNqPhcw+X5kly9leWk8s+I8O0yX91JIUCFpJCwx0r1s/Sir9nHt/W5yfXMXr771tfXe0XFX9Itr0bR4X+0dqel/safsX/ABM8XeCdV1Rb7ydb1LRJPsr307a5qt3NJbQxRRoSwa/vI40QLgAjeT8znzf9rH4OfCvwf+yF8L/2NfFHwb8A/F68sNP0/SPDvgvxz8Rk8OXGqtZWH2NrqyeVZpJZ1EiqVB3BbgkyE4DTeNPjL8O/2u/25/D/AOz5pnxN0uPwn8K9cbVNVjtdeltp/E3jC0QSx6PBsaMXcenRSLeXkUbShZZLSOZECur+R/t8ftS/CbUPFfi/xHe+M/hn8SdC8Aq+k+N/gT8QdGt9N1y0RriGGW70e4uUSaeWQtGybCySAxCHfM0SnhrVKcYtrbZfLV6P9E9tj7jJcvx2IxVKnU5lO7rTfvJ3laNNOUXFxbfM7ynTj71nOMjsP2A/+CfPgf4CaF4m+PvxY+DF58GbhPFb6xoHhDQfjRqtza6Bo1taWiGG/lt7iK1vUkuba7vDHKsyJFdLEzFY9iev/wDBLbwXp/gD/gnV8GdK0xpZP7Q+H+n61eTNczXBlu9RiF/cyb5WdjunuZWxuwN2FAUBR5J+0R+zn4H/AGcf2SNJ/ZV/Ztj8YeE4/jGdG+G2g+B5JJ/EVp4etby+vb3WLwwyTSlXFjeambi5M7IEtbVVIWJM/bNjaW1hZxWVnAsUMMapFHGuFRQMAAdgBXRRjGD5Utlrtu/ku3Zbnh51jsRi6PtqtRz9pP3b82kaasfilN2bnJfHLWMveb1Mj4lfDvwl8WvAOsfDTx5pX27R9c0+Wz1C2E8kLNG6lSVkjZXicdVkRldGAZWVgCPl/QvGvhbxd8GNb+BX7bnjOTQPH3wFmh8VXviix08rcy6Vps8ktl4msRcm9aRJ7aB4bgBppA73cDgGQBvryvFf2qf2WtS+KOraf8c/grqdjovxS8M6dPZ6Tfakrtpuv6dL80+iavEmfPsZjyG2tJbS4miyfMjlqtGXxRV+67r/AIHT5rqceU4ynD/Z60nGLalGS+xNaX62jJaS0f2ZWfLyvwLTfgx8T/hB+0948tf+CfNn4X8H6D4f8DaT4rTwHYaJYzQ/Eu5vJNWMVr/aEpEml28b23lQrExghE+5Y40Yh/c/jZ+zV8QNI+It5+1D+yJrWl6H8Qr3T1tvE2i64sx0XxjDGoEIvY4nUxXkSqqRXyAyLHmFxJHsEXK/8E0PDf7I3h/wj4kl/Z/+Bcnw18ZXF9bJ8UPBOtXNxLq+kXiRHyLeU3LtJ9kCO8lqU2wNHM0kaKZJBX08c9qzo0YypXfXXRuy1e21tNHp6rc9LOc1xWHzTlUfgSi3UhHmmnGKftLOSmm1zRblLRpxkko2+d/Bf/BSX4LWEtv4S/at0vUfgb4uZpoptF+Jm2zsbiSGKJ55LLVc/Yr2BTLtWRJQzbTmNDxXvHhjxb4V8a6BZ+K/BvibT9W0vULdLjT9S0u8S4t7mFhlZI5EJV1IIIYEgjpR4q8JeFfHXh688JeNvDOn6xpOoQNDf6Xqtmlxb3MZ6pJHICrqe4IINfLX7WXwI/4Jlfs1eGvDnjj4h/smfCa1/tjxvpXh7TPtXh6z0+FZL2cQzSmRICo8i0+03IDgKfs2A8ZKutSlWoxbbTS6vT79H+SOGjRyvNK0aVGnUhUk7KMUqib/ALqbhJLycpvq5dvavjX+2P8Ast/s66Rcax8Z/jt4a0Jba3jnktLjVEku2jdlVWS3jLTSAlhyqHjnoCa801nxz+0Z+21Z33gD4WeEvFXwl+Hd3tttY+IWvQSaX4j1K3YyLNFo9o6+dYsQgX7dcKjKtwJLdGdRInrnwl/Zw/Zy+CM91N8Ffgl4P8MT3McUd9ceH/D9tazXAj8wxiV40DSFfPmYFiTmaQ9XYnusAdqrkrT+N2XZf5/5JERxmV4JXwtJyqdJ1LNLzVNJq/8AilNf3b6nwX+3f+z342/ZotNG+JfwSj1zSfg/pPg2w8M/EBfAN1PH4o8J6LaXk19NqOlXG5n/ANIZo1vnG+eRLeNjkhp4O6/YJ8LeFfjVp+sfED4jXk3xS8P+B/GEg+DPxK+J/gVrfXLW0e1tpLgQzXtpFM8ccwEf2xeZpIZPmCxoqfXLFQuW6V8gah8QrX/gpjq9z8D/AIATahY/AXQdWm0/4ieNNP32MHjZYvlOk6NcxHM1l5ySw3k6eWHVfLhkdJHZueVGNOrzJ77R/rp1emnR9D3MNnOJzTK5YeurOOs63VRbu29LyqvWMbSXPGUlKLfvx2P2ZbTTv21v2kZv+CgmqR/aPB/hO11Dwv8AAm1u9Lt8SQySRpqviJJCGmR7qW3FpCNybbW2Zimbtgv1RVLw34c0Dwd4esfCXhPQ7PTNL0uzitNN03T7VIbe0t40CRwxRoAqIqgKqqAAAAAAKu11U48kdd936/1t5HyuPxUcXiLwjywilGK7RW19rt6uTsrybdtQyc9KKKa5lDL5aKRu/ebmIwMHkccnOPT+h0OI8b/ac/Yw8G/H+/T4k+EvFmqeAfiZp+ltZaF8R/CszQ30MPmCVbW6VWUX1n5o3NbyHGHk8t4mcvXm0f7bn7Qf7Ktt/ZH/AAUD+AV7Ho9pcR2//C4PhxanUNDuFZS3n3VoGN3pypmKEl0cSzFvLG0rn6vpCqn7y5/CsZUfecoOz/B+q/ys/M9rCZtGNFYfG0lWpLZNuM4rryTV7eklOF9eS+p5x8Cf2wP2XP2m7SO5+Anx88K+KZJNPW+fT9K1qJ7yC3LBd81sSJoMMQpEiKQ3BAPFfGf/AAUR/wCCTniz9qX9pUa5+zd8N/C/gG2m8K32o+J/HF1MPsnifWJ5XaOynsoGEiOkkUcz3QjIkF47kvLbpHJ9X/H3/gnr+xV+0/qN5rnxv/Zv8M6xqmoRGO+1yKzNnqM6mJYvmvLZo52xGiIpL5UIoXGBXNeEv+CV37G3w9RIPh/4e8caEiQiKNNJ+L3iaAJGJfN2Lt1EbV8z59o43fN15rlxWFljKPsq0FJerX6O33nvcPcQYThjMFmOV4irRrJNWcIVEk1Z3ftIKVt0pU7Xs7XSNb9gn9nnwZ+x3+yV4c8CXngTR/COrWOkLL46uobpGS91JF/0q+e4LMXjkcPJHvIMcTImyIJ5aY/jv/gqV+yboevR+BfhF4j1D4ueKpoYZ7fwt8IbNdcuXgkkMfnGWNxbIikZfdMCi5cgKCRHaf8ABJD/AIJ9R/EZPizrHwBXXteVlLXnivxNqmsLNtBC+bFe3MscuM8b1bG1T1Vce+eC/A3gv4ceGLPwV8PfCGl6Do+nw+VY6To2nx2ttbJ/djijVVQewAFbU6deMFBJRS076fdFL8TzcbjMjxGKni6rq16k25PmUaSu9dXzVpSXzg7dep8w3v7N/wC1J+3SYm/bhWL4e/DmS1jaf4L+DvFLXN1qsmDkatqcEcJ2Ln/j3tXMbkI5kygB+pfDfhvw74N8PWPhHwjoNnpek6XZxWmmaZp1qsNvaW8ahI4Yo0AVEVQFVVAAAAAAFXaAQelbU6Uad3u3u3v/AF5Ky8jy8dmmIx8Y02lCnD4YRVoq+7tq231lJyk7K8nZBRRwTRWh5p//2Q==" style="width:50pt;height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact" alt="SIHF Stamp">
+          <div id="pdf-timestamp" style="font-size:5.5pt;color:#888;margin-top:2pt"></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+<!-- END PRINT DOC -->
+
+<!-- ═══════════════════════════ SCREEN UI ════════════════════════════════ -->
+<div class="hdr">
+  <div class="hdr-inner">
+    <div><h1>SARV INDIA HOME FURNISHING</h1><span>Plot 166, Sector-25, HUDA, Panipat | sarvindia.com</span></div>
+    <div class="hdr-tag">ORDER FORM</div>
+  </div>
+  <div class="meta-bar">
+    <span>Order: <b id="dON">—</b></span>
+    <span>Date: <b id="dD">—</b></span>
+    <span>GST: <b>06ADEPB4329A1ZC</b></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ORDER INFO -->
+  <div class="sl">Order Information</div>
+  <div class="card">
+    <div class="g2">
+      <div class="fg"><label>Order Date</label><input type="text" id="orderDate" placeholder="DD-MM-YYYY" oninput="syncMeta()"></div>
+      <div class="fg"><label>Order No.</label><input type="text" id="orderNo" readonly></div>
+      <div class="fg"><label>Payment Terms</label>
+        <div class="combo-wrap">
+          <input type="text" id="payTerms" placeholder="Select or type..." autocomplete="off"
+            oninput="filterCombo('payTerms')" onfocus="openCombo('payTerms')" onblur="delayClose('payTerms')">
+          <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="combo-list" id="payTerms-list"></div>
+        </div>
+      </div>
+      <div class="fg"><label>Delivery Terms</label>
+        <div class="combo-wrap">
+          <input type="text" id="delivTerms" placeholder="e.g. 1st Week of July 2026" autocomplete="off"
+            oninput="filterCombo('delivTerms')" onfocus="openCombo('delivTerms')" onblur="delayClose('delivTerms')">
+          <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="combo-list" id="delivTerms-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUYER -->
+  <div class="sl">Buyer Details</div>
+  <div class="card">
+    <div class="g2">
+      <div class="fg"><label>Buyer / Company Name</label>
+        <div class="combo-wrap">
+          <input type="text" id="buyerName" placeholder="Enter or select buyer" autocomplete="off"
+            oninput="filterCombo('buyerName');syncMeta()" onfocus="openCombo('buyerName')" onblur="delayClose('buyerName')">
+          <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="combo-list" id="buyerName-list"></div>
+        </div>
+      </div>
+      <div class="fg"><label>Mobile No.</label><input type="tel" id="buyerMobile" placeholder="+91 XXXXXXXXXX" oninput="syncMeta()"></div>
+      <div class="fg"><label>Address</label><textarea id="buyerAddress" placeholder="Complete billing address..." oninput="syncMeta()"></textarea></div>
+      <div class="fg"><label>GSTIN</label><input type="text" id="buyerGST" placeholder="15-digit GSTIN" oninput="syncMeta()"></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="sl">Product Line Items</div>
+  <div id="prodsContainer"></div>
+  <button class="btn-add" onclick="addProduct()">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M7.5 4.5v6M4.5 7.5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Add Another Product
+  </button>
+
+  <!-- BAGS SUMMARY -->
+  <div class="sl">Packing Materials Summary</div>
+  <div class="sum-title">Bags &amp; Trims — Supplied By</div>
+  <div style="overflow-x:auto">
+    <table class="sum-tbl">
+      <thead><tr><th>Product</th><th>Label</th><th>Bag</th><th>Bore</th><th>Inner Box</th><th>Outer Box</th><th>Trims/Pc</th></tr></thead>
+      <tbody id="bagsTbody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;font-size:12px">Add a product to see summary</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- BILL -->
+  <div class="bill">
+    <div class="bill-ttl">Final Bill Summary</div>
+    <div class="bill-row"><span class="bill-rl">Total Value (Excl. GST)</span><span class="bill-rv" id="bExGST">₹0.00</span></div>
+    <div class="bill-row"><span class="bill-rl" id="bGSTLabel">GST</span><span class="bill-rv" id="bGST">₹0.00</span></div>
+    <div id="bProdRows"></div>
+    <div class="bill-tot">
+      <div><div class="bill-tl">Grand Total Payable</div><div class="bill-tn">Inclusive of 5% GST</div></div>
+      <div class="bill-tv" id="bGrand">₹0.00</div>
+    </div>
+  </div>
+
+  <!-- TERMS + BANK -->
+  <div class="sl">Terms &amp; Bank Details</div>
+  <div class="card">
+    <div class="bank-box">
+      <h4>Bank Details — SARV INDIA HOME FURNISHING</h4>
+      <p><b>A/C No:</b> 50200053404079 &nbsp;|&nbsp; <b>IFSC:</b> HDFC0000171</p>
+      <p><b>Bank:</b> HDFC BANK, Harmony Tower, G.T. Road, Panipat &nbsp;|&nbsp; <b>Type:</b> Current Account</p>
+    </div>
+    <ul class="tlist">
+      <li>Prices are Ex-Factory Panipat. GST @ 5% applicable.</li>
+      <li>Any dispute subject to Panipat (HR) Jurisdiction only.</li>
+      <li>Sizes &amp; weights subject to ±5% tolerance.</li>
+      <li>Our responsibility ceases after goods leave the factory.</li>
+      <li>Material once sold will not be taken back under any circumstances.</li>
+    </ul>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="sl">Acknowledgement &amp; Signatures</div>
+  <div class="sig-row">
+    <div class="sig-box"><div class="sig-line"></div><div class="sig-lbl">Buyer's Signature</div></div>
+    <div class="sig-box"><div class="sig-line"></div><div class="sig-lbl">Prepared By (SIHF)</div></div>
+    <div class="sig-box"><div class="sig-line"></div><div class="sig-lbl">Authorised Signatory</div></div>
+  </div>
+
+</div><!-- end .wrap -->
+
+<!-- BOTTOM -->
+<div class="bnav">
+  <button class="btn-reset" onclick="resetForm()">↺</button>
+  <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    SUBMIT &amp; SAVE TO SHEET + PDF
+  </button>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-bg" id="successModal">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <h3>Order Submitted Successfully!</h3>
+    <span class="modal-orderNo" id="modalOrderNo">—</span>
+    <div class="modal-detail" id="modalDetail"></div>
+    <p>PDF saved to Drive. Click below to open &amp; print.</p>
+    <div class="modal-btns">
+      <button class="btn-open-pdf green" id="btnOpenPDF" onclick="openPDF()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2z" stroke="white" stroke-width="1.4"/><path d="M10 2v3h3" stroke="white" stroke-width="1.4"/><path d="M5.5 8.5h5M5.5 11h3" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Open PDF &amp; Print Preview
+      </button>
+      <button class="btn-open-pdf" id="btnDriveLink" onclick="openDrive()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-8h4l4 8H2z" stroke="white" stroke-width="1.4"/><path d="M6 12l2-4 2 4" stroke="white" stroke-width="1.4"/></svg>
+        View in Google Drive
+      </button>
+      <button class="btn-close-modal" onclick="closeModal()">Close &amp; Start New Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDXICGpvZiVhRQo5JBPISvKCfifyD5q_2JW5wVNuYLTnDzZj-3zsGhuKPiQljjKucFlw/exec';
+
+// ═══════════════════════════════ STATE ═══════════════════════════════════
+const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops';
+let prodCount=0, lastPdfUrl='', lastDriveUrl='';
+
+// Default dropdown data (used if Sheet not connected)
+let DROPS = {
+  buyerName:     [],
+  fabricCode:    ["2900","3100","3500","4000"],
+  category:      ["SEMI CLOUDY","SUPER SOFT","MINK","DOUBLE LAYER","SHERPA","POLAR FLEECE","CLOUDY"],
+  size:          ["210×230 CM","150×200 CM","200×220 CM","220×240 CM","60×90 CM (Baby)"],
+  sattan:        ['5" PREMIUM','4" STANDARD','3" BASIC'],
+  moq:           ["500 PCS/Colour","1000 PCS/Colour","2000 PCS/Colour"],
+  deliveryTerms: ["1st Week of July 2026","2nd Week of July 2026","August 2026","September 2026"],
+  paymentTerms:  ["30% Advance | Balance Before Dispatch","50% Advance | Balance Before Dispatch","100% Advance","Credit (Pre-approved)"],
+  design:        ["5 New Designs Single Matching Each Design","3 New Designs","Custom Design"],
+};
+
+const TRIMS=[{k:'label',n:'Label / Tag'},{k:'bag',n:'Bag'},{k:'bore',n:'Bore'},{k:'inner',n:'Inner Box'},{k:'outer',n:'Outer Box'}];
+const SUPP=[{v:'na',l:'Not Required'},{v:'buyer',l:'Buyer Supplied'},{v:'seller',l:'SIHF Supplied'},{v:'foc',l:'SIHF (FOC)'}];
+const fmt=n=>'₹'+Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtN=n=>Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ═══════════════════════════════ INIT ════════════════════════════════════
+window.onload=function(){
+  const d=new Date();
+  const dd=String(d.getDate()).padStart(2,'0'),mm=String(d.getMonth()+1).padStart(2,'0'),yy=d.getFullYear();
+  const ds=dd+'-'+mm+'-'+yy;
+  document.getElementById('orderDate').value=ds;
+  document.getElementById('orderNo').value='Loading...';
+  document.getElementById('dON').textContent='...';
+  document.getElementById('dD').textContent=ds;
+
+  // load cached drops
+  const cached=localStorage.getItem(LS_DROPS);
+  if(cached){ try{ DROPS=JSON.parse(cached); }catch(e){} }
+
+  // Bind combo lists
+  bindCombo('payTerms','paymentTerms');
+  bindCombo('delivTerms','deliveryTerms');
+  bindCombo('buyerName','buyerName');
+
+  addProduct();
+  syncMeta();
+
+  // fetch order no + dropdowns from sheet
+  if(APPS_SCRIPT_URL) fetchDrops();
+};
+
+// ═══════════════════════════ API ═════════════════════════════════════════
+function getApiUrl(){ return APPS_SCRIPT_URL; }
+
+async function fetchDrops(){
+  try{
+    const r=await fetch(getApiUrl(),{method:'GET',redirect:'follow'});
+    const j=await r.json();
+    if(j.dropdowns){ DROPS=j.dropdowns; localStorage.setItem(LS_DROPS,JSON.stringify(DROPS)); refreshAllCombos(); }
+    if(j.nextOrderNo){
+      document.getElementById('orderNo').value=j.nextOrderNo;
+      document.getElementById('dON').textContent=j.nextOrderNo;
+    }
+  } catch(e){ /* silent */ }
+}
+
+// ═══════════════════════ COMBO BOX ═══════════════════════════════════════
+const comboState={}; // {fieldId: {key, open}}
+
+function bindCombo(fieldId, dropKey){
+  comboState[fieldId]={key:dropKey,open:false};
+  renderComboList(fieldId, '');
+}
+
+function openCombo(fieldId){
+  const inp=document.getElementById(fieldId);
+  filterCombo(fieldId,inp?inp.value:'');
+  document.getElementById(fieldId+'-list').classList.add('open');
+}
+
+function filterCombo(fieldId, overrideVal){
+  const inp=document.getElementById(fieldId);
+  const val=(overrideVal!==undefined?overrideVal:(inp?inp.value:'')).toLowerCase().trim();
+  renderComboList(fieldId,val);
+  document.getElementById(fieldId+'-list').classList.add('open');
+}
+
+function renderComboList(fieldId, filter){
+  const state=comboState[fieldId]; if(!state) return;
+  const list=document.getElementById(fieldId+'-list'); if(!list) return;
+  const items=(DROPS[state.key]||[]);
+  const filtered=filter?items.filter(i=>i.toLowerCase().includes(filter)):items;
+  if(!filtered.length){
+    list.innerHTML=filter?`<div class="combo-opt no-match">Press Enter/Submit to add "${document.getElementById(fieldId)?.value||''}"</div>`:'<div class="combo-opt no-match">No options yet</div>';
+  } else {
+    list.innerHTML=filtered.map(v=>`<div class="combo-opt" onmousedown="selectCombo('${fieldId}','${v.replace(/'/g,"\\'")}')">
+      ${v}</div>`).join('');
+  }
+}
+
+function selectCombo(fieldId, val){
+  const inp=document.getElementById(fieldId); if(inp){ inp.value=val; inp.dispatchEvent(new Event('input')); }
+  document.getElementById(fieldId+'-list').classList.remove('open');
+}
+
+function delayClose(fieldId){ setTimeout(()=>{ const l=document.getElementById(fieldId+'-list'); if(l) l.classList.remove('open'); },200); }
+
+function refreshAllCombos(){
+  Object.keys(comboState).forEach(id=>{ renderComboList(id,''); });
+  // also refresh product combos
+  document.querySelectorAll('.product-card').forEach(c=>{
+    const id=c.id.replace('prod-','');
+    ['fabric','category','size','sattan','moq','design'].forEach(k=>{
+      const cid='p'+id+'-'+k;
+      if(comboState[cid]) renderComboList(cid,'');
+    });
+  });
+}
+
+function bindProductCombos(id){
+  bindCombo('p'+id+'-fabric','fabricCode');
+  bindCombo('p'+id+'-category','category');
+  bindCombo('p'+id+'-size','size');
+  bindCombo('p'+id+'-sattan','sattan');
+  bindCombo('p'+id+'-moq','moq');
+  bindCombo('p'+id+'-design','design');
+}
+
+// ═══════════════════════ ADD PRODUCT ═════════════════════════════════════
+function addProduct(){
+  prodCount++;
+  const id=prodCount;
+  const html=`
+  <div class="pc product-card" id="prod-${id}">
+    <div class="pc-hdr">
+      <div class="pc-title">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="white" stroke-width="1.4"/><path d="M5 3V2.5A1.5 1.5 0 0 1 6.5 1h3A1.5 1.5 0 0 1 11 2.5V3M5.5 7.5h5M5.5 10h3" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Product #${id}
+      </div>
+      <button class="btn-del" onclick="removeProd(${id})">🗑 Remove</button>
+    </div>
+    <div class="pc-body">
+      <div class="shd">Specifications</div>
+      <div class="g3">
+        <div class="fg"><label>Fabric Name / Code</label>
+          <div class="combo-wrap">
+            <input type="text" id="p${id}-fabric" placeholder="e.g. 2900" autocomplete="off"
+              oninput="filterCombo('p${id}-fabric');calcAll()" onfocus="openCombo('p${id}-fabric')" onblur="delayClose('p${id}-fabric')">
+            <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="combo-list" id="p${id}-fabric-list"></div>
+          </div>
+        </div>
+        <div class="fg"><label>Category</label>
+          <div class="combo-wrap">
+            <input type="text" id="p${id}-category" placeholder="Select or type..." autocomplete="off"
+              oninput="filterCombo('p${id}-category');calcAll()" onfocus="openCombo('p${id}-category')" onblur="delayClose('p${id}-category')">
+            <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="combo-list" id="p${id}-category-list"></div>
+          </div>
+        </div>
+        <div class="fg"><label>Final Weight (KG)</label>
+          <input type="number" id="p${id}-weight" placeholder="e.g. 3.2" step="0.1" oninput="calcAll()"></div>
+        <div class="fg"><label>Final Size</label>
+          <div class="combo-wrap">
+            <input type="text" id="p${id}-size" placeholder="e.g. 210×230 CM" autocomplete="off"
+              oninput="filterCombo('p${id}-size');calcAll()" onfocus="openCombo('p${id}-size')" onblur="delayClose('p${id}-size')">
+            <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="combo-list" id="p${id}-size-list"></div>
+          </div>
+        </div>
+        <div class="fg"><label>DB / SB</label>
+          <select id="p${id}-dbsb"><option value="DB">DB (Double)</option><option value="SB">SB (Single)</option></select></div>
+        <div class="fg"><label>Ply</label>
+          <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option></select></div>
+        <div class="fg"><label>Sattan</label>
+          <div class="combo-wrap">
+            <input type="text" id="p${id}-sattan" placeholder='e.g. 5" PREMIUM' autocomplete="off"
+              oninput="filterCombo('p${id}-sattan')" onfocus="openCombo('p${id}-sattan')" onblur="delayClose('p${id}-sattan')">
+            <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="combo-list" id="p${id}-sattan-list"></div>
+          </div>
+        </div>
+        <div class="fg"><label>MOQ</label>
+          <div class="combo-wrap">
+            <input type="text" id="p${id}-moq" placeholder="e.g. 1000 PCS/Colour" autocomplete="off"
+              oninput="filterCombo('p${id}-moq')" onfocus="openCombo('p${id}-moq')" onblur="delayClose('p${id}-moq')">
+            <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="combo-list" id="p${id}-moq-list"></div>
+          </div>
+        </div>
+        <div class="fg"><label>Emboss</label>
+          <select id="p${id}-emboss"><option value="NO">NO</option><option value="YES">YES</option></select></div>
+      </div>
+      <div class="fg"><label>Design Details</label>
+        <div class="combo-wrap">
+          <input type="text" id="p${id}-design" placeholder="e.g. 5 New Designs Single Matching" autocomplete="off"
+            oninput="filterCombo('p${id}-design');calcAll()" onfocus="openCombo('p${id}-design')" onblur="delayClose('p${id}-design')">
+          <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="combo-list" id="p${id}-design-list"></div>
+        </div>
+      </div>
+      <div class="shd">Pricing &amp; Delivery</div>
+      <div class="g3">
+        <div class="fg"><label>Quantity (Pcs)</label><input type="number" id="p${id}-qty" placeholder="0" min="0" oninput="calcAll()"></div>
+        <div class="fg"><label>Price (₹ / Qty)</label><input type="number" id="p${id}-price" placeholder="e.g. 215" step="0.5" oninput="calcAll()"></div>
+        <div class="fg"><label>GST %</label><input type="number" id="p${id}-gst" placeholder="e.g. 5" step="0.5" min="0" value="5" oninput="calcAll()"></div>
+        <div class="fg"><label>Delivery Date</label><input type="text" id="p${id}-delivery" placeholder="e.g. July 1st Week"></div>
+      </div>
+      <div class="shd">Bags &amp; Trims</div>
+      <table class="tt">
+        <thead><tr><th>Material</th><th>Supplied By</th><th style="text-align:right">Cost/Pc (₹)</th></tr></thead>
+        <tbody>
+          ${TRIMS.map(t=>`
+          <tr>
+            <td style="font-weight:600;font-size:13px">${t.n}</td>
+            <td><select class="trim-sel" id="p${id}-${t.k}-supp" onchange="onSupp(${id},'${t.k}')">
+              ${SUPP.map(o=>`<option value="${o.v}">${o.l}</option>`).join('')}
+            </select></td>
+            <td style="text-align:right">
+              <input type="number" class="trim-pi" id="p${id}-${t.k}-cost" placeholder="0" step="0.5" min="0" value="0" disabled oninput="calcAll()">
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="pst">
+        <div class="pst-item"><div class="pst-lbl">Price/Qty</div><div class="pst-val" id="p${id}-ppkg">₹0.00</div></div>
+        <div class="pst-item"><div class="pst-lbl">Final Price/Qty</div><div class="pst-val" id="p${id}-ppc">₹0.00</div></div>
+        <div class="pst-item"><div class="pst-lbl">Amount (Incl. GST)</div><div class="pst-val big" id="p${id}-ptot">₹0.00</div></div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('prodsContainer').insertAdjacentHTML('beforeend',html);
+  bindProductCombos(id);
+  calcAll();
+}
+
+function removeProd(id){
+  const el=document.getElementById('prod-'+id);
+  if(el){el.style.opacity='0';el.style.transition='.18s';setTimeout(()=>{el.remove();calcAll();},180);}
+}
+function onSupp(id,key){
+  const sel=document.getElementById('p'+id+'-'+key+'-supp');
+  const inp=document.getElementById('p'+id+'-'+key+'-cost');
+  if(sel.value==='seller'){inp.disabled=false;inp.style.background='#EFF6FF';inp.style.borderColor='#93C5FD';}
+  else{inp.disabled=true;inp.value=0;inp.style.background='';inp.style.borderColor='';}
+  calcAll();
+}
+
+// ═══════════════════════ CALC ═════════════════════════════════════════════
+function getProd(id){
+  const g=(s)=>document.getElementById(s)?.value||'';
+  const n=(s)=>parseFloat(document.getElementById(s)?.value)||0;
+  const qty=n('p'+id+'-qty'), price=n('p'+id+'-price'), gstPct=n('p'+id+'-gst');
+  let trimsCostPerPc=0; const trimStatus={}, trimData={};
+  TRIMS.forEach(t=>{
+    const supp=document.getElementById('p'+id+'-'+t.k+'-supp')?.value||'na';
+    const costPerPc=supp==='seller'?(n('p'+id+'-'+t.k+'-cost')):0;
+    trimsCostPerPc+=costPerPc; trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc};
+  });
+  const trimsCostTotal=qty*trimsCostPerPc;
+  const exGST=(qty*price)+trimsCostTotal;
+  const gstAmt=exGST*(gstPct/100);
+  const amount=exGST+gstAmt;
+  const finalPricePerQty=qty?(exGST/qty):0;
+  return {
+    id, qty, price, gstPct, trimsCostPerPc, trimsCostTotal, exGST, gstAmt, amount, finalPricePerQty,
+    trimStatus, trimData,
+    weight:n('p'+id+'-weight'),
+    fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
+    dbsb:g('p'+id+'-dbsb'), ply:g('p'+id+'-ply'), sattan:g('p'+id+'-sattan'),
+    moq:g('p'+id+'-moq'), emboss:g('p'+id+'-emboss'), design:g('p'+id+'-design'),
+    delivery:g('p'+id+'-delivery'),
+  };
+}
+
+function calcAll(){
+  const cards=document.querySelectorAll('.product-card');
+  let grandEx=0, grandGst=0, pwRows=''; const prods=[];
+  cards.forEach(c=>{
+    const id=c.id.replace('prod-',''); const p=getProd(id);
+    grandEx+=p.exGST; grandGst+=p.gstAmt; prods.push(p);
+    const set=(s,v)=>{const el=document.getElementById(s);if(el)el.textContent=v;};
+    set('p'+id+'-ppkg',fmt(p.price));
+    set('p'+id+'-ppc',fmt(p.finalPricePerQty));
+    set('p'+id+'-ptot',fmt(p.amount));
+    pwRows+=`<div class="bill-row"><span class="bill-rl">${p.fabric||'Prod #'+id} (${p.qty} pcs × ${fmt(p.finalPricePerQty)}/qty)</span><span class="bill-rv">${fmt(p.amount)}</span></div>`;
+  });
+  const grand=grandEx+grandGst;
+  const gstPcts=[...new Set(prods.map(p=>p.gstPct))];
+  const gstLabel=gstPcts.length===1?('GST @ '+gstPcts[0]+'%'):'GST (Mixed)';
+  document.getElementById('bGSTLabel').textContent=gstLabel;
+  document.getElementById('bExGST').textContent=fmt(grandEx);
+  document.getElementById('bGST').textContent  =fmt(grandGst);
+  document.getElementById('bGrand').textContent=fmt(grand);
+  document.getElementById('bProdRows').innerHTML=pwRows;
+  updateBagsTable(prods);
+  updatePdfDoc(prods,grand);
+}
+
+function updateBagsTable(prods){
+  const tb=document.getElementById('bagsTbody');
+  if(!prods.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;font-size:12px">Add a product to see summary</td></tr>';return;}
+  const b=v=>({buyer:'<span class="bd-y">Buyer</span>',seller:'<span class="bd-y">SIHF</span>',foc:'<span class="bd-f">FOC</span>'}[v]||'<span class="bd-n">—</span>');
+  tb.innerHTML=prods.map(p=>`<tr>
+    <td><b>${p.fabric||'Prod #'+p.id}</b><br><span style="font-size:11px;color:var(--muted)">${p.qty} pcs</span></td>
+    <td>${b(p.trimStatus.label)}</td><td>${b(p.trimStatus.bag)}</td>
+    <td>${b(p.trimStatus.bore)}</td><td>${b(p.trimStatus.inner)}</td>
+    <td>${b(p.trimStatus.outer)}</td>
+    <td><b style="font-family:'DM Mono',monospace;color:var(--navy)">${fmt(p.trimsCostTotal)}</b></td>
+  </tr>`).join('');
+}
+
+// ═══════════════════ SYNC PDF DOC ════════════════════════════════════════
+function syncMeta(){
+  const s=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
+  s('pdf-bn',document.getElementById('buyerName')?.value);
+  s('pdf-mob',document.getElementById('buyerMobile')?.value);
+  s('pdf-addr',document.getElementById('buyerAddress')?.value);
+  s('pdf-gst',document.getElementById('buyerGST')?.value);
+  s('pdf-on',document.getElementById('orderNo')?.value);
+  s('pdf-od',document.getElementById('orderDate')?.value);
+  s('pdf-pt',document.getElementById('payTerms')?.value);
+  s('pdf-dt',document.getElementById('delivTerms')?.value);
+}
+
+function updatePdfDoc(prods,grand){
+  // Items
+  const ib=document.getElementById('pdf-items-body');
+  if(ib) ib.innerHTML=prods.map((p,i)=>{
+    return `<tr style="${i%2===1?'background:#F8FAFC':''}">
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E">${p.fabric||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.category}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.weight?p.weight+' KG':'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.size}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.dbsb}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.ply}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.sattan||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:left">${p.design||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.moq||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.emboss}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">₹${p.price?fmtN(p.price):'—'}/Qty</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.gstPct}%</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.delivery||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A;white-space:nowrap">${p.amount?'₹'+fmtN(p.amount):'—'}</td>
+    </tr>`;
+  }).join('');
+
+  const gt=document.getElementById('pdf-grand');
+  if(gt) gt.textContent=grand?'₹'+fmtN(grand):'₹0.00';
+
+  // Pack table
+  const pb=document.getElementById('pdf-pack-body');
+  if(pb) pb.innerHTML=prods.map((p,i)=>{
+    const bLbl=k=>{const v=p.trimStatus[k]; return v==='buyer'?'YES':'NO';};
+    const sLbl=k=>{const v=p.trimStatus[k],c=p.trimData[k]?.cost||0; if(v==='seller') return c?'YES(₹'+c+')':'NO'; if(v==='foc') return 'FOC'; return 'NO';};
+    return `<tr style="${i%2===1?'background:#F8FAFC':''}">
+      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
+      ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${bLbl(k)==='YES'?'#1B6B3A':'#999'}">${bLbl(k)}</td>`).join('')}
+      ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${sLbl(k)!=='NO'?'#1B6B3A':'#999'}">${sLbl(k)}</td>`).join('')}
+      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E">₹${p.finalPricePerQty?fmtN(p.finalPricePerQty):'0'}/Qty</td>
+      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A">${p.amount?'₹'+fmtN(p.amount):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════ COLLECT PAYLOAD ════════════════════════════════
+function collectPayload(){
+  const cards=document.querySelectorAll('.product-card');
+  const prods=[]; let totalExGST=0, totalGst=0;
+  cards.forEach(c=>{
+    const id=c.id.replace('prod-',''); const p=getProd(id);
+    totalExGST+=p.exGST; totalGst+=p.gstAmt;
+    prods.push({
+      fabric:p.fabric,category:p.category,weight:p.weight,size:p.size,
+      dbsb:p.dbsb,ply:p.ply,sattan:p.sattan,moq:p.moq,emboss:p.emboss,
+      design:p.design,qty:p.qty,price:p.price,gstPct:p.gstPct,delivery:p.delivery,
+      trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
+    });
+  });
+  return {
+    orderNo:       document.getElementById('orderNo').value,
+    orderDate:     document.getElementById('orderDate').value,
+    buyerName:     document.getElementById('buyerName').value,
+    buyerMobile:   document.getElementById('buyerMobile').value,
+    buyerAddress:  document.getElementById('buyerAddress').value,
+    buyerGST:      document.getElementById('buyerGST').value,
+    paymentTerms:  document.getElementById('payTerms').value,
+    deliveryTerms: document.getElementById('delivTerms').value,
+    products:      prods,
+    summary:{exGST:totalExGST.toFixed(2),gst:totalGst.toFixed(2),grandTotal:(totalExGST+totalGst).toFixed(2)},
+  };
+}
+
+// ═══════════════════════ HANDLE SUBMIT ═══════════════════════════════════
+async function handleSubmit(){
+  const url=getApiUrl();
+  if(!url){ toast('⚠️ Set APPS_SCRIPT_URL in HTML file'); return; }
+  const payload=collectPayload();
+  if(!payload.buyerName.trim()){ toast('⚠️ Enter Buyer Name'); document.getElementById('buyerName').focus(); return; }
+  if(!payload.products.length){ toast('⚠️ Add at least one product'); return; }
+
+  // Update local DROPS with any new values entered
+  updateLocalDrops(payload);
+
+  const btn=document.getElementById('btnSubmit');
+  btn.disabled=true;
+  btn.innerHTML='<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="white" stroke-width="1.5" stroke-dasharray="4 4"><animateTransform attributeName="transform" type="rotate" from="0 9 9" to="360 9 9" dur=".8s" repeatCount="indefinite"/></circle></svg> Saving & Generating PDF...';
+
+  try{
+    const resp=await fetch(url,{method:'POST',redirect:'follow',body:JSON.stringify(payload)});
+    const data=await resp.json();
+
+    if(data.success){
+      lastPdfUrl  = data.pdfUrl   || '';
+      lastDriveUrl= data.driveUrl || '';
+
+      // Show success modal
+      document.getElementById('modalOrderNo').textContent=data.orderNo;
+      document.getElementById('modalDetail').innerHTML=`
+        <span><b>Saved At</b><em>${data.savedAt}</em></span>
+        <span><b>File Name</b><em>${data.fileName||'—'}</em></span>
+        <span><b>Grand Total</b><em>₹${Number(payload.summary.grandTotal).toLocaleString('en-IN',{minimumFractionDigits:2})}</em></span>
+      `;
+      document.getElementById('successModal').classList.add('open');
+    } else {
+      toast('❌ '+(data.error||'Submit failed. Check Sheet API logs.'));
+    }
+  } catch(err){
+    toast('❌ Network error: '+err.message);
+  } finally {
+    btn.disabled=false;
+    btn.innerHTML='<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> SUBMIT &amp; SAVE TO SHEET + PDF';
+  }
+}
+
+function openPDF(){
+  if(lastPdfUrl){ window.open(lastPdfUrl,'_blank'); }
+  else{ toast('PDF URL not available. Check Drive.'); }
+  closeModal();
+  // auto trigger print after opening — handled by user in Drive viewer
+}
+
+function openDrive(){
+  if(lastDriveUrl){ window.open(lastDriveUrl,'_blank'); }
+  closeModal();
+}
+
+function closeModal(){
+  document.getElementById('successModal').classList.remove('open');
+}
+
+// ════════════════ UPDATE LOCAL DROPDOWN STATE ═════════════════════════════
+function updateLocalDrops(payload){
+  const add=(key,val)=>{
+    if(!val||!String(val).trim()) return;
+    val=String(val).trim();
+    if(!DROPS[key]) DROPS[key]=[];
+    if(!DROPS[key].includes(val)) DROPS[key].push(val);
+  };
+  add('buyerName',    payload.buyerName);
+  add('deliveryTerms',payload.deliveryTerms);
+  add('paymentTerms', payload.paymentTerms);
+  payload.products.forEach(p=>{
+    add('fabricCode', p.fabric);
+    add('category',   p.category);
+    add('size',       p.size);
+    add('sattan',     p.sattan);
+    add('moq',        p.moq);
+    add('design',     p.design);
+  });
+  localStorage.setItem(LS_DROPS,JSON.stringify(DROPS));
+  refreshAllCombos();
+}
+
+// ══════════════════════ RESET ════════════════════════════════════════════
+function resetForm(){
+  if(!confirm('Reset entire form? All data will be cleared.')) return;
+  document.getElementById('prodsContainer').innerHTML='';
+  prodCount=0;
+  ['buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  addProduct(); syncMeta();
+}
+
+// ══════════════════════ TOAST ═════════════════════════════════════════════
+let toastT;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
