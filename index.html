@@ -224,6 +224,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <td style="width:50%;border:0.5pt solid #ccc;vertical-align:top">
         <div style="background:#1A3C5E;color:#fff;font-weight:700;font-size:8pt;padding:4pt 8pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">BUYER DETAILS</div>
         <div style="padding:6pt 8pt">
+          <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Sale Channel:</b> <span id="pdf-sc">—</span></div>
+          <div style="margin-bottom:4pt" id="pdf-agency-row"><b style="color:#1A3C5E">Agency Name:</b> <span id="pdf-an">—</span></div>
           <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Buyer Name:</b> <span id="pdf-bn">—</span></div>
           <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Mobile:</b> <span id="pdf-mob">—</span></div>
           <div style="margin-bottom:4pt"><b style="color:#1A3C5E">Address:</b> <span id="pdf-addr">—</span></div>
@@ -259,8 +261,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Emboss</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Qty</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">Price(₹/Qty)</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Disc%</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">GST%</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Delivery</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Amount</th>
       </tr>
     </thead>
@@ -385,6 +387,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <!-- BUYER -->
   <div class="sl">Buyer Details</div>
   <div class="card">
+    <div class="fg"><label>Sale Channel</label>
+      <select id="saleChannel" onchange="onSaleChannelChange();syncMeta()">
+        <option value="Direct Sale">Direct Sale</option>
+        <option value="Through Agency">Through Agency</option>
+      </select>
+    </div>
+    <div class="fg" id="agencyNameWrap" style="display:none"><label>Agency Name</label>
+      <input type="text" id="agencyName" placeholder="Enter agency name" oninput="syncMeta()">
+    </div>
     <div class="g2">
       <div class="fg"><label>Buyer / Company Name</label>
         <div class="combo-wrap">
@@ -495,7 +506,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDXICGpvZiVhRQo5JBPISvKCfifyD5q_2JW5wVNuYLTnDzZj-3zsGhuKPiQljjKucFlw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbye4aVdE5-Wf5hckqMOOySkg6oRWiB9iFO0ijffgGwo8NdD-JzMo7JyzKykvwlygf_b8A/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops';
@@ -699,8 +710,8 @@ function addProduct(){
       <div class="g3">
         <div class="fg"><label>Quantity (Pcs)</label><input type="number" id="p${id}-qty" placeholder="0" min="0" oninput="calcAll()"></div>
         <div class="fg"><label>Price (₹ / Qty)</label><input type="number" id="p${id}-price" placeholder="e.g. 215" step="0.5" oninput="calcAll()"></div>
+        <div class="fg"><label>Discount % on Price</label><input type="number" id="p${id}-discount" placeholder="0" min="0" max="100" step="0.1" value="0" oninput="calcAll()"></div>
         <div class="fg"><label>GST %</label><input type="number" id="p${id}-gst" placeholder="e.g. 5" step="0.5" min="0" value="5" oninput="calcAll()"></div>
-        <div class="fg"><label>Delivery Date</label><input type="text" id="p${id}-delivery" placeholder="e.g. July 1st Week"></div>
       </div>
       <div class="shd">Bags &amp; Trims</div>
       <table class="tt">
@@ -747,6 +758,8 @@ function getProd(id){
   const g=(s)=>document.getElementById(s)?.value||'';
   const n=(s)=>parseFloat(document.getElementById(s)?.value)||0;
   const qty=n('p'+id+'-qty'), price=n('p'+id+'-price'), gstPct=n('p'+id+'-gst');
+  const discount=n('p'+id+'-discount');
+  const effectivePrice=price*(1-discount/100);
   let trimsCostPerPc=0; const trimStatus={}, trimData={};
   TRIMS.forEach(t=>{
     const supp=document.getElementById('p'+id+'-'+t.k+'-supp')?.value||'na';
@@ -754,18 +767,18 @@ function getProd(id){
     trimsCostPerPc+=costPerPc; trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc};
   });
   const trimsCostTotal=qty*trimsCostPerPc;
-  const exGST=(qty*price)+trimsCostTotal;
+  const exGST=(qty*effectivePrice)+trimsCostTotal;
   const gstAmt=exGST*(gstPct/100);
   const amount=exGST+gstAmt;
   const finalPricePerQty=qty?(exGST/qty):0;
   return {
-    id, qty, price, gstPct, trimsCostPerPc, trimsCostTotal, exGST, gstAmt, amount, finalPricePerQty,
+    id, qty, price, discount, effectivePrice, gstPct,
+    trimsCostPerPc, trimsCostTotal, exGST, gstAmt, amount, finalPricePerQty,
     trimStatus, trimData,
     weight:n('p'+id+'-weight'),
     fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
     dbsb:g('p'+id+'-dbsb'), ply:g('p'+id+'-ply'), sattan:g('p'+id+'-sattan'),
     moq:g('p'+id+'-moq'), emboss:g('p'+id+'-emboss'), design:g('p'+id+'-design'),
-    delivery:g('p'+id+'-delivery'),
   };
 }
 
@@ -776,7 +789,7 @@ function calcAll(){
     const id=c.id.replace('prod-',''); const p=getProd(id);
     grandEx+=p.exGST; grandGst+=p.gstAmt; prods.push(p);
     const set=(s,v)=>{const el=document.getElementById(s);if(el)el.textContent=v;};
-    set('p'+id+'-ppkg',fmt(p.price));
+    set('p'+id+'-ppkg', fmt(p.effectivePrice)+(p.discount>0?' (-'+p.discount+'%)':''));
     set('p'+id+'-ppc',fmt(p.finalPricePerQty));
     set('p'+id+'-ptot',fmt(p.amount));
     pwRows+=`<div class="bill-row"><span class="bill-rl">${p.fabric||'Prod #'+id} (${p.qty} pcs × ${fmt(p.finalPricePerQty)}/qty)</span><span class="bill-rv">${fmt(p.amount)}</span></div>`;
@@ -809,6 +822,12 @@ function updateBagsTable(prods){
 // ═══════════════════ SYNC PDF DOC ════════════════════════════════════════
 function syncMeta(){
   const s=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
+  const sc=document.getElementById('saleChannel')?.value||'Direct Sale';
+  const an=document.getElementById('agencyName')?.value||'';
+  s('pdf-sc', sc);
+  s('pdf-an', an);
+  const agencyRow=document.getElementById('pdf-agency-row');
+  if(agencyRow) agencyRow.style.display=(sc==='Through Agency')?'':'none';
   s('pdf-bn',document.getElementById('buyerName')?.value);
   s('pdf-mob',document.getElementById('buyerMobile')?.value);
   s('pdf-addr',document.getElementById('buyerAddress')?.value);
@@ -817,6 +836,12 @@ function syncMeta(){
   s('pdf-od',document.getElementById('orderDate')?.value);
   s('pdf-pt',document.getElementById('payTerms')?.value);
   s('pdf-dt',document.getElementById('delivTerms')?.value);
+}
+
+function onSaleChannelChange(){
+  const sc=document.getElementById('saleChannel')?.value;
+  const wrap=document.getElementById('agencyNameWrap');
+  if(wrap) wrap.style.display=(sc==='Through Agency')?'':'none';
 }
 
 function updatePdfDoc(prods,grand){
@@ -836,9 +861,9 @@ function updatePdfDoc(prods,grand){
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.moq||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.emboss}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">₹${p.price?fmtN(p.price):'—'}/Qty</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">₹${p.effectivePrice?fmtN(p.effectivePrice):'—'}/Qty${p.discount>0?`<br><small style="color:#D4870A;font-size:5.5pt">${fmtN(p.price)}-${p.discount}%</small>`:''}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">${p.discount>0?p.discount+'%':'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.gstPct}%</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.delivery||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A;white-space:nowrap">${p.amount?'₹'+fmtN(p.amount):'—'}</td>
     </tr>`;
   }).join('');
@@ -871,13 +896,16 @@ function collectPayload(){
     prods.push({
       fabric:p.fabric,category:p.category,weight:p.weight,size:p.size,
       dbsb:p.dbsb,ply:p.ply,sattan:p.sattan,moq:p.moq,emboss:p.emboss,
-      design:p.design,qty:p.qty,price:p.price,gstPct:p.gstPct,delivery:p.delivery,
+      design:p.design,qty:p.qty,price:p.price,discount:p.discount,
+      effectivePrice:p.effectivePrice,gstPct:p.gstPct,
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
     });
   });
   return {
     orderNo:       document.getElementById('orderNo').value,
     orderDate:     document.getElementById('orderDate').value,
+    saleChannel:   document.getElementById('saleChannel').value,
+    agencyName:    document.getElementById('agencyName').value||'',
     buyerName:     document.getElementById('buyerName').value,
     buyerMobile:   document.getElementById('buyerMobile').value,
     buyerAddress:  document.getElementById('buyerAddress').value,
@@ -975,9 +1003,11 @@ function resetForm(){
   if(!confirm('Reset entire form? All data will be cleared.')) return;
   document.getElementById('prodsContainer').innerHTML='';
   prodCount=0;
-  ['buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms'].forEach(id=>{
+  ['agencyName','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
+  const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
+  const aw=document.getElementById('agencyNameWrap'); if(aw) aw.style.display='none';
   addProduct(); syncMeta();
 }
 
