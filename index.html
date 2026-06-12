@@ -223,16 +223,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     <tr>
       <td style="width:38%;border:0.5pt solid #ccc;vertical-align:top">
         <div style="background:#1A3C5E;color:#fff;font-weight:700;font-size:7.5pt;padding:3pt 8pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">BUYER DETAILS</div>
+        <div id="pdf-agency-block" style="display:none;border-bottom:0.5pt solid #ccc;padding:4pt 8pt;background:#F0F7FF;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+          <div style="font-weight:700;color:#1A3C5E;font-size:6.5pt;text-transform:uppercase;margin-bottom:2pt">Agency Details</div>
+          <table style="width:100%;border-collapse:collapse"><tr>
+            <td style="vertical-align:top;width:40%"><b style="color:#1A3C5E">Agency:</b> <span id="pdf-an">—</span></td>
+            <td style="vertical-align:top;width:35%"><b style="color:#1A3C5E">Contact:</b> <span id="pdf-ac">—</span></td>
+            <td style="vertical-align:top;width:25%"><b style="color:#1A3C5E">Mobile:</b> <span id="pdf-am">—</span></td>
+          </tr></table>
+        </div>
         <table style="width:100%;border-collapse:collapse"><tr>
           <td style="vertical-align:top;padding:5pt 4pt 5pt 8pt;width:55%">
             <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Sale Channel:</b> <span id="pdf-sc">—</span></div>
-            <div style="margin-bottom:3pt" id="pdf-agency-row"><b style="color:#1A3C5E">Agency Name:</b> <span id="pdf-an">—</span></div>
-            <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Company Name:</b> <span id="pdf-company">—</span></div>
+            <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Buyer / Company:</b> <span id="pdf-bn">—</span></div>
             <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Address:</b> <span id="pdf-addr">—</span></div>
             <div><b style="color:#1A3C5E">GST No.:</b> <span id="pdf-gst">—</span></div>
           </td>
           <td style="vertical-align:top;padding:5pt 8pt 5pt 4pt;width:45%">
-            <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Buyer Name:</b> <span id="pdf-bn">—</span></div>
             <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Contact Person:</b> <span id="pdf-contact">—</span></div>
             <div><b style="color:#1A3C5E">Mobile:</b> <span id="pdf-mob">—</span></div>
           </td>
@@ -275,15 +281,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">MOQ</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Emboss</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Qty</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Pack</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">Price(₹/KG)</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Disc%</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">GST%</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Amount</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%">Amount</th>
       </tr>
     </thead>
     <tbody id="pdf-items-body"></tbody>
     <tfoot><tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-      <td colspan="15" style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:9pt">TOTAL AMOUNT (Incl. GST)</td>
+      <td colspan="16" style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:9pt">TOTAL AMOUNT (Incl. GST)</td>
       <td style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:10pt" id="pdf-grand">₹0.00</td>
     </tr></tfoot>
   </table>
@@ -402,8 +409,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         <option value="Through Agency">Through Agency</option>
       </select>
     </div>
-    <div class="fg" id="agencyNameWrap" style="display:none"><label>Agency Name</label>
-      <input type="text" id="agencyName" placeholder="Enter agency name" oninput="syncMeta()">
+    <div id="agencyWrap" style="display:none">
+      <div class="g3">
+        <div class="fg"><label>Agency Name</label><input type="text" id="agencyName" placeholder="Enter agency name" oninput="syncMeta()"></div>
+        <div class="fg"><label>Agency Contact Person</label><input type="text" id="agencyContact" placeholder="Agency contact person" oninput="syncMeta()"></div>
+        <div class="fg"><label>Agency Mobile No.</label><input type="tel" id="agencyMobile" placeholder="+91 XXXXXXXXXX" oninput="syncMeta()"></div>
+      </div>
     </div>
     <div class="g2">
       <div class="fg"><label>Buyer / Company Name</label>
@@ -415,7 +426,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         </div>
       </div>
       <div class="fg"><label>Mobile No.</label><input type="tel" id="buyerMobile" placeholder="+91 XXXXXXXXXX" oninput="syncMeta()"></div>
-      <div class="fg"><label>Company Name</label><input type="text" id="companyName" placeholder="Company / Business Name" oninput="syncMeta()"></div>
       <div class="fg"><label>Contact Person Name</label><input type="text" id="contactPerson" placeholder="Contact Person Name" oninput="syncMeta()"></div>
       <div class="fg"><label>Address</label><textarea id="buyerAddress" placeholder="Complete billing address..." oninput="syncMeta()"></textarea></div>
       <div class="fg"><label>GSTIN</label><input type="text" id="buyerGST" placeholder="15-digit GSTIN" oninput="syncMeta()"></div>
@@ -518,7 +528,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3ckOhOJxJFnGJ3fpRiu4SBHyxvx2t-oTr615ckGd2cpvBT0Wq469Pob_BZZZHJzR7/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGyTjj47GG98mOz9umtQY7IxQuH05K4nRBs-UYfg5iOvc0gPuRlyrZuvIcVP5BH-Ff/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -648,6 +658,7 @@ function onItemCodeSelect(id, code){
   setV('p'+id+'-moq',     item.moq);
   setS('p'+id+'-emboss',  item.emboss);
   const pEl=document.getElementById('p'+id+'-price'); if(pEl) pEl.value=item.price;
+  const ppEl=document.getElementById('p'+id+'-packPcs'); if(ppEl && item.packPcs) ppEl.value=item.packPcs;
   suppressCombo=false;
   calcAll();
   toast('✓ Item '+code+' loaded');
@@ -762,6 +773,16 @@ function addProduct(){
       </div>
       <div class="shd">Pricing &amp; Delivery</div>
       <div class="g3">
+        <div class="fg"><label>Pack Type</label>
+          <select id="p${id}-packType">
+            <option value="Bora">Bora</option>
+            <option value="Bale">Bale</option>
+            <option value="Box">Box</option>
+            <option value="Loose">Loose</option>
+          </select>
+        </div>
+        <div class="fg"><label>No. of Packs</label><input type="number" id="p${id}-packs" placeholder="0" min="0" oninput="calcPackQty(${id})"></div>
+        <div class="fg"><label>Packing (pcs/pack)</label><input type="number" id="p${id}-packPcs" placeholder="0" min="0" oninput="calcPackQty(${id})"></div>
         <div class="fg"><label>Quantity (Pcs)</label><input type="number" id="p${id}-qty" placeholder="0" min="0" oninput="calcAll()"></div>
         <div class="fg"><label>Price (₹ / KG)</label><input type="number" id="p${id}-price" placeholder="e.g. 215" step="0.5" oninput="calcAll()"></div>
         <div class="fg"><label>Discount % on Price</label><input type="number" id="p${id}-discount" placeholder="0" min="0" max="100" step="0.1" value="0" oninput="calcAll()"></div>
@@ -769,7 +790,7 @@ function addProduct(){
       </div>
       <div class="shd">Bags &amp; Trims</div>
       <table class="tt">
-        <thead><tr><th>Material</th><th>Supplied By</th><th style="text-align:right">Cost/Pc (₹)</th></tr></thead>
+        <thead><tr><th>Material</th><th>Supplied By</th><th>No. of Pcs</th><th style="text-align:right">Cost/Pc (₹)</th></tr></thead>
         <tbody>
           ${TRIMS.map(t=>`
           <tr>
@@ -777,6 +798,9 @@ function addProduct(){
             <td><select class="trim-sel" id="p${id}-${t.k}-supp" onchange="onSupp(${id},'${t.k}')">
               ${SUPP.map(o=>`<option value="${o.v}">${o.l}</option>`).join('')}
             </select></td>
+            <td>
+              <input type="number" class="trim-pi" id="p${id}-${t.k}-pcs" placeholder="0" min="0" value="0" disabled oninput="calcAll()" style="width:70px">
+            </td>
             <td style="text-align:right">
               <input type="number" class="trim-pi" id="p${id}-${t.k}-cost" placeholder="0" step="0.5" min="0" value="0" disabled oninput="calcAll()">
             </td>
@@ -802,8 +826,22 @@ function removeProd(id){
 function onSupp(id,key){
   const sel=document.getElementById('p'+id+'-'+key+'-supp');
   const inp=document.getElementById('p'+id+'-'+key+'-cost');
-  if(sel.value==='seller'){inp.disabled=false;inp.style.background='#EFF6FF';inp.style.borderColor='#93C5FD';}
-  else{inp.disabled=true;inp.value=0;inp.style.background='';inp.style.borderColor='';}
+  const pcsInp=document.getElementById('p'+id+'-'+key+'-pcs');
+  if(sel.value==='seller'){
+    inp.disabled=false;inp.style.background='#EFF6FF';inp.style.borderColor='#93C5FD';
+    if(pcsInp){pcsInp.disabled=false;pcsInp.style.background='#EFF6FF';pcsInp.style.borderColor='#93C5FD';const autoVal=key==='outer'?(parseFloat(document.getElementById('p'+id+'-packs')?.value)||0):(parseFloat(document.getElementById('p'+id+'-qty')?.value)||0);pcsInp.value=autoVal;}
+  } else {
+    inp.disabled=true;inp.value=0;inp.style.background='';inp.style.borderColor='';
+    if(pcsInp){pcsInp.disabled=true;pcsInp.value=0;pcsInp.style.background='';pcsInp.style.borderColor='';}
+  }
+  calcAll();
+}
+
+function calcPackQty(id){
+  const packs=parseFloat(document.getElementById('p'+id+'-packs')?.value)||0;
+  const pcsPerPack=parseFloat(document.getElementById('p'+id+'-packPcs')?.value)||0;
+  const qtyEl=document.getElementById('p'+id+'-qty');
+  if(qtyEl) qtyEl.value=packs*pcsPerPack;
   calcAll();
 }
 
@@ -816,20 +854,23 @@ function getProd(id){
   const weight=n('p'+id+'-weight');
   const effectivePricePerKg=price*(1-discount/100);
   const pricePerPc=effectivePricePerKg*weight;
-  let trimsCostPerPc=0; const trimStatus={}, trimData={};
+  let trimsCostPerPc=0, trimsCostTotal=0; const trimStatus={}, trimData={};
   TRIMS.forEach(t=>{
     const supp=document.getElementById('p'+id+'-'+t.k+'-supp')?.value||'na';
     const costPerPc=supp==='seller'?(n('p'+id+'-'+t.k+'-cost')):0;
-    trimsCostPerPc+=costPerPc; trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc};
+    const trimPcs=supp==='seller'?(n('p'+id+'-'+t.k+'-pcs')):0;
+    trimsCostPerPc+=costPerPc; trimsCostTotal+=trimPcs*costPerPc;
+    trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc,pcs:trimPcs};
   });
-  const trimsCostTotal=qty*trimsCostPerPc;
   const fabricCost=qty*pricePerPc;
   const exGST=fabricCost+trimsCostTotal;
   const gstAmt=exGST*(gstPct/100);
   const amount=exGST+gstAmt;
   const finalPricePerQty=qty?(exGST/qty):0;
+  const packType=g('p'+id+'-packType');
+  const packs=n('p'+id+'-packs'), packPcs=n('p'+id+'-packPcs');
   return {
-    id, qty, price, discount, effectivePricePerKg, pricePerPc, weight, gstPct,
+    id, qty, packs, packPcs, price, discount, effectivePricePerKg, pricePerPc, weight, gstPct, packType,
     trimsCostPerPc, trimsCostTotal, exGST, gstAmt, amount, finalPricePerQty,
     trimStatus, trimData,
     fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
@@ -879,13 +920,13 @@ function updateBagsTable(prods){
 function syncMeta(){
   const s=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
   const sc=document.getElementById('saleChannel')?.value||'Direct Sale';
-  const an=document.getElementById('agencyName')?.value||'';
   s('pdf-sc', sc);
-  s('pdf-an', an);
-  const agencyRow=document.getElementById('pdf-agency-row');
-  if(agencyRow) agencyRow.style.display=(sc==='Through Agency')?'':'none';
+  s('pdf-an', document.getElementById('agencyName')?.value);
+  s('pdf-ac', document.getElementById('agencyContact')?.value);
+  s('pdf-am', document.getElementById('agencyMobile')?.value);
+  const agencyBlock=document.getElementById('pdf-agency-block');
+  if(agencyBlock) agencyBlock.style.display=(sc==='Through Agency')?'':'none';
   s('pdf-bn',document.getElementById('buyerName')?.value);
-  s('pdf-company', document.getElementById('companyName')?.value);
   s('pdf-contact', document.getElementById('contactPerson')?.value);
   s('pdf-mob',document.getElementById('buyerMobile')?.value);
   s('pdf-addr',document.getElementById('buyerAddress')?.value);
@@ -898,7 +939,7 @@ function syncMeta(){
 
 function onSaleChannelChange(){
   const sc=document.getElementById('saleChannel')?.value;
-  const wrap=document.getElementById('agencyNameWrap');
+  const wrap=document.getElementById('agencyWrap');
   if(wrap) wrap.style.display=(sc==='Through Agency')?'':'none';
 }
 
@@ -918,7 +959,8 @@ function updatePdfDoc(prods,grand){
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:left">${p.design||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.moq||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.emboss}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}${p.packs?`<br><small style="color:#2E6DA4;font-size:5.5pt">${p.packs}×${p.packPcs}</small>`:''}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packType||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">₹${p.effectivePricePerKg?fmtN(p.effectivePricePerKg):'—'}/KG${p.discount>0?`<br><small style="color:#D4870A;font-size:5.5pt">${fmtN(p.price)}-${p.discount}%</small>`:''}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">${p.discount>0?p.discount+'%':'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.gstPct}%</td>
@@ -933,7 +975,7 @@ function updatePdfDoc(prods,grand){
   const pb=document.getElementById('pdf-pack-body');
   if(pb) pb.innerHTML=prods.map((p,i)=>{
     const bLbl=k=>{const v=p.trimStatus[k]; return v==='buyer'?'YES':'NO';};
-    const sLbl=k=>{const v=p.trimStatus[k],c=p.trimData[k]?.cost||0; if(v==='seller') return c?'YES(₹'+c+')':'NO'; if(v==='foc') return 'FOC'; return 'NO';};
+    const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.cost||0,pc=td?.pcs||0; if(v==='seller') return c?'₹'+c+'×'+pc+'pc':'NO'; if(v==='foc') return 'FOC'; return 'NO';};
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
       ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${bLbl(k)==='YES'?'#1B6B3A':'#999'}">${bLbl(k)}</td>`).join('')}
@@ -959,8 +1001,8 @@ function collectPayload(){
     prods.push({
       fabric:p.fabric,category:p.category,weight:p.weight,size:p.size,
       dbsb:p.dbsb,ply:p.ply,sattan:p.sattan,moq:p.moq,emboss:p.emboss,
-      design:p.design,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
-      gstPct:p.gstPct,
+      design:p.design,packs:p.packs,packPcs:p.packPcs,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
+      gstPct:p.gstPct,packType:p.packType,
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
     });
   });
@@ -969,8 +1011,9 @@ function collectPayload(){
     orderDate:     document.getElementById('orderDate').value,
     saleChannel:   document.getElementById('saleChannel').value,
     agencyName:    document.getElementById('agencyName').value||'',
+    agencyContact: document.getElementById('agencyContact').value||'',
+    agencyMobile:  document.getElementById('agencyMobile').value||'',
     buyerName:     document.getElementById('buyerName').value,
-    companyName:   document.getElementById('companyName').value||'',
     contactPerson: document.getElementById('contactPerson').value||'',
     buyerMobile:   document.getElementById('buyerMobile').value,
     buyerAddress:  document.getElementById('buyerAddress').value,
@@ -987,7 +1030,8 @@ async function handleSubmit(){
   const url=getApiUrl();
   if(!url){ toast('⚠️ Set APPS_SCRIPT_URL in HTML file'); return; }
   const payload=collectPayload();
-  if(!payload.buyerName.trim()){ toast('⚠️ Enter Buyer Name'); document.getElementById('buyerName').focus(); return; }
+  if(!payload.buyerName.trim()){ toast('⚠️ Enter Buyer / Company Name'); document.getElementById('buyerName').focus(); return; }
+  if(payload.saleChannel==='Through Agency' && !payload.agencyName.trim()){ toast('⚠️ Enter Agency Name'); document.getElementById('agencyName').focus(); return; }
   if(!payload.products.length){ toast('⚠️ Add at least one product'); return; }
 
   // Update local DROPS with any new values entered
@@ -1041,11 +1085,11 @@ function closeModal(){
   // Auto reset form for new order
   document.getElementById('prodsContainer').innerHTML='';
   prodCount=0;
-  ['agencyName','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','companyName','contactPerson'].forEach(id=>{
+  ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
-  const aw=document.getElementById('agencyNameWrap'); if(aw) aw.style.display='none';
+  const aw=document.getElementById('agencyWrap'); if(aw) aw.style.display='none';
   addProduct(); syncMeta();
   if(APPS_SCRIPT_URL) fetchDrops();
 }
@@ -1078,11 +1122,11 @@ function resetForm(){
   if(!confirm('Reset entire form? All data will be cleared.')) return;
   document.getElementById('prodsContainer').innerHTML='';
   prodCount=0;
-  ['agencyName','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','companyName','contactPerson'].forEach(id=>{
+  ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
-  const aw=document.getElementById('agencyNameWrap'); if(aw) aw.style.display='none';
+  const aw=document.getElementById('agencyWrap'); if(aw) aw.style.display='none';
   addProduct(); syncMeta();
 }
 
