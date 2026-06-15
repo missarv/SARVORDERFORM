@@ -131,9 +131,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 
 /* ═══════════════════════ SIGS ═══════════════════════════ */
 .sig-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:10px}
-.sig-box{border:1px dashed var(--border);border-radius:9px;padding:24px 10px 10px;text-align:center}
-.sig-line{border-bottom:1.5px solid var(--border);margin:0 14px 7px;height:36px}
-.sig-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.sig-box{border:1px dashed var(--border);border-radius:9px;padding:10px 10px 8px;text-align:center}
+.sig-canvas{width:100%;height:90px;border:1px solid var(--border);border-radius:6px;cursor:crosshair;touch-action:none;background:#FAFBFC}
+.sig-actions{display:flex;justify-content:flex-end;margin-top:4px}
+.sig-clear{font-size:10px;color:#DC2626;cursor:pointer;background:none;border:none;text-decoration:underline;padding:2px 4px}
+.sig-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.sig-ts{font-size:9px;color:#1B6B3A;margin-top:2px;min-height:14px}
 
 /* ═══════════════════════ API CONFIG ════════════════════ */
 .api-box{background:#FFF8E6;border:1.5px solid #FCD34D;border-radius:11px;padding:13px 14px;margin:12px 0}
@@ -199,6 +202,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   .hdr,.bnav,.btn-add,.btn-del,.api-box,.pc-hdr .btn-del,.shd,.pst,.bill,.sum-title,.sum-tbl,.sl,.toast,.modal-bg{display:none!important}
   .wrap{display:none!important}
   .print-doc{display:block!important}
+  .pdf-no-break{page-break-inside:avoid;break-inside:avoid}
 }
 </style>
 </head>
@@ -270,7 +274,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     <thead>
       <tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:3%">SR</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Fabric</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Item Code</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%">Category</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Wt(KG)</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">Size</th>
@@ -321,6 +325,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     <tfoot id="pdf-pack-foot"></tfoot>
   </table>
 
+  <div style="page-break-inside:avoid;break-inside:avoid">
   <div style="border:0.5pt solid #ccc;border-radius:2pt;overflow:hidden;margin-top:4pt">
     <div style="background:#1A3C5E;color:#fff;font-size:7.5pt;font-weight:700;padding:3pt 7pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">TERMS &amp; CONDITIONS</div>
     <table style="width:100%;border-collapse:collapse"><tr>
@@ -340,23 +345,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <div style="font-size:7.5pt;font-weight:700;color:#1A3C5E;text-transform:uppercase;margin:4pt 0 2pt;padding-bottom:2pt;border-bottom:1pt solid #1A3C5E">ACKNOWLEDGEMENT &amp; SIGNATURES</div>
   <table style="width:100%;border-collapse:collapse;font-size:7pt">
     <tr>
-      <td style="border:0.5pt solid #ccc;text-align:center;width:33%">
+      <td style="border:0.5pt solid #ccc;text-align:center;width:33%;vertical-align:top">
         <div style="background:#1A3C5E;color:#fff;padding:3pt;font-weight:700;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">BUYER'S SIGNATURE</div>
-        <div style="height:28pt;position:relative"><div style="position:absolute;bottom:8pt;left:12pt;right:12pt;border-bottom:0.5pt solid #aaa"></div><div style="position:absolute;bottom:2pt;left:10pt;font-size:5.5pt;color:#888">Date: ___________</div></div>
+        <div style="height:50pt;position:relative;padding:2pt">
+          <img id="pdf-sig-buyer" style="max-width:95%;max-height:42pt;display:none" />
+          <div style="position:absolute;bottom:8pt;left:12pt;right:12pt;border-bottom:0.5pt solid #aaa"></div>
+          <div id="pdf-sig-buyer-date" style="position:absolute;bottom:2pt;left:10pt;font-size:5.5pt;color:#888">Date: ___________</div>
+        </div>
       </td>
-      <td style="border:0.5pt solid #ccc;border-left:none;text-align:center;width:33%">
+      <td style="border:0.5pt solid #ccc;border-left:none;text-align:center;width:33%;vertical-align:top">
         <div style="background:#1A3C5E;color:#fff;padding:3pt;font-weight:700;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">PREPARED BY</div>
-        <div style="height:28pt;position:relative"><div style="position:absolute;bottom:8pt;left:12pt;right:12pt;border-bottom:0.5pt solid #aaa"></div><div style="position:absolute;bottom:2pt;left:10pt;font-size:5.5pt;color:#888">Date: ___________</div></div>
+        <div style="height:50pt;position:relative;padding:2pt">
+          <img id="pdf-sig-prepared" style="max-width:95%;max-height:42pt;display:none" />
+          <div style="position:absolute;bottom:8pt;left:12pt;right:12pt;border-bottom:0.5pt solid #aaa"></div>
+          <div id="pdf-sig-prepared-date" style="position:absolute;bottom:2pt;left:10pt;font-size:5.5pt;color:#888">Date: ___________</div>
+        </div>
       </td>
       <td style="border:0.5pt solid #ccc;border-left:none;text-align:center;width:34%">
         <div style="background:#1A3C5E;color:#fff;padding:3pt;font-weight:700;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">AUTHORISED SIGN (SARV INDIA)</div>
         <div style="padding:3pt 0 2pt;text-align:center">
+          <img id="pdf-sig-auth" style="max-width:95%;max-height:28pt;display:none" />
           <img src="data:image/jpeg;base64,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 tIjb3sUtzc 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" style="width:50pt;height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact" alt="SIHF Stamp">
           <div id="pdf-timestamp" style="font-size:5.5pt;color:#888;margin-top:2pt"></div>
         </div>
       </td>
     </tr>
   </table>
+  </div><!-- end page-break-inside:avoid wrapper -->
 </div>
 <!-- END PRINT DOC -->
 
@@ -379,7 +394,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <div class="sl">Order Information</div>
   <div class="card">
     <div class="g2">
-      <div class="fg"><label>Order Date</label><input type="text" id="orderDate" placeholder="DD-MM-YYYY" oninput="syncMeta()"></div>
+      <div class="fg"><label>Order Date</label><input type="text" id="orderDate" placeholder="DD-MM-YYYY" readonly></div>
       <div class="fg"><label>Order No.</label><input type="text" id="orderNo" readonly></div>
       <div class="fg"><label>Payment Terms</label>
         <div class="combo-wrap">
@@ -411,7 +426,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     </div>
     <div id="agencyWrap" style="display:none">
       <div class="g3">
-        <div class="fg"><label>Agency Name</label><input type="text" id="agencyName" placeholder="Enter agency name" oninput="syncMeta()"></div>
+        <div class="fg"><label>Agency Name</label>
+          <div class="combo-wrap">
+            <input type="text" id="agencyName" placeholder="Enter or select agency" autocomplete="off"
+              oninput="filterCombo('agencyName');syncMeta()" onfocus="openCombo('agencyName')" onblur="delayClose('agencyName')">
+            <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="combo-list" id="agencyName-list"></div>
+          </div>
+        </div>
         <div class="fg"><label>Agency Contact Person</label><input type="text" id="agencyContact" placeholder="Agency contact person" oninput="syncMeta()"></div>
         <div class="fg"><label>Agency Mobile No.</label><input type="tel" id="agencyMobile" placeholder="+91 XXXXXXXXXX" oninput="syncMeta()"></div>
       </div>
@@ -458,7 +480,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     <div id="bProdRows"></div>
     <div class="bill-tot">
       <div><div class="bill-tl">Grand Total Payable</div><div class="bill-tn">Inclusive of 5% GST</div></div>
-      <div class="bill-tv" id="bGrand">₹0.00</div>
+      <div class="bill-tv" id="bGrand">₹0</div>
     </div>
   </div>
 
@@ -483,9 +505,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <!-- SIGNATURES -->
   <div class="sl">Acknowledgement &amp; Signatures</div>
   <div class="sig-row">
-    <div class="sig-box"><div class="sig-line"></div><div class="sig-lbl">Buyer's Signature</div></div>
-    <div class="sig-box"><div class="sig-line"></div><div class="sig-lbl">Prepared By (SIHF)</div></div>
-    <div class="sig-box"><div class="sig-line"></div><div class="sig-lbl">Authorised Signatory</div></div>
+    <div class="sig-box">
+      <canvas class="sig-canvas" id="sigBuyer" width="400" height="100"></canvas>
+      <div class="sig-actions"><button class="sig-clear" type="button" onclick="clearSig('sigBuyer')">✕ Clear</button></div>
+      <div class="sig-lbl">Buyer's Signature</div>
+      <div class="sig-ts" id="sigBuyer-ts"></div>
+    </div>
+    <div class="sig-box">
+      <canvas class="sig-canvas" id="sigPrepared" width="400" height="100"></canvas>
+      <div class="sig-actions"><button class="sig-clear" type="button" onclick="clearSig('sigPrepared')">✕ Clear</button></div>
+      <div class="sig-lbl">Prepared By (SIHF)</div>
+      <div class="sig-ts" id="sigPrepared-ts"></div>
+    </div>
+    <div class="sig-box">
+      <canvas class="sig-canvas" id="sigAuth" width="400" height="100"></canvas>
+      <div class="sig-actions"><button class="sig-clear" type="button" onclick="clearSig('sigAuth')">✕ Clear</button></div>
+      <div class="sig-lbl">Authorised Signatory</div>
+      <div class="sig-ts" id="sigAuth-ts"></div>
+    </div>
   </div>
 
 </div><!-- end .wrap -->
@@ -528,16 +565,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGyTjj47GG98mOz9umtQY7IxQuH05K4nRBs-UYfg5iOvc0gPuRlyrZuvIcVP5BH-Ff/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBrWGaC7KUVtuMPys2I3Vxzh_lz0r5LRq3L7o2cwdRz89QCOHCmS4h43CoDkCvV9x7/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
 let prodCount=0, lastPdfUrl='', lastDriveUrl='', suppressCombo=false;
+let BUYER_DETAILS={}, AGENCY_DETAILS={};
 
 // Default dropdown data (used if Sheet not connected)
 let DROPS = {
   itemCode:      [],
   buyerName:     [],
+  agencyName:    [],
+  dbsb:          ["DB","DP","SB","SS","SC"],
   fabricCode:    ["2900","3100","3500","4000"],
   category:      ["SEMI CLOUDY","SUPER SOFT","MINK","DOUBLE LAYER","SHERPA","POLAR FLEECE","CLOUDY"],
   size:          ["210×230 CM","150×200 CM","200×220 CM","220×240 CM","60×90 CM (Baby)"],
@@ -571,13 +611,109 @@ window.onload=function(){
   bindCombo('payTerms','paymentTerms');
   bindCombo('delivTerms','deliveryTerms');
   bindCombo('buyerName','buyerName');
+  bindCombo('agencyName','agencyName');
 
   addProduct();
   syncMeta();
 
+  // Init signature pads
+  initSigPad('sigBuyer');
+  initSigPad('sigPrepared');
+  initSigPad('sigAuth');
+
   // fetch order no + dropdowns from sheet
   if(APPS_SCRIPT_URL) fetchDrops();
 };
+
+// ═══════════════════ AUTO-SELECT NUMERIC INPUTS ═════════════════════════
+document.addEventListener('click',function(e){
+  if(e.target.matches('input[type="number"]')) e.target.select();
+});
+
+// ═══════════════════ SIGNATURE PAD ═════════════════════════════════════
+const sigPads={};
+function initSigPad(canvasId){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const pad={canvas,ctx,drawing:false,hasData:false};
+  sigPads[canvasId]=pad;
+
+  // hi-DPI scaling
+  const rect=canvas.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=rect.width*dpr;
+  canvas.height=rect.height*dpr;
+  ctx.scale(dpr,dpr);
+  canvas.style.width=rect.width+'px';
+  canvas.style.height=rect.height+'px';
+
+  ctx.strokeStyle='#1A3C5E';
+  ctx.lineWidth=2;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+
+  function getPos(e){
+    const r=canvas.getBoundingClientRect();
+    const t=e.touches?e.touches[0]:e;
+    return {x:t.clientX-r.left, y:t.clientY-r.top};
+  }
+  function start(e){
+    e.preventDefault();
+    pad.drawing=true;
+    const p=getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y);
+  }
+  function move(e){
+    if(!pad.drawing) return;
+    e.preventDefault();
+    const p=getPos(e);
+    ctx.lineTo(p.x,p.y);
+    ctx.stroke();
+    pad.hasData=true;
+  }
+  function end(e){
+    if(pad.drawing){
+      e.preventDefault();
+      pad.drawing=false;
+      if(pad.hasData && !pad.stamped){
+        pad.stamped=true;
+        const now=new Date();
+        const ts=String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()+' '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+        pad.timestamp=ts;
+        const tsEl=document.getElementById(canvasId+'-ts');
+        if(tsEl) tsEl.textContent='Signed: '+ts;
+      }
+    }
+  }
+
+  canvas.addEventListener('mousedown',start);
+  canvas.addEventListener('mousemove',move);
+  canvas.addEventListener('mouseup',end);
+  canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+}
+
+function clearSig(canvasId){
+  const pad=sigPads[canvasId];
+  if(!pad) return;
+  const dpr=window.devicePixelRatio||1;
+  pad.ctx.clearRect(0,0,pad.canvas.width/dpr,pad.canvas.height/dpr);
+  pad.hasData=false;
+  pad.stamped=false;
+  pad.timestamp='';
+  const tsEl=document.getElementById(canvasId+'-ts');
+  if(tsEl) tsEl.textContent='';
+}
+
+function getSigData(canvasId){
+  const pad=sigPads[canvasId];
+  if(!pad||!pad.hasData) return '';
+  return pad.canvas.toDataURL('image/png');
+}
 
 // ═══════════════════════════ API ═════════════════════════════════════════
 function getApiUrl(){ return APPS_SCRIPT_URL; }
@@ -585,14 +721,24 @@ function getApiUrl(){ return APPS_SCRIPT_URL; }
 async function fetchDrops(){
   try{
     const r=await fetch(getApiUrl(),{method:'GET',redirect:'follow'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
     const j=await r.json();
-    if(j.dropdowns){ DROPS=j.dropdowns; localStorage.setItem(LS_DROPS,JSON.stringify(DROPS)); refreshAllCombos(); }
+    if(j.status==='error') throw new Error(j.error||'Sheet error');
+    if(j.dropdowns){ DROPS=j.dropdowns; if(!DROPS.agencyName) DROPS.agencyName=[]; localStorage.setItem(LS_DROPS,JSON.stringify(DROPS)); refreshAllCombos(); }
     if(j.standardItems){ STANDARD_ITEMS=j.standardItems; DROPS.itemCode=Object.keys(STANDARD_ITEMS); refreshAllCombos(); }
+    if(j.buyerDetails){ BUYER_DETAILS=j.buyerDetails; const bKeys=Object.keys(BUYER_DETAILS); if(bKeys.length){ bKeys.forEach(b=>{ if(!DROPS.buyerName) DROPS.buyerName=[]; if(!DROPS.buyerName.includes(b)) DROPS.buyerName.push(b); }); refreshAllCombos(); } }
+    if(j.agencyDetails){ AGENCY_DETAILS=j.agencyDetails; const aKeys=Object.keys(AGENCY_DETAILS); if(aKeys.length){ aKeys.forEach(a=>{ if(!DROPS.agencyName) DROPS.agencyName=[]; if(!DROPS.agencyName.includes(a)) DROPS.agencyName.push(a); }); refreshAllCombos(); } }
     if(j.nextOrderNo){
       document.getElementById('orderNo').value=j.nextOrderNo;
       document.getElementById('dON').textContent=j.nextOrderNo;
     }
-  } catch(e){ /* silent */ }
+    console.log('✅ Sheet connected — drops, items, buyer & agency details loaded');
+  } catch(e){
+    console.warn('⚠️ Sheet connection failed:',e.message);
+    toast('⚠️ Sheet connection failed: '+e.message);
+    const on=document.getElementById('orderNo');
+    if(on && on.value==='Loading...') on.value='OFFLINE';
+  }
 }
 
 // ═══════════════════════ COMBO BOX ═══════════════════════════════════════
@@ -641,6 +787,30 @@ function selectCombo(fieldId, val){
     const pid=fieldId.replace(/-itemCode$/,'').replace(/^p/,'');
     onItemCodeSelect(pid, val);
   }
+  // Auto-fill buyer details on buyer selection
+  if(fieldId==='buyerName'){
+    const bd=BUYER_DETAILS[val];
+    if(bd){
+      const setF=(id,v)=>{const e=document.getElementById(id);if(e&&v){e.value=v;e.dispatchEvent(new Event('input'));}};
+      setF('contactPerson',bd.contactPerson);
+      setF('buyerMobile',bd.mobile);
+      setF('buyerAddress',bd.address);
+      setF('buyerGST',bd.gst);
+      syncMeta();
+      toast('✓ Buyer details loaded');
+    }
+  }
+  // Auto-fill agency details on agency selection
+  if(fieldId==='agencyName'){
+    const ad=AGENCY_DETAILS[val];
+    if(ad){
+      const setF=(id,v)=>{const e=document.getElementById(id);if(e&&v){e.value=v;e.dispatchEvent(new Event('input'));}};
+      setF('agencyContact',ad.contact);
+      setF('agencyMobile',ad.mobile);
+      syncMeta();
+      toast('✓ Agency details loaded');
+    }
+  }
 }
 
 function onItemCodeSelect(id, code){
@@ -652,14 +822,27 @@ function onItemCodeSelect(id, code){
   setV('p'+id+'-category',item.category);
   const wEl=document.getElementById('p'+id+'-weight'); if(wEl) wEl.value=item.weight;
   setV('p'+id+'-size',    item.size);
-  setS('p'+id+'-dbsb',    item.dbsb);
+  setV('p'+id+'-dbsb',    item.dbsb);
   setS('p'+id+'-ply',     item.ply);
   setV('p'+id+'-sattan',  item.sattan);
   setV('p'+id+'-moq',     item.moq);
   setS('p'+id+'-emboss',  item.emboss);
   const pEl=document.getElementById('p'+id+'-price'); if(pEl) pEl.value=item.price;
-  const ppEl=document.getElementById('p'+id+'-packPcs'); if(ppEl && item.packPcs) ppEl.value=item.packPcs;
   suppressCombo=false;
+  // Trigger Pack Type change to auto-set suppliers (this enables cost inputs for SIHF-supplied trims)
+  onPackTypeChange(id);
+  // Auto-fill Packing (pcs/pack) from Standard Items — AFTER onPackTypeChange so it doesn't get blanked
+  const ppEl=document.getElementById('p'+id+'-packPcs');
+  if(ppEl && item.packPcs){ ppEl.value=item.packPcs; calcPackQty(id); }
+  // Auto-fill trim Cost/Pc from Standard Items (after suppliers are set so cost inputs are enabled)
+  const trimPriceMap={label:'labelPrice',bag:'bagPrice',bore:'borePrice',inner:'innerPrice',outer:'outerPrice'};
+  Object.keys(trimPriceMap).forEach(k=>{
+    const priceKey=trimPriceMap[k];
+    if(item[priceKey]){
+      const costEl=document.getElementById('p'+id+'-'+k+'-cost');
+      if(costEl && !costEl.disabled) costEl.value=item[priceKey];
+    }
+  });
   calcAll();
   toast('✓ Item '+code+' loaded');
 }
@@ -671,7 +854,7 @@ function refreshAllCombos(){
   // also refresh product combos
   document.querySelectorAll('.product-card').forEach(c=>{
     const id=c.id.replace('prod-','');
-    ['itemCode','fabric','category','size','sattan','moq','design'].forEach(k=>{
+    ['itemCode','fabric','category','size','dbsb','sattan','moq','design'].forEach(k=>{
       const cid='p'+id+'-'+k;
       if(comboState[cid]) renderComboList(cid,'');
     });
@@ -683,6 +866,7 @@ function bindProductCombos(id){
   bindCombo('p'+id+'-fabric','fabricCode');
   bindCombo('p'+id+'-category','category');
   bindCombo('p'+id+'-size','size');
+  bindCombo('p'+id+'-dbsb','dbsb');
   bindCombo('p'+id+'-sattan','sattan');
   bindCombo('p'+id+'-moq','moq');
   bindCombo('p'+id+'-design','design');
@@ -741,7 +925,13 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>DB / SB</label>
-          <select id="p${id}-dbsb"><option value="DB">DB (Double)</option><option value="SB">SB (Single)</option></select></div>
+          <div class="combo-wrap">
+            <input type="text" id="p${id}-dbsb" placeholder="DB" value="DB" autocomplete="off"
+              oninput="filterCombo('p${id}-dbsb')" onfocus="openCombo('p${id}-dbsb')" onblur="delayClose('p${id}-dbsb')">
+            <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="combo-list" id="p${id}-dbsb-list"></div>
+          </div>
+        </div>
         <div class="fg"><label>Ply</label>
           <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option></select></div>
         <div class="fg"><label>Sattan</label>
@@ -765,7 +955,7 @@ function addProduct(){
       </div>
       <div class="fg"><label>Design Details</label>
         <div class="combo-wrap">
-          <input type="text" id="p${id}-design" placeholder="e.g. 5 New Designs Single Matching" autocomplete="off"
+          <input type="text" id="p${id}-design" placeholder="e.g. 5 New Designs Single Matching" value="ASSORTED" autocomplete="off"
             oninput="filterCombo('p${id}-design');calcAll()" onfocus="openCombo('p${id}-design')" onblur="delayClose('p${id}-design')">
           <svg class="combo-arrow" width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="#6B7897" stroke-width="1.5" stroke-linecap="round"/></svg>
           <div class="combo-list" id="p${id}-design-list"></div>
@@ -773,8 +963,8 @@ function addProduct(){
       </div>
       <div class="shd">Pricing &amp; Delivery</div>
       <div class="g3">
-        <div class="fg"><label>Pack Type</label>
-          <select id="p${id}-packType">
+        <div class="fg"><label>Packing Type</label>
+          <select id="p${id}-packType" onchange="onPackTypeChange(${id})">
             <option value="Bora">Bora</option>
             <option value="Bale">Bale</option>
             <option value="Box">Box</option>
@@ -805,6 +995,13 @@ function addProduct(){
               <input type="number" class="trim-pi" id="p${id}-${t.k}-cost" placeholder="0" step="0.5" min="0" value="0" disabled oninput="calcAll()">
             </td>
           </tr>`).join('')}
+          <tr id="p${id}-packCharge-row" style="background:#FFFBEA">
+            <td style="font-weight:600;font-size:13px;color:#92400E" id="p${id}-packCharge-label">Bora Packing Charge</td>
+            <td colspan="2" style="color:var(--muted);font-size:12px;text-align:center">—</td>
+            <td style="text-align:right">
+              <input type="number" class="trim-pi" id="p${id}-packCharge" placeholder="0" step="0.5" min="0" value="0" oninput="calcAll()" style="background:#FFFBEA;border-color:#FCD34D">
+            </td>
+          </tr>
         </tbody>
       </table>
       <div class="pst">
@@ -829,7 +1026,7 @@ function onSupp(id,key){
   const pcsInp=document.getElementById('p'+id+'-'+key+'-pcs');
   if(sel.value==='seller'){
     inp.disabled=false;inp.style.background='#EFF6FF';inp.style.borderColor='#93C5FD';
-    if(pcsInp){pcsInp.disabled=false;pcsInp.style.background='#EFF6FF';pcsInp.style.borderColor='#93C5FD';const autoVal=key==='outer'?(parseFloat(document.getElementById('p'+id+'-packs')?.value)||0):(parseFloat(document.getElementById('p'+id+'-qty')?.value)||0);pcsInp.value=autoVal;}
+    if(pcsInp){pcsInp.disabled=false;pcsInp.style.background='#EFF6FF';pcsInp.style.borderColor='#93C5FD';const autoVal=(key==='outer'||key==='bore')?(parseFloat(document.getElementById('p'+id+'-packs')?.value)||0):(parseFloat(document.getElementById('p'+id+'-qty')?.value)||0);pcsInp.value=autoVal;}
   } else {
     inp.disabled=true;inp.value=0;inp.style.background='';inp.style.borderColor='';
     if(pcsInp){pcsInp.disabled=true;pcsInp.value=0;pcsInp.style.background='';pcsInp.style.borderColor='';}
@@ -842,6 +1039,37 @@ function calcPackQty(id){
   const pcsPerPack=parseFloat(document.getElementById('p'+id+'-packPcs')?.value)||0;
   const qtyEl=document.getElementById('p'+id+'-qty');
   if(qtyEl) qtyEl.value=packs*pcsPerPack;
+  calcAll();
+}
+
+function onPackTypeChange(id){
+  const pt=document.getElementById('p'+id+'-packType')?.value||'Bora';
+  // Point 1: Bale or Box → blank Packing (pcs/pack) & recalc qty
+  if(pt==='Bale'||pt==='Box'){
+    const ppEl=document.getElementById('p'+id+'-packPcs');
+    if(ppEl){ppEl.value='';calcPackQty(id);}
+  }
+  // Point 7: Auto supplier pick based on Pack Type
+  // Reset all trims to 'na' first
+  TRIMS.forEach(t=>{
+    const sel=document.getElementById('p'+id+'-'+t.k+'-supp');
+    if(sel){sel.value='na';onSupp(id,t.k);}
+  });
+  // Bale or Bora → Label/Tag + Bore = SIHF Supplied
+  if(pt==='Bale'||pt==='Bora'){
+    ['label','bore'].forEach(k=>{
+      const sel=document.getElementById('p'+id+'-'+k+'-supp');
+      if(sel){sel.value='seller';onSupp(id,k);}
+    });
+  }
+  // Box → Label/Tag = SIHF Supplied
+  if(pt==='Box'){
+    const sel=document.getElementById('p'+id+'-label-supp');
+    if(sel){sel.value='seller';onSupp(id,'label');}
+  }
+  // Update packing charge label
+  const lbl=document.getElementById('p'+id+'-packCharge-label');
+  if(lbl) lbl.textContent=pt+' Packing Charge';
   calcAll();
 }
 
@@ -862,18 +1090,19 @@ function getProd(id){
     trimsCostPerPc+=costPerPc; trimsCostTotal+=trimPcs*costPerPc;
     trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc,pcs:trimPcs};
   });
+  const packCharge=n('p'+id+'-packCharge');
   const fabricCost=qty*pricePerPc;
-  const exGST=fabricCost+trimsCostTotal;
+  const exGST=fabricCost+trimsCostTotal+packCharge;
   const gstAmt=exGST*(gstPct/100);
   const amount=exGST+gstAmt;
   const finalPricePerQty=qty?(exGST/qty):0;
   const packType=g('p'+id+'-packType');
   const packs=n('p'+id+'-packs'), packPcs=n('p'+id+'-packPcs');
   return {
-    id, qty, packs, packPcs, price, discount, effectivePricePerKg, pricePerPc, weight, gstPct, packType,
+    id, qty, packs, packPcs, price, discount, effectivePricePerKg, pricePerPc, weight, gstPct, packType, packCharge,
     trimsCostPerPc, trimsCostTotal, exGST, gstAmt, amount, finalPricePerQty,
     trimStatus, trimData,
-    fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
+    itemCode:g('p'+id+'-itemCode'), fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
     dbsb:g('p'+id+'-dbsb'), ply:g('p'+id+'-ply'), sattan:g('p'+id+'-sattan'),
     moq:g('p'+id+'-moq'), emboss:g('p'+id+'-emboss'), design:g('p'+id+'-design'),
   };
@@ -897,7 +1126,7 @@ function calcAll(){
   document.getElementById('bGSTLabel').textContent=gstLabel;
   document.getElementById('bExGST').textContent=fmt(grandEx);
   document.getElementById('bGST').textContent  =fmt(grandGst);
-  document.getElementById('bGrand').textContent=fmt(grand);
+  document.getElementById('bGrand').textContent='₹'+Math.round(grand).toLocaleString('en-IN');
   document.getElementById('bProdRows').innerHTML=pwRows;
   updateBagsTable(prods);
   updatePdfDoc(prods,grand);
@@ -949,18 +1178,18 @@ function updatePdfDoc(prods,grand){
   if(ib) ib.innerHTML=prods.map((p,i)=>{
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E">${p.fabric||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E">${p.itemCode||p.fabric||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.category}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.weight?p.weight+' KG':'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.size}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.dbsb}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.ply}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.sattan||'—'}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:left">${p.design||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.design||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.moq||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.emboss}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}${p.packs?`<br><small style="color:#2E6DA4;font-size:5.5pt">${p.packs}×${p.packPcs}</small>`:''}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packType||'—'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}${p.packPcs?`<br><small style="color:#2E6DA4;font-size:5.5pt">${p.packPcs} pcs/pack</small>`:''}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packs?(p.packs+' '+(p.packType||'')):(p.packType||'—')}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">₹${p.effectivePricePerKg?fmtN(p.effectivePricePerKg):'—'}/KG${p.discount>0?`<br><small style="color:#D4870A;font-size:5.5pt">${fmtN(p.price)}-${p.discount}%</small>`:''}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">${p.discount>0?p.discount+'%':'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.gstPct}%</td>
@@ -969,26 +1198,41 @@ function updatePdfDoc(prods,grand){
   }).join('');
 
   const gt=document.getElementById('pdf-grand');
-  if(gt) gt.textContent=grand?'₹'+fmtN(grand):'₹0.00';
+  if(gt) gt.textContent=grand?'₹'+Math.round(grand).toLocaleString('en-IN'):'₹0';
 
   // Pack table
   const pb=document.getElementById('pdf-pack-body');
   if(pb) pb.innerHTML=prods.map((p,i)=>{
     const bLbl=k=>{const v=p.trimStatus[k]; return v==='buyer'?'YES':'NO';};
-    const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.cost||0,pc=td?.pcs||0; if(v==='seller') return c?'₹'+c+'×'+pc+'pc':'NO'; if(v==='foc') return 'FOC'; return 'NO';};
+    const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.cost||0,pc=td?.pcs||0; if(v==='seller') return c?pc+'pc×₹'+c:'NO'; if(v==='foc') return 'FOC'; return 'NO';};
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
       ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${bLbl(k)==='YES'?'#1B6B3A':'#999'}">${bLbl(k)}</td>`).join('')}
       ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${sLbl(k)!=='NO'?'#1B6B3A':'#999'}">${sLbl(k)}</td>`).join('')}
-      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">₹${p.trimsCostTotal?fmtN(p.trimsCostTotal):'0'}</td>
+      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">₹${p.trimsCostTotal?fmtN(p.trimsCostTotal):'0'}${p.packCharge?`<br><small style="color:#92400E;font-size:5.5pt">+₹${fmtN(p.packCharge)} ${p.packType} pkg</small>`:''}</td>
     </tr>`;
   }).join('');
   const totalTrims=prods.reduce((s,p)=>s+p.trimsCostTotal,0);
+  const totalPackCharge=prods.reduce((s,p)=>s+(p.packCharge||0),0);
   const pf=document.getElementById('pdf-pack-foot');
   if(pf) pf.innerHTML=`<tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-  <td colspan="11" style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:8.5pt">TOTAL TRIMS COST</td>
-  <td style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt">₹${fmtN(totalTrims)}</td>
+  <td colspan="11" style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:8.5pt">TOTAL TRIMS COST${totalPackCharge?(' + PACKING ₹'+fmtN(totalPackCharge)):''}</td>
+  <td style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt">₹${fmtN(totalTrims+totalPackCharge)}</td>
 </tr>`;
+
+  // ── Signature images + timestamps into PDF print doc ──
+  const sigMap=[['sigBuyer','pdf-sig-buyer','pdf-sig-buyer-date'],['sigPrepared','pdf-sig-prepared','pdf-sig-prepared-date'],['sigAuth','pdf-sig-auth','pdf-timestamp']];
+  sigMap.forEach(([canvasId,imgId,dateId])=>{
+    const data=getSigData(canvasId);
+    const img=document.getElementById(imgId);
+    if(img){
+      if(data){ img.src=data; img.style.display='block'; }
+      else{ img.src=''; img.style.display='none'; }
+    }
+    const pad=sigPads[canvasId];
+    const dateEl=document.getElementById(dateId);
+    if(dateEl){ dateEl.textContent=pad&&pad.timestamp?('Date: '+pad.timestamp):'Date: ___________'; }
+  });
 }
 
 // ═══════════════════════ COLLECT PAYLOAD ════════════════════════════════
@@ -999,10 +1243,10 @@ function collectPayload(){
     const id=c.id.replace('prod-',''); const p=getProd(id);
     totalExGST+=p.exGST; totalGst+=p.gstAmt;
     prods.push({
-      fabric:p.fabric,category:p.category,weight:p.weight,size:p.size,
+      itemCode:p.itemCode,fabric:p.fabric,category:p.category,weight:p.weight,size:p.size,
       dbsb:p.dbsb,ply:p.ply,sattan:p.sattan,moq:p.moq,emboss:p.emboss,
       design:p.design,packs:p.packs,packPcs:p.packPcs,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
-      gstPct:p.gstPct,packType:p.packType,
+      gstPct:p.gstPct,packType:p.packType,packCharge:p.packCharge,
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
     });
   });
@@ -1021,7 +1265,15 @@ function collectPayload(){
     paymentTerms:  document.getElementById('payTerms').value,
     deliveryTerms: document.getElementById('delivTerms').value,
     products:      prods,
-    summary:{exGST:totalExGST.toFixed(2),gst:totalGst.toFixed(2),grandTotal:(totalExGST+totalGst).toFixed(2)},
+    summary:{exGST:totalExGST.toFixed(2),gst:totalGst.toFixed(2),grandTotal:Math.round(totalExGST+totalGst).toString()},
+    signatures:{
+      buyer:    getSigData('sigBuyer'),
+      prepared: getSigData('sigPrepared'),
+      auth:     getSigData('sigAuth'),
+      buyerTs:    sigPads.sigBuyer?.timestamp||'',
+      preparedTs: sigPads.sigPrepared?.timestamp||'',
+      authTs:     sigPads.sigAuth?.timestamp||''
+    },
   };
 }
 
@@ -1054,7 +1306,7 @@ async function handleSubmit(){
       document.getElementById('modalDetail').innerHTML=`
         <span><b>Saved At</b><em>${data.savedAt}</em></span>
         <span><b>File Name</b><em>${data.fileName||'—'}</em></span>
-        <span><b>Grand Total</b><em>₹${Number(payload.summary.grandTotal).toLocaleString('en-IN',{minimumFractionDigits:2})}</em></span>
+        <span><b>Grand Total</b><em>₹${Math.round(Number(payload.summary.grandTotal)).toLocaleString('en-IN')}</em></span>
       `;
       document.getElementById('successModal').classList.add('open');
     } else {
@@ -1090,6 +1342,8 @@ function closeModal(){
   });
   const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
   const aw=document.getElementById('agencyWrap'); if(aw) aw.style.display='none';
+  // Clear signature pads
+  clearSig('sigBuyer'); clearSig('sigPrepared'); clearSig('sigAuth');
   addProduct(); syncMeta();
   if(APPS_SCRIPT_URL) fetchDrops();
 }
@@ -1103,18 +1357,35 @@ function updateLocalDrops(payload){
     if(!DROPS[key].includes(val)) DROPS[key].push(val);
   };
   add('buyerName',    payload.buyerName);
+  add('agencyName',   payload.agencyName);
   add('deliveryTerms',payload.deliveryTerms);
   add('paymentTerms', payload.paymentTerms);
   payload.products.forEach(p=>{
     add('fabricCode', p.fabric);
     add('category',   p.category);
     add('size',       p.size);
+    add('dbsb',       p.dbsb);
     add('sattan',     p.sattan);
     add('moq',        p.moq);
     add('design',     p.design);
   });
   localStorage.setItem(LS_DROPS,JSON.stringify(DROPS));
   refreshAllCombos();
+  // Update local buyer/agency details for immediate auto-fill on next order
+  if(payload.buyerName && payload.buyerName.trim()){
+    BUYER_DETAILS[payload.buyerName.trim()]={
+      contactPerson: payload.contactPerson||'',
+      mobile: payload.buyerMobile||'',
+      address: payload.buyerAddress||'',
+      gst: payload.buyerGST||''
+    };
+  }
+  if(payload.agencyName && payload.agencyName.trim()){
+    AGENCY_DETAILS[payload.agencyName.trim()]={
+      contact: payload.agencyContact||'',
+      mobile: payload.agencyMobile||''
+    };
+  }
 }
 
 // ══════════════════════ RESET ════════════════════════════════════════════
