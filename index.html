@@ -183,6 +183,56 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 .modal-detail span b{color:var(--navy)}
 .modal-detail span em{font-style:normal;color:var(--text);font-family:'DM Mono',monospace;font-size:11.5px}
 
+/* ═══════════════════════ ORDER HISTORY PANEL ══════════ */
+.oh-panel{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:250;display:none;justify-content:flex-end}
+.oh-panel.open{display:flex}
+.oh-drawer{background:#fff;width:100%;max-width:680px;height:100%;display:flex;flex-direction:column;animation:slideRight .25s ease;box-shadow:-4px 0 24px rgba(0,0,0,.18)}
+@keyframes slideRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.oh-hdr{background:var(--navy);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.oh-hdr h3{font-size:16px;font-weight:700;flex:1;margin:0}
+.oh-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.oh-close:hover{background:rgba(255,255,255,.15)}
+.oh-search{padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.oh-search input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:var(--input)}
+.oh-search input:focus{border-color:var(--blue)}
+.oh-count{padding:6px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;border-bottom:1px solid var(--border);background:#F8FAFC}
+.oh-body{flex:1;overflow-y:auto;padding:0}
+.oh-card{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:14px 16px;border-bottom:1px solid #EEF1F6;cursor:default;transition:background .15s}
+.oh-card:hover{background:#F0F7FF}
+.oh-card-top{display:flex;align-items:center;gap:8px;grid-column:1/-1}
+.oh-orderNo{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--navy)}
+.oh-date{font-size:11px;color:var(--muted)}
+.oh-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px}
+.oh-status.saved{background:#E8F5E9;color:#2E7D32}
+.oh-status.pending{background:#FFF3E0;color:#E65100}
+.oh-buyer{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;grid-column:1/-1}
+.oh-meta{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.oh-meta b{color:var(--text);font-weight:600}
+.oh-total{font-size:15px;font-weight:700;color:#1B6B3A;white-space:nowrap;text-align:right;align-self:center}
+.oh-actions{display:flex;gap:6px;align-items:center;justify-content:flex-end;grid-column:2;grid-row:2/4}
+.oh-pdf-btn{display:inline-flex;align-items:center;gap:4px;background:var(--navy);color:#fff;border:none;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.oh-pdf-btn:hover{background:#2A5A8E}
+.oh-pdf-btn.disabled{background:#ccc;cursor:default;pointer-events:none}
+.oh-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:14px}
+.oh-loading{text-align:center;padding:48px 20px;color:var(--muted);font-size:13px}
+.oh-meta-row{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;grid-column:1/-1}
+.oh-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;grid-column:1/-1;margin-top:4px}
+.oh-saved-at{font-size:10px;color:#999;grid-column:1/-1}
+.oh-pdf-na{font-size:11px;color:#bbb;font-style:italic}
+.oh-actions-row{display:flex;gap:6px;flex-wrap:wrap;grid-column:1/-1;margin-top:6px;padding-top:8px;border-top:1px dashed #E8ECF1}
+.oh-act-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:7px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap;border:none;transition:opacity .15s}
+.oh-act-btn:hover{opacity:.85}
+.oh-wa-buyer{background:#25D366;color:#fff}
+.oh-wa-agency{background:#128C7E;color:#fff}
+.oh-mail-buyer{background:#D44638;color:#fff}
+.oh-mail-agency{background:#B23121;color:#fff}
+.oh-act-btn.disabled{background:#ddd;color:#aaa;cursor:default;pointer-events:none}
+.oh-sent-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.35);font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:99px;padding:0 4px;margin-left:2px}
+.oh-sent-total{font-size:10px;font-weight:700;color:#1B6B3A;display:flex;align-items:center;gap:4px;margin-left:auto;padding:3px 8px;background:#E8F5E9;border-radius:6px;white-space:nowrap}
+.oh-act-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;grid-column:1/-1;margin-top:4px}
+.btn-history{background:var(--navy);color:#fff;border:none;padding:14px 16px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-history:hover{background:#2A5A8E}
+
 /* ═══════════════════════ TOAST ═══════════════════════ */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A1A2E;color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:300}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -214,7 +264,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:6pt;margin-bottom:5pt;border-bottom:2pt solid #D4870A">
     <div>
       <div style="font-size:19pt;font-weight:700;color:#1A3C5E;font-family:Arial">SARV INDIA HOME FURNISHING</div>
-      <div style="font-size:7.5pt;color:#555;margin-top:2pt">Plot No. 166, Sector-25, Part-II, HUDA, Panipat – 132103 (Haryana)  |  GST: 06ADEPB4329A1ZC  |  HDFC Bank, Harmony Tower, G.T. Road, Panipat</div>
+      <div style="font-size:7.5pt;color:#555;margin-top:2pt">Sanoli Road, 11K.M Stone, Near Kurar Village Trun, V.P.O Jalalpur-1, Distt. Panipat- 132103 (Haryana) | GST: 06ACSFS1161L1ZP | Mob:92158-00933 |Sarvindia.com</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:13pt;font-weight:700;color:#D4870A">ORDER CONFIRMATION</div>
@@ -294,7 +344,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     </thead>
     <tbody id="pdf-items-body"></tbody>
     <tfoot><tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-      <td colspan="16" style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:9pt">TOTAL AMOUNT (Incl. GST)</td>
+      <td colspan="11" style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:9pt">Grand Total</td>
+      <td style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt" id="pdf-total-qty">—</td>
+      <td style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt" id="pdf-total-packs">—</td>
+      <td colspan="3" style="padding:5pt 4pt;border:0.5pt solid #1A3C5E"></td>
       <td style="padding:5pt 4pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:10pt" id="pdf-grand">₹0.00</td>
     </tr></tfoot>
   </table>
@@ -311,12 +364,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <tr>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label/Tag</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
-        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore/Bale</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Outer Box</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
-        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore/Bale</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Outer Box</th>
       </tr>
@@ -450,7 +503,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <div class="fg"><label>Mobile No.</label><input type="tel" id="buyerMobile" placeholder="+91 XXXXXXXXXX" oninput="syncMeta()"></div>
       <div class="fg"><label>Contact Person Name</label><input type="text" id="contactPerson" placeholder="Contact Person Name" oninput="syncMeta()"></div>
       <div class="fg"><label>Address</label><textarea id="buyerAddress" placeholder="Complete billing address..." oninput="syncMeta()"></textarea></div>
-      <div class="fg"><label>GSTIN</label><input type="text" id="buyerGST" placeholder="15-digit GSTIN" oninput="syncMeta()"></div>
+      <div class="fg"><label>GSTIN</label><input type="text" id="buyerGST" placeholder="15-digit GSTIN" oninput="syncMeta();onGSTInput(this.value)"></div>
     </div>
   </div>
 
@@ -467,7 +520,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <div class="sum-title">Bags &amp; Trims — Supplied By</div>
   <div style="overflow-x:auto">
     <table class="sum-tbl">
-      <thead><tr><th>Product</th><th>Label</th><th>Bag</th><th>Bore</th><th>Inner Box</th><th>Outer Box</th><th>Trims/Pc</th></tr></thead>
+      <thead><tr><th>Product</th><th>Label</th><th>Bag</th><th>Bore/Bale</th><th>Inner Box</th><th>Outer Box</th><th>Trims/Pc</th></tr></thead>
       <tbody id="bagsTbody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;font-size:12px">Add a product to see summary</td></tr></tbody>
     </table>
   </div>
@@ -530,10 +583,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 <!-- BOTTOM -->
 <div class="bnav">
   <button class="btn-reset" onclick="resetForm()">↺</button>
-  <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()">
+  <button class="btn-history" onclick="openOrderHistory()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v2H2zM2 7h12v2H2zM2 11h8v2H2z" fill="white"/></svg>
+    Orders
+  </button>
+  <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()" style="flex:1">
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     SUBMIT &amp; SAVE TO SHEET + PDF
   </button>
+</div>
+
+<!-- ORDER HISTORY PANEL -->
+<div class="oh-panel" id="ohPanel" onclick="if(event.target===this)closeOrderHistory()">
+  <div class="oh-drawer">
+    <div class="oh-hdr">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 4h14v2H3zM3 9h14v2H3zM3 14h10v2H3z" fill="white"/></svg>
+      <h3>Order History</h3>
+      <button class="oh-close" onclick="closeOrderHistory()">&times;</button>
+    </div>
+    <div class="oh-search">
+      <input type="text" id="ohSearch" placeholder="Search by order no, buyer, GSTIN, date..." oninput="filterOrderHistory()">
+    </div>
+    <div class="oh-count" id="ohCount">—</div>
+    <div class="oh-body" id="ohBody">
+      <div class="oh-loading">Loading orders...</div>
+    </div>
+  </div>
 </div>
 
 <!-- SUCCESS MODAL -->
@@ -565,7 +640,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBrWGaC7KUVtuMPys2I3Vxzh_lz0r5LRq3L7o2cwdRz89QCOHCmS4h43CoDkCvV9x7/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJKv_OMj6YhFj8xSkCqHWC0g90t7ZDUmwoTHN4t7tVPLLQAu_VcbWioZ1y4XF-MIIH/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -813,6 +888,63 @@ function selectCombo(fieldId, val){
   }
 }
 
+// ══════════════ GST → AUTO-FILL BUYER DETAILS ═══════════════════════════
+let _lastGSTMatch='';
+function onGSTInput(gst){
+  gst=(gst||'').trim().toUpperCase();
+  if(gst.length!==15||gst===_lastGSTMatch) return;
+
+  // 1) Local lookup first — check saved BUYER_DETAILS
+  for(const [buyer,bd] of Object.entries(BUYER_DETAILS)){
+    if((bd.gst||'').trim().toUpperCase()===gst){
+      _lastGSTMatch=gst;
+      suppressCombo=true;
+      const setF=(id,v)=>{const e=document.getElementById(id);if(e&&v){e.value=v;e.dispatchEvent(new Event('input'));}};
+      setF('buyerName',buyer);
+      setF('contactPerson',bd.contactPerson);
+      setF('buyerMobile',bd.mobile);
+      setF('buyerAddress',bd.address);
+      suppressCombo=false;
+      syncMeta();
+      toast('✓ Buyer details loaded from saved data');
+      return;
+    }
+  }
+
+  // 2) Online GST portal lookup
+  fetchGSTOnline(gst);
+}
+
+async function fetchGSTOnline(gstin){
+  const url=getApiUrl();
+  if(!url) return;
+  toast('🔍 Fetching GST details...');
+  try{
+    const r=await fetch(url+'?action=gstLookup&gstin='+encodeURIComponent(gstin),{method:'GET',redirect:'follow'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    if(j.gst){
+      _lastGSTMatch=gstin;
+      suppressCombo=true;
+      const setF=(id,v)=>{const e=document.getElementById(id);if(e&&v){e.value=v;e.dispatchEvent(new Event('input'));}};
+      // Trade Name → Buyer Name, Legal Name → Contact Person
+      setF('buyerName', j.gst.tradeName||j.gst.legalName||'');
+      setF('contactPerson', j.gst.legalName||'');
+      setF('buyerAddress', j.gst.address||'');
+      suppressCombo=false;
+      syncMeta();
+      const stsTag=j.gst.status?(' ('+j.gst.status+')'):'';
+
+      toast('✓ GST details loaded'+stsTag);
+    } else {
+      toast('⚠️ '+(j.error||'GSTIN not found on portal'));
+    }
+  }catch(e){
+    console.warn('GST lookup error:',e.message);
+    toast('⚠️ GST lookup failed: '+e.message);
+  }
+}
+
 function onItemCodeSelect(id, code){
   const item=STANDARD_ITEMS[code]; if(!item) return;
   suppressCombo=true;
@@ -835,7 +967,8 @@ function onItemCodeSelect(id, code){
   const ppEl=document.getElementById('p'+id+'-packPcs');
   if(ppEl && item.packPcs){ ppEl.value=item.packPcs; calcPackQty(id); }
   // Auto-fill trim Cost/Pc from Standard Items (after suppliers are set so cost inputs are enabled)
-  const trimPriceMap={label:'labelPrice',bag:'bagPrice',bore:'borePrice',inner:'innerPrice',outer:'outerPrice'};
+  const curPt=document.getElementById('p'+id+'-packType')?.value||'Bora';
+  const trimPriceMap={label:'labelPrice',bag:'bagPrice',bore:(curPt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
   Object.keys(trimPriceMap).forEach(k=>{
     const priceKey=trimPriceMap[k];
     if(item[priceKey]){
@@ -984,7 +1117,7 @@ function addProduct(){
         <tbody>
           ${TRIMS.map(t=>`
           <tr>
-            <td style="font-weight:600;font-size:13px">${t.n}</td>
+            <td style="font-weight:600;font-size:13px" id="p${id}-${t.k}-lbl">${t.n}</td>
             <td><select class="trim-sel" id="p${id}-${t.k}-supp" onchange="onSupp(${id},'${t.k}')">
               ${SUPP.map(o=>`<option value="${o.v}">${o.l}</option>`).join('')}
             </select></td>
@@ -997,7 +1130,10 @@ function addProduct(){
           </tr>`).join('')}
           <tr id="p${id}-packCharge-row" style="background:#FFFBEA">
             <td style="font-weight:600;font-size:13px;color:#92400E" id="p${id}-packCharge-label">Bora Packing Charge</td>
-            <td colspan="2" style="color:var(--muted);font-size:12px;text-align:center">—</td>
+            <td style="color:#92400E;font-size:11px;text-align:center;font-weight:600">SIHF</td>
+            <td>
+              <input type="number" class="trim-pi" id="p${id}-packCharge-pcs" placeholder="0" min="0" value="0" oninput="calcAll()" style="background:#FFFBEA;border-color:#FCD34D;width:70px">
+            </td>
             <td style="text-align:right">
               <input type="number" class="trim-pi" id="p${id}-packCharge" placeholder="0" step="0.5" min="0" value="0" oninput="calcAll()" style="background:#FFFBEA;border-color:#FCD34D">
             </td>
@@ -1027,11 +1163,24 @@ function onSupp(id,key){
   if(sel.value==='seller'){
     inp.disabled=false;inp.style.background='#EFF6FF';inp.style.borderColor='#93C5FD';
     if(pcsInp){pcsInp.disabled=false;pcsInp.style.background='#EFF6FF';pcsInp.style.borderColor='#93C5FD';const autoVal=(key==='outer'||key==='bore')?(parseFloat(document.getElementById('p'+id+'-packs')?.value)||0):(parseFloat(document.getElementById('p'+id+'-qty')?.value)||0);pcsInp.value=autoVal;}
+    // Auto-fill cost from Standard Items when Supplied By changes to SIHF
+    autoFillTrimCost(id,key);
   } else {
     inp.disabled=true;inp.value=0;inp.style.background='';inp.style.borderColor='';
     if(pcsInp){pcsInp.disabled=true;pcsInp.value=0;pcsInp.style.background='';pcsInp.style.borderColor='';}
   }
   calcAll();
+}
+function autoFillTrimCost(id,key){
+  const itemCode=document.getElementById('p'+id+'-itemCode')?.value;
+  const item=STANDARD_ITEMS[itemCode]; if(!item) return;
+  const pt=document.getElementById('p'+id+'-packType')?.value||'Bora';
+  const trimPriceMap={label:'labelPrice',bag:'bagPrice',bore:(pt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
+  const priceKey=trimPriceMap[key];
+  if(priceKey && item[priceKey]){
+    const costEl=document.getElementById('p'+id+'-'+key+'-cost');
+    if(costEl && !costEl.disabled) costEl.value=item[priceKey];
+  }
 }
 
 function calcPackQty(id){
@@ -1039,6 +1188,25 @@ function calcPackQty(id){
   const pcsPerPack=parseFloat(document.getElementById('p'+id+'-packPcs')?.value)||0;
   const qtyEl=document.getElementById('p'+id+'-qty');
   if(qtyEl) qtyEl.value=packs*pcsPerPack;
+  // Auto-update packCharge pcs = No. of Packs
+  const pcPcsEl=document.getElementById('p'+id+'-packCharge-pcs');
+  if(pcPcsEl) pcPcsEl.value=packs;
+  // Auto-update trim pcs: bore/outer = packs, label/bag = qty
+  const qty=packs*pcsPerPack;
+  ['bore','outer'].forEach(k=>{
+    const supp=document.getElementById('p'+id+'-'+k+'-supp')?.value;
+    if(supp==='seller'){
+      const pcsEl=document.getElementById('p'+id+'-'+k+'-pcs');
+      if(pcsEl && !pcsEl.disabled) pcsEl.value=packs;
+    }
+  });
+  ['label','bag'].forEach(k=>{
+    const supp=document.getElementById('p'+id+'-'+k+'-supp')?.value;
+    if(supp==='seller'){
+      const pcsEl=document.getElementById('p'+id+'-'+k+'-pcs');
+      if(pcsEl && !pcsEl.disabled) pcsEl.value=qty;
+    }
+  });
   calcAll();
 }
 
@@ -1049,13 +1217,16 @@ function onPackTypeChange(id){
     const ppEl=document.getElementById('p'+id+'-packPcs');
     if(ppEl){ppEl.value='';calcPackQty(id);}
   }
+  // Rename Bore → Bale when Packing Type is Bale
+  const boreLbl=document.getElementById('p'+id+'-bore-lbl');
+  if(boreLbl) boreLbl.textContent=pt==='Bale'?'Bale':'Bore';
   // Point 7: Auto supplier pick based on Pack Type
   // Reset all trims to 'na' first
   TRIMS.forEach(t=>{
     const sel=document.getElementById('p'+id+'-'+t.k+'-supp');
     if(sel){sel.value='na';onSupp(id,t.k);}
   });
-  // Bale or Bora → Label/Tag + Bore = SIHF Supplied
+  // Bale or Bora → Label/Tag + Bore(Bale) = SIHF Supplied
   if(pt==='Bale'||pt==='Bora'){
     ['label','bore'].forEach(k=>{
       const sel=document.getElementById('p'+id+'-'+k+'-supp');
@@ -1067,9 +1238,12 @@ function onPackTypeChange(id){
     const sel=document.getElementById('p'+id+'-label-supp');
     if(sel){sel.value='seller';onSupp(id,'label');}
   }
-  // Update packing charge label
+  // Update packing charge label & auto-fill pcs = No. of Packs
   const lbl=document.getElementById('p'+id+'-packCharge-label');
   if(lbl) lbl.textContent=pt+' Packing Charge';
+  const packs=parseFloat(document.getElementById('p'+id+'-packs')?.value)||0;
+  const pcPcsEl=document.getElementById('p'+id+'-packCharge-pcs');
+  if(pcPcsEl) pcPcsEl.value=packs;
   calcAll();
 }
 
@@ -1090,7 +1264,9 @@ function getProd(id){
     trimsCostPerPc+=costPerPc; trimsCostTotal+=trimPcs*costPerPc;
     trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc,pcs:trimPcs};
   });
-  const packCharge=n('p'+id+'-packCharge');
+  const packChargePcs=n('p'+id+'-packCharge-pcs');
+  const packChargeCostPc=n('p'+id+'-packCharge');
+  const packCharge=packChargePcs*packChargeCostPc;
   const fabricCost=qty*pricePerPc;
   const exGST=fabricCost+trimsCostTotal+packCharge;
   const gstAmt=exGST*(gstPct/100);
@@ -1099,7 +1275,7 @@ function getProd(id){
   const packType=g('p'+id+'-packType');
   const packs=n('p'+id+'-packs'), packPcs=n('p'+id+'-packPcs');
   return {
-    id, qty, packs, packPcs, price, discount, effectivePricePerKg, pricePerPc, weight, gstPct, packType, packCharge,
+    id, qty, packs, packPcs, price, discount, effectivePricePerKg, pricePerPc, weight, gstPct, packType, packCharge, packChargePcs, packChargeCostPc,
     trimsCostPerPc, trimsCostTotal, exGST, gstAmt, amount, finalPricePerQty,
     trimStatus, trimData,
     itemCode:g('p'+id+'-itemCode'), fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
@@ -1197,6 +1373,14 @@ function updatePdfDoc(prods,grand){
     </tr>`;
   }).join('');
 
+  // Qty & Pack totals in the TOTAL AMOUNT footer row
+  const totalQty=prods.reduce((s,p)=>s+(p.qty||0),0);
+  const totalPacks=prods.reduce((s,p)=>s+(p.packs||0),0);
+  const tqEl=document.getElementById('pdf-total-qty');
+  const tpEl=document.getElementById('pdf-total-packs');
+  if(tqEl) tqEl.textContent=totalQty?Number(totalQty).toLocaleString('en-IN'):'—';
+  if(tpEl) tpEl.textContent=totalPacks||'—';
+
   const gt=document.getElementById('pdf-grand');
   if(gt) gt.textContent=grand?'₹'+Math.round(grand).toLocaleString('en-IN'):'₹0';
 
@@ -1204,12 +1388,12 @@ function updatePdfDoc(prods,grand){
   const pb=document.getElementById('pdf-pack-body');
   if(pb) pb.innerHTML=prods.map((p,i)=>{
     const bLbl=k=>{const v=p.trimStatus[k]; return v==='buyer'?'YES':'NO';};
-    const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.cost||0,pc=td?.pcs||0; if(v==='seller') return c?pc+'pc×₹'+c:'NO'; if(v==='foc') return 'FOC'; return 'NO';};
+    const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.cost||0,pc=td?.pcs||0; if(v==='seller') return (c&&pc)?pc+'pc×₹'+c:'NO'; if(v==='foc') return 'FOC'; return 'NO';};
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
       ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${bLbl(k)==='YES'?'#1B6B3A':'#999'}">${bLbl(k)}</td>`).join('')}
       ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${sLbl(k)!=='NO'?'#1B6B3A':'#999'}">${sLbl(k)}</td>`).join('')}
-      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">₹${p.trimsCostTotal?fmtN(p.trimsCostTotal):'0'}${p.packCharge?`<br><small style="color:#92400E;font-size:5.5pt">+₹${fmtN(p.packCharge)} ${p.packType} pkg</small>`:''}</td>
+      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">₹${p.trimsCostTotal?fmtN(p.trimsCostTotal):'0'}${p.packCharge?`<br><small style="color:#92400E;font-size:5.5pt">+${p.packChargePcs?p.packChargePcs+'pc×₹'+fmtN(p.packChargeCostPc):'₹'+fmtN(p.packCharge)} ${p.packType} pkg</small>`:''}</td>
     </tr>`;
   }).join('');
   const totalTrims=prods.reduce((s,p)=>s+p.trimsCostTotal,0);
@@ -1246,7 +1430,7 @@ function collectPayload(){
       itemCode:p.itemCode,fabric:p.fabric,category:p.category,weight:p.weight,size:p.size,
       dbsb:p.dbsb,ply:p.ply,sattan:p.sattan,moq:p.moq,emboss:p.emboss,
       design:p.design,packs:p.packs,packPcs:p.packPcs,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
-      gstPct:p.gstPct,packType:p.packType,packCharge:p.packCharge,
+      gstPct:p.gstPct,packType:p.packType,packCharge:p.packCharge,packChargePcs:p.packChargePcs,packChargeCostPc:p.packChargeCostPc,
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
     });
   });
@@ -1407,6 +1591,238 @@ function toast(msg){
   const el=document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
   clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ══════════════════════ ORDER HISTORY PANEL ══════════════════════════════
+let ohCache=null;
+
+function openOrderHistory(){
+  const panel=document.getElementById('ohPanel');
+  panel.classList.add('open');
+  document.getElementById('ohSearch').value='';
+  if(!ohCache) fetchOrderList();
+  else renderOrderList(ohCache);
+}
+
+function closeOrderHistory(){
+  document.getElementById('ohPanel').classList.remove('open');
+}
+
+async function fetchOrderList(){
+  const body=document.getElementById('ohBody');
+  body.innerHTML='<div class="oh-loading">Loading orders…</div>';
+  document.getElementById('ohCount').textContent='—';
+  const url=getApiUrl();
+  if(!url){ body.innerHTML='<div class="oh-loading">⚠️ APPS_SCRIPT_URL not set</div>'; return; }
+  try{
+    const resp=await fetch(url+'?action=orderList');
+    const data=await resp.json();
+    if(data.success && Array.isArray(data.orders)){
+      ohCache=data.orders;
+      renderOrderList(ohCache);
+    } else {
+      body.innerHTML='<div class="oh-loading">❌ '+(data.error||'Failed to load')+'</div>';
+    }
+  }catch(err){
+    body.innerHTML='<div class="oh-loading">❌ Network error: '+err.message+'</div>';
+  }
+}
+
+// ── Order History helpers ──
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function sanitizePhone(ph){
+  if(!ph) return '';
+  let d=String(ph).replace(/[^0-9]/g,'');
+  if(d.startsWith('0')) d=d.slice(1);
+  if(d.length===10) d='91'+d;
+  return d.length>=12?d:'';
+}
+
+function buildWhatsAppUrl(phone,o,target){
+  const gt=o.grandTotal?'₹'+Number(o.grandTotal).toLocaleString('en-IN'):'—';
+  const pdfLine=o.pdfLink?('\n📎 Order PDF: '+o.pdfLink):'';
+  let msg='';
+  if(target==='buyer'){
+    msg=`Dear ${o.contact||o.buyerName||'Sir/Madam'},\n\n`
+      +`Greetings from *SARV INDIA HOME FURNISHING*!\n\n`
+      +`Your order details are as below:\n\n`
+      +`📋 *Order No:* ${o.orderNo}\n`
+      +`📅 *Order Date:* ${o.orderDate||'—'}\n`
+      +`📦 *Total Items:* ${o.totalProducts||0}\n`
+      +`🔢 *Total Qty:* ${o.totalQty?Number(o.totalQty).toLocaleString('en-IN'):'—'}\n`
+      +`💰 *Grand Total:* ${gt}`
+      +pdfLine
+      +`\n\nPlease review and confirm.\nThank you! 🙏\n\n— *SARV INDIA HOME FURNISHING*`;
+  } else {
+    msg=`Dear ${o.agencyContact||o.agencyName||'Sir/Madam'},\n\n`
+      +`Greetings from *SARV INDIA HOME FURNISHING*!\n\n`
+      +`Please find the order details placed via your agency:\n\n`
+      +`📋 *Order No:* ${o.orderNo}\n`
+      +`📅 *Order Date:* ${o.orderDate||'—'}\n`
+      +`🏢 *Buyer:* ${o.buyerName||'—'}\n`
+      +`📦 *Total Items:* ${o.totalProducts||0}\n`
+      +`🔢 *Total Qty:* ${o.totalQty?Number(o.totalQty).toLocaleString('en-IN'):'—'}\n`
+      +`💰 *Grand Total:* ${gt}`
+      +pdfLine
+      +`\n\nPlease review and share with the buyer.\nThank you! 🙏\n\n— *SARV INDIA HOME FURNISHING*`;
+  }
+  return 'https://wa.me/'+phone+'?text='+encodeURIComponent(msg);
+}
+
+// ── Sent count tracking ──
+const LS_SENT='sihf_sent_counts';
+function getSentCounts(){
+  try{ return JSON.parse(localStorage.getItem(LS_SENT))||{}; }catch(e){ return {}; }
+}
+function saveSentCounts(c){ localStorage.setItem(LS_SENT,JSON.stringify(c)); }
+function trackSend(orderNo,type,url){
+  const counts=getSentCounts();
+  if(!counts[orderNo]) counts[orderNo]={waBuyer:0,waAgency:0,mailBuyer:0,mailAgency:0};
+  counts[orderNo][type]=(counts[orderNo][type]||0)+1;
+  saveSentCounts(counts);
+  // Update badge in DOM
+  const badge=document.getElementById('oh-badge-'+orderNo+'-'+type);
+  if(badge){badge.textContent=counts[orderNo][type];badge.style.display='inline-flex';}
+  // Update total count
+  const totalEl=document.getElementById('oh-total-sent-'+orderNo);
+  if(totalEl){
+    const oc=counts[orderNo];
+    const t=(oc.waBuyer||0)+(oc.waAgency||0)+(oc.mailBuyer||0)+(oc.mailAgency||0);
+    totalEl.textContent='📨 '+t+' sent';
+    totalEl.style.display=t?'flex':'none';
+  }
+  if(url.startsWith('mailto:')) location.href=url;
+  else window.open(url,'_blank');
+}
+function getSentBadge(orderNo,type){
+  const counts=getSentCounts();
+  const c=counts[orderNo]&&counts[orderNo][type]?counts[orderNo][type]:0;
+  return c?'<span class="oh-sent-badge" id="oh-badge-'+orderNo+'-'+type+'">'+c+'</span>':'<span class="oh-sent-badge" id="oh-badge-'+orderNo+'-'+type+'" style="display:none">0</span>';
+}
+function getTotalSent(orderNo){
+  const counts=getSentCounts();
+  const oc=counts[orderNo]||{};
+  const t=(oc.waBuyer||0)+(oc.waAgency||0)+(oc.mailBuyer||0)+(oc.mailAgency||0);
+  return '<span class="oh-sent-total" id="oh-total-sent-'+orderNo+'" style="'+(t?'':'display:none')+'">📨 '+t+' sent</span>';
+}
+
+function buildMailUrl(o,target){
+  const gt=o.grandTotal?'₹'+Number(o.grandTotal).toLocaleString('en-IN'):'—';
+  const pdfLine=o.pdfLink?('\n📎 Order PDF: '+o.pdfLink):'';
+  let subject='', body='';
+  if(target==='buyer'){
+    subject=`SARV INDIA — Order ${o.orderNo} Details`;
+    body=`Dear ${o.contact||o.buyerName||'Sir/Madam'},\n\n`
+      +`Greetings from SARV INDIA HOME FURNISHING!\n\n`
+      +`Your order details are as below:\n\n`
+      +`Order No: ${o.orderNo}\n`
+      +`Order Date: ${o.orderDate||'—'}\n`
+      +`Total Items: ${o.totalProducts||0}\n`
+      +`Total Qty: ${o.totalQty?Number(o.totalQty).toLocaleString('en-IN'):'—'}\n`
+      +`Grand Total: ${gt}`
+      +pdfLine
+      +`\n\nPlease review and confirm.\n\nThank you & Regards,\nSARV INDIA HOME FURNISHING`;
+  } else {
+    subject=`SARV INDIA — Order ${o.orderNo} via ${o.agencyName||'Agency'}`;
+    body=`Dear ${o.agencyContact||o.agencyName||'Sir/Madam'},\n\n`
+      +`Greetings from SARV INDIA HOME FURNISHING!\n\n`
+      +`Please find the order details placed via your agency:\n\n`
+      +`Order No: ${o.orderNo}\n`
+      +`Order Date: ${o.orderDate||'—'}\n`
+      +`Buyer: ${o.buyerName||'—'}\n`
+      +`Total Items: ${o.totalProducts||0}\n`
+      +`Total Qty: ${o.totalQty?Number(o.totalQty).toLocaleString('en-IN'):'—'}\n`
+      +`Grand Total: ${gt}`
+      +pdfLine
+      +`\n\nPlease review and share with the buyer.\n\nThank you & Regards,\nSARV INDIA HOME FURNISHING`;
+  }
+  return 'mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+
+function renderOrderList(orders){
+  const body=document.getElementById('ohBody');
+  const countEl=document.getElementById('ohCount');
+  if(!orders.length){
+    body.innerHTML='<div class="oh-loading">No orders found</div>';
+    countEl.textContent='0 orders';
+    return;
+  }
+  countEl.textContent=orders.length+' order'+(orders.length>1?'s':'');
+  body.innerHTML=orders.map((o,idx)=>{
+    const gt=o.grandTotal?'₹'+Number(o.grandTotal).toLocaleString('en-IN'):'—';
+    const dt=o.orderDate||'—';
+    const buyer=o.buyerName||'—';
+    const oNo=o.orderNo||'—';
+    const status=o.status||'';
+    const savedAt=o.savedAt||'';
+    const channel=o.saleChannel||'';
+    const totalQty=o.totalQty?Number(o.totalQty).toLocaleString('en-IN'):'—';
+    const totalProds=o.totalProducts||'—';
+    const pdfLink=o.pdfLink||'';
+    const statusBadge=status?`<span class="oh-status ${status.toLowerCase().replace(/\s+/g,'-')}">${status}</span>`:'';
+
+    // WhatsApp & Mail buttons
+    const buyerMob=sanitizePhone(o.mobile);
+    const agencyMob=sanitizePhone(o.agencyMobile);
+    const hasBuyerPhone=!!buyerMob;
+    const hasAgencyPhone=!!agencyMob;
+
+    const waBuyerUrl=hasBuyerPhone?buildWhatsAppUrl(buyerMob,o,'buyer'):'';
+    const waAgencyUrl=hasAgencyPhone?buildWhatsAppUrl(agencyMob,o,'agency'):'';
+    const mailBuyerUrl=buildMailUrl(o,'buyer');
+    const mailAgencyUrl=o.agencyName?buildMailUrl(o,'agency'):'';
+
+    // Escape URLs for onclick
+    const escUrl=u=>u.replace(/'/g,"\\'");
+    const waBuyerBtn=waBuyerUrl
+      ?`<a class="oh-act-btn oh-wa-buyer" href="javascript:void(0)" onclick="trackSend('${oNo}','waBuyer','${escUrl(waBuyerUrl)}')" title="WhatsApp to ${esc(buyer)}">💬 Buyer${getSentBadge(oNo,'waBuyer')}</a>`
+      :`<span class="oh-act-btn disabled" title="No buyer mobile">💬 Buyer</span>`;
+    const waAgencyBtn=o.agencyName
+      ?(waAgencyUrl
+        ?`<a class="oh-act-btn oh-wa-agency" href="javascript:void(0)" onclick="trackSend('${oNo}','waAgency','${escUrl(waAgencyUrl)}')" title="WhatsApp to ${esc(o.agencyName)}">💬 Agency${getSentBadge(oNo,'waAgency')}</a>`
+        :`<span class="oh-act-btn disabled" title="No agency mobile">💬 Agency</span>`)
+      :'';
+    const mailBuyerBtn=`<a class="oh-act-btn oh-mail-buyer" href="javascript:void(0)" onclick="trackSend('${oNo}','mailBuyer','${escUrl(mailBuyerUrl)}')" title="Email about order">✉ Buyer${getSentBadge(oNo,'mailBuyer')}</a>`;
+    const mailAgencyBtn=o.agencyName
+      ?`<a class="oh-act-btn oh-mail-agency" href="javascript:void(0)" onclick="trackSend('${oNo}','mailAgency','${escUrl(mailAgencyUrl)}')" title="Email agency">✉ Agency${getSentBadge(oNo,'mailAgency')}</a>`
+      :'';
+
+    return `<div class="oh-card" data-search="${(oNo+' '+buyer+' '+dt+' '+channel+' '+status+' '+(o.agencyName||'')).toLowerCase()}">
+      <div class="oh-card-top">
+        <div class="oh-orderNo">${oNo}</div>
+        ${statusBadge}
+      </div>
+      <div class="oh-buyer">${buyer}${o.contact?' <small style="color:var(--muted);font-weight:400">('+esc(o.contact)+')</small>':''}</div>
+      <div class="oh-meta-row">
+        <span>📅 ${dt}</span>
+        <span>📦 ${totalProds} items</span>
+        <span>🔢 Qty: ${totalQty}</span>
+      </div>
+      ${channel?'<div class="oh-meta-row"><span>🏷️ '+channel+(o.agencyName?' — '+esc(o.agencyName):'')+'</span></div>':''}
+      <div class="oh-card-bottom">
+        <div class="oh-total">${gt}</div>
+        ${pdfLink?'<a class="oh-pdf-btn" href="'+pdfLink+'" target="_blank" rel="noopener">📄 PDF</a>':'<span class="oh-pdf-na">No PDF</span>'}
+      </div>
+      <div class="oh-actions-row">
+        ${waBuyerBtn}${waAgencyBtn}${mailBuyerBtn}${mailAgencyBtn}${getTotalSent(oNo)}
+      </div>
+      ${savedAt?'<div class="oh-saved-at">Saved: '+savedAt+'</div>':''}
+    </div>`;
+  }).join('');
+}
+
+function filterOrderHistory(){
+  const q=document.getElementById('ohSearch').value.trim().toLowerCase();
+  const cards=document.querySelectorAll('#ohBody .oh-card');
+  let visible=0;
+  cards.forEach(card=>{
+    const match=!q||card.dataset.search.includes(q);
+    card.style.display=match?'':'none';
+    if(match) visible++;
+  });
+  document.getElementById('ohCount').textContent=visible+' order'+(visible!==1?'s':'')+
+    (q?' (filtered)':'');
 }
 </script>
 </body>
