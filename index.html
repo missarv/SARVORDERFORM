@@ -313,7 +313,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
           <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Bank Name:</b> HDFC BANK, PANIPAT</div>
           <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Branch:</b> Harmony Tower, G.T. Road</div>
           <div style="margin-bottom:3pt"><b style="color:#1A3C5E">A/C No.:</b> 50200053404079</div>
-          <div><b style="color:#1A3C5E">IFSC:</b> HDFC0000171 &nbsp;|&nbsp; <b style="color:#1A3C5E">Type:</b> Current A/c</div>
+          <div><b style="color:#1A3C5E">IFSC:</b> HDFC0000171</div>
         </div>
       </td>
     </tr>
@@ -331,15 +331,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">DB/SB</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Ply</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Sattan</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:15%">Design Details</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">MOQ</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Design Details</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">MOQ</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Emboss</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Qty</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Pack</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Qty</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Pack</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">Price(₹/KG)</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Disc%</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">GST%</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%">Amount</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Amount</th>
       </tr>
     </thead>
     <tbody id="pdf-items-body"></tbody>
@@ -356,20 +356,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <table style="width:100%;border-collapse:collapse;font-size:7pt" id="pdf-pack">
     <thead>
       <tr>
-        <th rowspan="2" style="background:#1A3C5E;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%;-webkit-print-color-adjust:exact;print-color-adjust:exact">SR</th>
+        <th rowspan="2" style="background:#1A3C5E;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:3%;-webkit-print-color-adjust:exact;print-color-adjust:exact">SR</th>
         <th colspan="5" style="background:#2E6DA4;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY BUYER</th>
         <th colspan="5" style="background:#1B6B3A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY SELLER</th>
-        <th rowspan="2" style="background:#D4870A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%;-webkit-print-color-adjust:exact;print-color-adjust:exact">Trims Cost</th>
+        <th rowspan="2" style="background:#D4870A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%;-webkit-print-color-adjust:exact;print-color-adjust:exact">Trims Cost</th>
+        <th rowspan="2" style="background:#92400E;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%;-webkit-print-color-adjust:exact;print-color-adjust:exact">Pkg Charge</th>
       </tr>
       <tr>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label/Tag</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
-        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore/Bale</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact" id="pdf-bore-buyer-th">Bore</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Outer Box</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
-        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bore/Bale</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact" id="pdf-bore-seller-th">Bore</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Outer Box</th>
       </tr>
@@ -640,7 +641,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJKv_OMj6YhFj8xSkCqHWC0g90t7ZDUmwoTHN4t7tVPLLQAu_VcbWioZ1y4XF-MIIH/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7xWmes7mFUYoi-XzzK93w_5ROPLKHI8oAjjSIuLPoI-4BjHDRq96rzKpEg_rJ-n0X/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -664,7 +665,7 @@ let DROPS = {
 };
 
 const TRIMS=[{k:'label',n:'Label / Tag'},{k:'bag',n:'Bag'},{k:'bore',n:'Bore'},{k:'inner',n:'Inner Box'},{k:'outer',n:'Outer Box'}];
-const SUPP=[{v:'na',l:'Not Required'},{v:'buyer',l:'Buyer Supplied'},{v:'seller',l:'SIHF Supplied'},{v:'foc',l:'SIHF (FOC)'}];
+const SUPP=[{v:'na',l:'NA'},{v:'buyer',l:'Buyer Supplied'},{v:'seller',l:'SIHF Supplied'},{v:'foc',l:'SIHF (FOC)'}];
 const fmt=n=>'₹'+Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtN=n=>Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -960,6 +961,12 @@ function onItemCodeSelect(id, code){
   setV('p'+id+'-moq',     item.moq);
   setS('p'+id+'-emboss',  item.emboss);
   const pEl=document.getElementById('p'+id+'-price'); if(pEl) pEl.value=item.price;
+  // GREY/WHITE FABRIC → Design Details "NA" + Packing Type "Roll" + PLY "NA"
+  if(code==='GREY/WHITE FABRIC'){
+    setV('p'+id+'-design','NA');
+    setS('p'+id+'-packType','Roll');
+    setS('p'+id+'-ply','Na');
+  }
   suppressCombo=false;
   // Trigger Pack Type change to auto-set suppliers (this enables cost inputs for SIHF-supplied trims)
   onPackTypeChange(id);
@@ -1048,7 +1055,7 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>Final Weight (KG)</label>
-          <input type="number" id="p${id}-weight" placeholder="e.g. 3.2" step="0.1" oninput="calcAll()"></div>
+          <input type="number" id="p${id}-weight" placeholder="e.g. 3.2" step="0.1" oninput="calcTotalWeight(${id});calcAll()"></div>
         <div class="fg"><label>Final Size</label>
           <div class="combo-wrap">
             <input type="text" id="p${id}-size" placeholder="e.g. 210×230 CM" autocomplete="off"
@@ -1066,7 +1073,7 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>Ply</label>
-          <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option></select></div>
+          <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option><option value="Na">Na</option></select></div>
         <div class="fg"><label>Sattan</label>
           <div class="combo-wrap">
             <input type="text" id="p${id}-sattan" placeholder='e.g. 5" PREMIUM' autocomplete="off"
@@ -1084,7 +1091,7 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>Emboss</label>
-          <select id="p${id}-emboss"><option value="NO">NO</option><option value="YES">YES</option></select></div>
+          <select id="p${id}-emboss"><option value="NO">NO</option><option value="YES">YES</option><option value="NA">NA</option></select></div>
       </div>
       <div class="fg"><label>Design Details</label>
         <div class="combo-wrap">
@@ -1101,15 +1108,17 @@ function addProduct(){
             <option value="Bora">Bora</option>
             <option value="Bale">Bale</option>
             <option value="Box">Box</option>
+            <option value="Roll">Roll</option>
             <option value="Loose">Loose</option>
           </select>
         </div>
-        <div class="fg"><label>No. of Packs</label><input type="number" id="p${id}-packs" placeholder="0" min="0" oninput="calcPackQty(${id})"></div>
+        <div class="fg"><label id="p${id}-packs-lbl">No. of Bora</label><input type="number" id="p${id}-packs" placeholder="0" min="0" oninput="calcPackQty(${id})"></div>
         <div class="fg"><label>Packing (pcs/pack)</label><input type="number" id="p${id}-packPcs" placeholder="0" min="0" oninput="calcPackQty(${id})"></div>
         <div class="fg"><label>Quantity (Pcs)</label><input type="number" id="p${id}-qty" placeholder="0" min="0" oninput="calcAll()"></div>
         <div class="fg"><label>Price (₹ / KG)</label><input type="number" id="p${id}-price" placeholder="e.g. 215" step="0.5" oninput="calcAll()"></div>
         <div class="fg"><label>Discount % on Price</label><input type="number" id="p${id}-discount" placeholder="0" min="0" max="100" step="0.1" value="0" oninput="calcAll()"></div>
         <div class="fg"><label>GST %</label><input type="number" id="p${id}-gst" placeholder="e.g. 5" step="0.5" min="0" value="5" oninput="calcAll()"></div>
+        <div class="fg"><label>Weight <small style="font-weight:400;text-transform:none;color:var(--muted)">(Packs×Pcs×Wt)</small></label><input type="number" id="p${id}-totalWeight" placeholder="auto" step="0.1" min="0" oninput="calcAll()" style="background:#EEF2F7;border-color:#D0DAE8"></div>
       </div>
       <div class="shd">Bags &amp; Trims</div>
       <table class="tt">
@@ -1207,20 +1216,54 @@ function calcPackQty(id){
       if(pcsEl && !pcsEl.disabled) pcsEl.value=qty;
     }
   });
+  calcTotalWeight(id);
   calcAll();
+}
+
+function calcTotalWeight(id){
+  const twEl=document.getElementById('p'+id+'-totalWeight');
+  if(!twEl || twEl.disabled) return;
+  // Roll → user enters weight manually, don't auto-calc
+  const pt=document.getElementById('p'+id+'-packType')?.value||'Bora';
+  if(pt==='Roll') return;
+  const packs=parseFloat(document.getElementById('p'+id+'-packs')?.value)||0;
+  const pcsPerPack=parseFloat(document.getElementById('p'+id+'-packPcs')?.value)||0;
+  const wt=parseFloat(document.getElementById('p'+id+'-weight')?.value)||0;
+  const val=packs*pcsPerPack*wt;
+  twEl.value=val?parseFloat(val.toFixed(2)):'';
 }
 
 function onPackTypeChange(id){
   const pt=document.getElementById('p'+id+'-packType')?.value||'Bora';
-  // Point 1: Bale or Box → blank Packing (pcs/pack) & recalc qty
+  const rollHideFields=['p'+id+'-packs','p'+id+'-packPcs','p'+id+'-qty'];
+  const rollHidePlaceholders=['0','0','0'];
+  // ROLL → packs=1, packPcs=1, qty=1 (hidden); price & totalWeight stay editable
+  if(pt==='Roll'){
+    rollHideFields.forEach((fid)=>{
+      const el=document.getElementById(fid);
+      if(el){el.value=1;el.disabled=true;el.placeholder='NA';el.style.background='#F3F4F6';el.style.color='#9CA3AF';}
+    });
+    // totalWeight editable for Roll — user enters manually
+    const twEl=document.getElementById('p'+id+'-totalWeight');
+    if(twEl){twEl.disabled=false;twEl.value='';twEl.placeholder='Enter weight';twEl.style.background='#EEF2F7';twEl.style.color='';}
+  } else {
+    // Re-enable fields when switching away from ROLL
+    rollHideFields.forEach((fid,i)=>{
+      const el=document.getElementById(fid);
+      if(el){el.disabled=false;el.placeholder=rollHidePlaceholders[i];el.style.background='';el.style.color='';}
+    });
+    const twEl=document.getElementById('p'+id+'-totalWeight');
+    if(twEl){twEl.disabled=false;twEl.placeholder='auto';twEl.style.background='#EEF2F7';twEl.style.color='';}
+  }
+  // Bale or Box → blank Packing (pcs/pack) & recalc qty
   if(pt==='Bale'||pt==='Box'){
     const ppEl=document.getElementById('p'+id+'-packPcs');
     if(ppEl){ppEl.value='';calcPackQty(id);}
   }
-  // Rename Bore → Bale when Packing Type is Bale
+  // Rename Bore based on Packing Type
   const boreLbl=document.getElementById('p'+id+'-bore-lbl');
-  if(boreLbl) boreLbl.textContent=pt==='Bale'?'Bale':'Bore';
-  // Point 7: Auto supplier pick based on Pack Type
+  if(boreLbl) boreLbl.textContent=(pt==='Bale'||pt==='Box')?pt:'Bore';
+  // Auto supplier pick based on Pack Type
   // Reset all trims to 'na' first
   TRIMS.forEach(t=>{
     const sel=document.getElementById('p'+id+'-'+t.k+'-supp');
@@ -1238,12 +1281,16 @@ function onPackTypeChange(id){
     const sel=document.getElementById('p'+id+'-label-supp');
     if(sel){sel.value='seller';onSupp(id,'label');}
   }
+  // Update "No. of {PackType}" label
+  const packsLbl=document.getElementById('p'+id+'-packs-lbl');
+  if(packsLbl) packsLbl.textContent='No. of '+pt;
   // Update packing charge label & auto-fill pcs = No. of Packs
   const lbl=document.getElementById('p'+id+'-packCharge-label');
   if(lbl) lbl.textContent=pt+' Packing Charge';
   const packs=parseFloat(document.getElementById('p'+id+'-packs')?.value)||0;
   const pcPcsEl=document.getElementById('p'+id+'-packCharge-pcs');
   if(pcPcsEl) pcPcsEl.value=packs;
+  calcTotalWeight(id);
   calcAll();
 }
 
@@ -1267,7 +1314,8 @@ function getProd(id){
   const packChargePcs=n('p'+id+'-packCharge-pcs');
   const packChargeCostPc=n('p'+id+'-packCharge');
   const packCharge=packChargePcs*packChargeCostPc;
-  const fabricCost=qty*pricePerPc;
+  const totalWeight=n('p'+id+'-totalWeight');
+  const fabricCost=totalWeight*effectivePricePerKg;
   const exGST=fabricCost+trimsCostTotal+packCharge;
   const gstAmt=exGST*(gstPct/100);
   const amount=exGST+gstAmt;
@@ -1275,7 +1323,7 @@ function getProd(id){
   const packType=g('p'+id+'-packType');
   const packs=n('p'+id+'-packs'), packPcs=n('p'+id+'-packPcs');
   return {
-    id, qty, packs, packPcs, price, discount, effectivePricePerKg, pricePerPc, weight, gstPct, packType, packCharge, packChargePcs, packChargeCostPc,
+    id, qty, packs, packPcs, price, discount, effectivePricePerKg, pricePerPc, weight, totalWeight, gstPct, packType, packCharge, packChargePcs, packChargeCostPc,
     trimsCostPerPc, trimsCostTotal, exGST, gstAmt, amount, finalPricePerQty,
     trimStatus, trimData,
     itemCode:g('p'+id+'-itemCode'), fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
@@ -1352,6 +1400,8 @@ function updatePdfDoc(prods,grand){
   // Items
   const ib=document.getElementById('pdf-items-body');
   if(ib) ib.innerHTML=prods.map((p,i)=>{
+    const isRoll=p.packType==='Roll';
+    const naCell='<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;color:#9CA3AF;font-style:italic">NA</td>';
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E">${p.itemCode||p.fabric||'—'}</td>
@@ -1364,9 +1414,9 @@ function updatePdfDoc(prods,grand){
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.design||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.moq||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.emboss}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}${p.packPcs?`<br><small style="color:#2E6DA4;font-size:5.5pt">${p.packPcs} pcs/pack</small>`:''}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packs?(p.packs+' '+(p.packType||'')):(p.packType||'—')}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">₹${p.effectivePricePerKg?fmtN(p.effectivePricePerKg):'—'}/KG${p.discount>0?`<br><small style="color:#D4870A;font-size:5.5pt">${fmtN(p.price)}-${p.discount}%</small>`:''}</td>
+      ${isRoll?naCell:`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}${p.packPcs?`<br><small style="color:#2E6DA4;font-size:5.5pt">${p.packPcs} pcs/${p.packType||'pack'}</small>`:''}</td>`}
+      ${isRoll?`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">Roll${p.totalWeight?'<br><small style="color:#1B6B3A;font-size:5.5pt;font-weight:700">'+fmtN(p.totalWeight)+' KG</small>':''}</td>`:`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packs?(p.packs+' '+(p.packType||'')):(p.packType||'—')}${p.totalWeight?'<br><small style="color:#1B6B3A;font-size:5.5pt;font-weight:700">'+fmtN(p.totalWeight)+' KG</small>':''}</td>`}
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">${p.effectivePricePerKg?`₹${fmtN(p.effectivePricePerKg)}/KG${p.discount>0?`<br><small style="color:#D4870A;font-size:5.5pt">${fmtN(p.price)}-${p.discount}%</small>`:''}`:' —'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">${p.discount>0?p.discount+'%':'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.gstPct}%</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A;white-space:nowrap">${p.amount?'₹'+fmtN(p.amount):'—'}</td>
@@ -1384,24 +1434,35 @@ function updatePdfDoc(prods,grand){
   const gt=document.getElementById('pdf-grand');
   if(gt) gt.textContent=grand?'₹'+Math.round(grand).toLocaleString('en-IN'):'₹0';
 
-  // Pack table
+  // Pack table — dynamic bore header based on packing types
+  const packTypes=[...new Set(prods.map(p=>p.packType).filter(Boolean))];
+  const boreHdrLabel=packTypes.length===1?((packTypes[0]==='Bale'||packTypes[0]==='Box')?packTypes[0]:'Bore'):
+    (packTypes.some(t=>t==='Bale'||t==='Box')?packTypes.map(t=>(t==='Bale'||t==='Box')?t:'Bore').filter((v,i,a)=>a.indexOf(v)===i).join('/'):'Bore');
+  const bth1=document.getElementById('pdf-bore-buyer-th');
+  const bth2=document.getElementById('pdf-bore-seller-th');
+  if(bth1) bth1.textContent=boreHdrLabel;
+  if(bth2) bth2.textContent=boreHdrLabel;
+
   const pb=document.getElementById('pdf-pack-body');
   if(pb) pb.innerHTML=prods.map((p,i)=>{
     const bLbl=k=>{const v=p.trimStatus[k]; return v==='buyer'?'YES':'NO';};
     const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.cost||0,pc=td?.pcs||0; if(v==='seller') return (c&&pc)?pc+'pc×₹'+c:'NO'; if(v==='foc') return 'FOC'; return 'NO';};
+    const pkgChgHtml=p.packCharge?`${p.packChargePcs?p.packChargePcs+'pc×₹'+fmtN(p.packChargeCostPc):'₹'+fmtN(p.packCharge)}<br><small style="font-size:5.5pt">${p.packType}</small>`:'—';
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
       ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${bLbl(k)==='YES'?'#1B6B3A':'#999'}">${bLbl(k)}</td>`).join('')}
       ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${sLbl(k)!=='NO'?'#1B6B3A':'#999'}">${sLbl(k)}</td>`).join('')}
-      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">₹${p.trimsCostTotal?fmtN(p.trimsCostTotal):'0'}${p.packCharge?`<br><small style="color:#92400E;font-size:5.5pt">+${p.packChargePcs?p.packChargePcs+'pc×₹'+fmtN(p.packChargeCostPc):'₹'+fmtN(p.packCharge)} ${p.packType} pkg</small>`:''}</td>
+      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">₹${p.trimsCostTotal?fmtN(p.trimsCostTotal):'0'}</td>
+      <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#92400E">${pkgChgHtml}</td>
     </tr>`;
   }).join('');
   const totalTrims=prods.reduce((s,p)=>s+p.trimsCostTotal,0);
   const totalPackCharge=prods.reduce((s,p)=>s+(p.packCharge||0),0);
   const pf=document.getElementById('pdf-pack-foot');
   if(pf) pf.innerHTML=`<tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-  <td colspan="11" style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:8.5pt">TOTAL TRIMS COST${totalPackCharge?(' + PACKING ₹'+fmtN(totalPackCharge)):''}</td>
-  <td style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt">₹${fmtN(totalTrims+totalPackCharge)}</td>
+  <td colspan="11" style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:8.5pt">TOTAL</td>
+  <td style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt">₹${fmtN(totalTrims)}</td>
+  <td style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt">₹${fmtN(totalPackCharge)}</td>
 </tr>`;
 
   // ── Signature images + timestamps into PDF print doc ──
@@ -1427,7 +1488,7 @@ function collectPayload(){
     const id=c.id.replace('prod-',''); const p=getProd(id);
     totalExGST+=p.exGST; totalGst+=p.gstAmt;
     prods.push({
-      itemCode:p.itemCode,fabric:p.fabric,category:p.category,weight:p.weight,size:p.size,
+      itemCode:p.itemCode,fabric:p.fabric,category:p.category,weight:p.weight,totalWeight:p.totalWeight,size:p.size,
       dbsb:p.dbsb,ply:p.ply,sattan:p.sattan,moq:p.moq,emboss:p.emboss,
       design:p.design,packs:p.packs,packPcs:p.packPcs,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
       gstPct:p.gstPct,packType:p.packType,packCharge:p.packCharge,packChargePcs:p.packChargePcs,packChargeCostPc:p.packChargeCostPc,
