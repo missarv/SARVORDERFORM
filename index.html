@@ -326,7 +326,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:3%">SR</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Item Code</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%">Category</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">Wt(KG)</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%" id="pdf-wt-th">Wt(KG)</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:7%">Size</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">DB/SB</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Ply</th>
@@ -651,7 +651,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwkMQNdBTJVQoqZJ41nqb_F0xE63ifx1Y6VJa7lhjrP42UjJHgFieBdD1tF4dsqXmeF/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynIYTwEYa7BnNJ8_Wzo6h3YlaRHYcb5ROD4EGgUIOeIRal3kawvzZOt0yTYaPZ5ZYz/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -971,15 +971,16 @@ function onItemCodeSelect(id, code){
   setV('p'+id+'-moq',     item.moq);
   setS('p'+id+'-emboss',  item.emboss);
   const pEl=document.getElementById('p'+id+'-price'); if(pEl) pEl.value=item.price;
-  // GREY/WHITE FABRIC → Design "NA", Pack Type "Roll", PLY "NA", Weight input shows "GSM"
+  // GREY/WHITE FABRIC → Design "NA", Pack Type "Roll", PLY "NA", label "GSM", input "GSM"
+  const wLbl=document.getElementById('p'+id+'-weight-lbl');
   if(code==='GREY/WHITE FABRIC'){
     setV('p'+id+'-design','NA');
     setS('p'+id+'-packType','Roll');
     setS('p'+id+'-ply','NA');
-    // Show "GSM" text in weight input (label stays "Final Weight (KG)")
-    if(wEl){wEl.type='text';wEl.value='GSM';wEl.disabled=true;wEl.style.background='#F3F4F6';wEl.style.color='#9CA3AF';wEl.style.fontStyle='italic';wEl.style.textAlign='center';}
+    if(wLbl) wLbl.textContent='GSM';
+    if(wEl){wEl.type='number';wEl.value='';wEl.disabled=false;wEl.placeholder='GSM';wEl.style.background='';wEl.style.color='';wEl.style.fontStyle='';wEl.style.textAlign='';}
   } else {
-    // Restore weight input to number type (in case switching from GREY/WHITE FABRIC)
+    if(wLbl) wLbl.textContent='Final Weight (KG)';
     if(wEl){wEl.type='number';wEl.disabled=false;wEl.style.background='';wEl.style.color='';wEl.style.fontStyle='';wEl.style.textAlign='';}
   }
   suppressCombo=false;
@@ -1246,9 +1247,9 @@ function calcTotalWeight(id){
   if(pt==='Roll') return;
   const packs=parseFloat(document.getElementById('p'+id+'-packs')?.value)||0;
   const pcsPerPack=parseFloat(document.getElementById('p'+id+'-packPcs')?.value)||0;
-  // GSM mode: weight input shows "GSM" text → use 1 for calculation
-  const wRaw=document.getElementById('p'+id+'-weight')?.value||'';
-  const wt=(wRaw==='GSM')?1:(parseFloat(wRaw)||0);
+  // GSM mode: label = "GSM" → use 1 for calculation
+  const isGSM=(document.getElementById('p'+id+'-weight-lbl')?.textContent||'')==='GSM';
+  const wt=isGSM?1:(parseFloat(document.getElementById('p'+id+'-weight')?.value)||0);
   const val=packs*pcsPerPack*wt;
   twEl.value=val?parseFloat(val.toFixed(2)):'';
 }
@@ -1281,18 +1282,25 @@ function onPackTypeChange(id){
     if(ppEl){ppEl.value='';calcPackQty(id);}
   }
   // Bore label stays fixed as "Bore" for all packing types
-  // Auto supplier pick based on Pack Type
+  // Auto supplier pick based on Pack Type & Item Code
   // Reset all trims to 'na' first
   TRIMS.forEach(t=>{
     const sel=document.getElementById('p'+id+'-'+t.k+'-supp');
     if(sel){sel.value='na';onSupp(id,t.k);}
   });
-  // Label/Tag = SIHF (FOC) always for all pack types
-  const labelSel=document.getElementById('p'+id+'-label-supp');
-  if(labelSel){labelSel.value='foc';onSupp(id,'label');}
-  // Bore = SIHF Supplied for all pack types
-  const boreSel=document.getElementById('p'+id+'-bore-supp');
-  if(boreSel){boreSel.value='seller';onSupp(id,'bore');}
+  // Check if GREY/WHITE FABRIC — all trims stay 'na' (including Bore)
+  const curItemCode=document.getElementById('p'+id+'-itemCode')?.value||'';
+  const isGreyWhite=curItemCode.toUpperCase()==='GREY/WHITE FABRIC';
+  if(!isGreyWhite){
+    // Label/Tag = SIHF (FOC) for non-fabric items
+    const labelSel=document.getElementById('p'+id+'-label-supp');
+    if(labelSel){labelSel.value='foc';onSupp(id,'label');}
+    // Bore = SIHF (FOC) only when Packing Type = "Bora", otherwise NA
+    if(pt==='Bora'){
+      const boreSel=document.getElementById('p'+id+'-bore-supp');
+      if(boreSel){boreSel.value='foc';onSupp(id,'bore');}
+    }
+  }
   // Update "No. of {PackType}" label
   const packsLbl=document.getElementById('p'+id+'-packs-lbl');
   if(packsLbl) packsLbl.textContent='No. of '+pt;
@@ -1342,9 +1350,8 @@ function getProd(id){
   const packs=isRoll?1:n('p'+id+'-packs');
   const packPcs=isRoll?1:n('p'+id+'-packPcs');
   // GSM mode: weight input shows "GSM" text → use 1 for calculations
-  const weightRaw=document.getElementById('p'+id+'-weight')?.value||'';
-  const isGSM=weightRaw==='GSM';
-  const weight=isGSM?0:(parseFloat(weightRaw)||0);
+  const isGSM=(document.getElementById('p'+id+'-weight-lbl')?.textContent||'')==='GSM';
+  const weight=parseFloat(document.getElementById('p'+id+'-weight')?.value)||0;
   const calcWeight=isGSM?1:weight;
   const effectivePricePerKg=price*(1-discount/100);
   const pricePerPc=effectivePricePerKg*calcWeight;
@@ -1440,6 +1447,10 @@ function onSaleChannelChange(){
 }
 
 function updatePdfDoc(prods,grand){
+  // Dynamic Wt header — "GSM" if any product is GSM, else "Wt(KG)"
+  const hasGSM=prods.some(p=>p.isGSM);
+  const wtTh=document.getElementById('pdf-wt-th');
+  if(wtTh) wtTh.textContent=hasGSM?'GSM':'Wt(KG)';
   // Items
   const ib=document.getElementById('pdf-items-body');
   if(ib) ib.innerHTML=prods.map((p,i)=>{
@@ -1449,7 +1460,7 @@ function updatePdfDoc(prods,grand){
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E">${p.itemCode||p.fabric||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.category}</td>
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.isGSM?'GSM':(p.weight?p.weight+' KG':'—')}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.isGSM?(p.weight?p.weight+' GSM':'—'):(p.weight?p.weight+' KG':'—')}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.size}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.dbsb}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.ply}</td>
@@ -1458,16 +1469,16 @@ function updatePdfDoc(prods,grand){
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.moq||'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.emboss}</td>
       ${isRoll?naCell:`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}${p.packPcs?`<br><small style="color:#2E6DA4;font-size:5.5pt">${p.packPcs} pcs/${p.packType||'pack'}</small>`:''}</td>`}
-      ${isRoll?`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">Roll${p.totalWeight?'<br><small style="color:#1B6B3A;font-size:5.5pt;font-weight:700">'+fmtN(p.totalWeight)+' KG</small>':''}</td>`:`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packs?(p.packs+' '+(p.packType||'')):(p.packType||'—')}${p.totalWeight?'<br><small style="color:#1B6B3A;font-size:5.5pt;font-weight:700">'+fmtN(p.totalWeight)+' KG</small>':''}</td>`}
+      ${isRoll?`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A">${p.totalWeight?fmtN(p.totalWeight)+' KG':'Roll'}</td>`:`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packs?(p.packs+' '+(p.packType||'')):(p.packType||'—')}${p.totalWeight?'<br><small style="color:#1B6B3A;font-size:5.5pt;font-weight:700">'+fmtN(p.totalWeight)+' KG</small>':''}</td>`}
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">${p.effectivePricePerKg?`₹${fmtN(p.effectivePricePerKg)}/KG${p.discount>0?`<br><small style="color:#D4870A;font-size:5.5pt">${fmtN(p.price)}-${p.discount}%</small>`:''}`:' —'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">${p.discount>0?p.discount+'%':'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A;white-space:nowrap">${p.fabricCost?'₹'+fmtN(p.fabricCost):'—'}</td>
     </tr>`;
   }).join('');
 
-  // Qty & Pack totals in the TOTAL AMOUNT footer row
-  const totalQty=prods.reduce((s,p)=>s+(p.qty||0),0);
-  const totalPacks=prods.reduce((s,p)=>s+(p.packs||0),0);
+  // Qty & Pack totals in the TOTAL AMOUNT footer row — exclude Roll items (they have hardcoded 1)
+  const totalQty=prods.reduce((s,p)=>s+(p.packType==='Roll'?0:(p.qty||0)),0);
+  const totalPacks=prods.reduce((s,p)=>s+(p.packType==='Roll'?0:(p.packs||0)),0);
   const totalWt=prods.reduce((s,p)=>s+(p.totalWeight||0),0);
   const tqEl=document.getElementById('pdf-total-qty');
   const tpEl=document.getElementById('pdf-total-packs');
