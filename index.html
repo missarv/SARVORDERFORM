@@ -304,7 +304,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
           <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Order No.:</b> <span id="pdf-on">—</span></div>
           <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Order Date:</b> <span id="pdf-od">—</span></div>
           <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Payment Terms:</b> <span id="pdf-pt">—</span></div>
-          <div><b style="color:#1A3C5E">Delivery Terms:</b> <span id="pdf-dt">—</span></div>
+          <div style="margin-bottom:3pt"><b style="color:#1A3C5E">Delivery Terms:</b> <span id="pdf-dt">—</span></div>
+          <div><b style="color:#1A3C5E">Transport:</b> <span id="pdf-tn">—</span></div>
         </div>
       </td>
       <td style="width:30%;border:0.5pt solid #ccc;border-left:none;vertical-align:top">
@@ -435,6 +436,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       </td>
     </tr>
   </table>
+  <div id="pdf-remarks-section" style="display:none;margin-top:4pt">
+    <div style="font-size:7.5pt;font-weight:700;color:#1A3C5E;text-transform:uppercase;margin:4pt 0 2pt;padding-bottom:2pt;border-bottom:1pt solid #1A3C5E">REMARKS</div>
+    <table style="width:100%;border-collapse:collapse;font-size:7pt" id="pdf-remarks-table"></table>
+  </div>
   </div><!-- end page-break-inside:avoid wrapper -->
 </div>
 <!-- END PRINT DOC -->
@@ -515,6 +520,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <div class="fg"><label>Contact Person Name</label><input type="text" id="contactPerson" placeholder="Contact Person Name" oninput="syncMeta()"></div>
       <div class="fg"><label>Address</label><textarea id="buyerAddress" placeholder="Complete billing address..." oninput="syncMeta()"></textarea></div>
       <div class="fg"><label>GSTIN</label><input type="text" id="buyerGST" placeholder="15-digit GSTIN" oninput="syncMeta();onGSTInput(this.value)"></div>
+      <div class="fg"><label>Transport Name</label><input type="text" id="transportName" placeholder="e.g. XYZ Transport" oninput="syncMeta()"></div>
     </div>
   </div>
 
@@ -651,7 +657,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynIYTwEYa7BnNJ8_Wzo6h3YlaRHYcb5ROD4EGgUIOeIRal3kawvzZOt0yTYaPZ5ZYz/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6VZrzvgbGmlvsdEn1TQ-z5EwkE7-9kLBXSvekEn6liUwxbKQZ5RTBU2XEB1NxqF3QMA/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -882,6 +888,7 @@ function selectCombo(fieldId, val){
       setF('buyerMobile',bd.mobile);
       setF('buyerAddress',bd.address);
       setF('buyerGST',bd.gst);
+      setF('transportName',bd.transportName);
       syncMeta();
       toast('✓ Buyer details loaded');
     }
@@ -1136,6 +1143,7 @@ function addProduct(){
         <div class="fg"><label>GST %</label><input type="number" id="p${id}-gst" placeholder="e.g. 5" step="0.5" min="0" value="5" oninput="calcAll()"></div>
         <div class="fg"><label>Weight <small style="font-weight:400;text-transform:none;color:var(--muted)">(Packs×Pcs×Wt)</small></label><input type="number" id="p${id}-totalWeight" placeholder="auto" step="0.1" min="0" oninput="calcAll()" style="background:#EEF2F7;border-color:#D0DAE8"></div>
       </div>
+      <div class="fg" style="margin-top:10px"><label>Remarks</label><input type="text" id="p${id}-remarks" placeholder="Any special instructions for this product..." oninput="calcAll()"></div>
       <div class="shd">Bags &amp; Trims</div>
       <table class="tt">
         <thead><tr><th>Material</th><th>Supplied By</th><th>No. of Pcs</th><th style="text-align:right">Cost/Pc (₹)</th></tr></thead>
@@ -1379,6 +1387,7 @@ function getProd(id){
     itemCode:g('p'+id+'-itemCode'), fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
     dbsb:g('p'+id+'-dbsb'), ply:g('p'+id+'-ply'), sattan:g('p'+id+'-sattan'),
     moq:g('p'+id+'-moq'), emboss:g('p'+id+'-emboss'), design:g('p'+id+'-design'),
+    remarks:g('p'+id+'-remarks'),
   };
 }
 
@@ -1438,6 +1447,7 @@ function syncMeta(){
   s('pdf-od',document.getElementById('orderDate')?.value);
   s('pdf-pt',document.getElementById('payTerms')?.value);
   s('pdf-dt',document.getElementById('delivTerms')?.value);
+  s('pdf-tn',document.getElementById('transportName')?.value);
 }
 
 function onSaleChannelChange(){
@@ -1528,6 +1538,20 @@ function updatePdfDoc(prods,grand){
   if(ttEl) ttEl.textContent='₹'+Math.round(totalTaxable).toLocaleString('en-IN');
   if(naEl) naEl.textContent='₹'+Math.round(netAmount).toLocaleString('en-IN');
 
+  // ── Remarks section below signatures ──
+  const remarksProds=prods.filter(p=>p.remarks&&p.remarks.trim());
+  const remarksSec=document.getElementById('pdf-remarks-section');
+  const remarksTbl=document.getElementById('pdf-remarks-table');
+  if(remarksSec&&remarksTbl){
+    if(remarksProds.length){
+      remarksSec.style.display='';
+      remarksTbl.innerHTML=remarksProds.map((p,i)=>`<tr style="${i%2===1?'background:#F8FAFC':''}">
+        <td style="padding:3pt 6pt;border:0.5pt solid #ccc;font-weight:700;color:#1A3C5E;width:20%">Product ${prods.indexOf(p)+1}: ${p.itemCode||p.fabric||'—'}</td>
+        <td style="padding:3pt 6pt;border:0.5pt solid #ccc">${p.remarks}</td>
+      </tr>`).join('');
+    } else { remarksSec.style.display='none'; remarksTbl.innerHTML=''; }
+  }
+
   // ── Signature images + timestamps into PDF print doc ──
   const sigMap=[['sigBuyer','pdf-sig-buyer','pdf-sig-buyer-date'],['sigPrepared','pdf-sig-prepared','pdf-sig-prepared-date'],['sigAuth','pdf-sig-auth','pdf-timestamp']];
   sigMap.forEach(([canvasId,imgId,dateId])=>{
@@ -1556,6 +1580,7 @@ function collectPayload(){
       design:p.design,packs:p.packs,packPcs:p.packPcs,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
       gstPct:p.gstPct,packType:p.packType,packCharge:p.packCharge,packChargePcs:p.packChargePcs,packChargeCostPc:p.packChargeCostPc,
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
+      remarks:p.remarks||'',
     });
   });
   return {
@@ -1572,6 +1597,7 @@ function collectPayload(){
     buyerGST:      document.getElementById('buyerGST').value,
     paymentTerms:  document.getElementById('payTerms').value,
     deliveryTerms: document.getElementById('delivTerms').value,
+    transportName: document.getElementById('transportName').value||'',
     products:      prods,
     summary:{exGST:totalExGST.toFixed(2),gst:totalGst.toFixed(2),grandTotal:Math.round(totalExGST+totalGst).toString()},
     signatures:{
@@ -1645,7 +1671,7 @@ function closeModal(){
   // Auto reset form for new order
   document.getElementById('prodsContainer').innerHTML='';
   prodCount=0;
-  ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson'].forEach(id=>{
+  ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson','transportName'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
@@ -1685,7 +1711,8 @@ function updateLocalDrops(payload){
       contactPerson: payload.contactPerson||'',
       mobile: payload.buyerMobile||'',
       address: payload.buyerAddress||'',
-      gst: payload.buyerGST||''
+      gst: payload.buyerGST||'',
+      transportName: payload.transportName||''
     };
   }
   if(payload.agencyName && payload.agencyName.trim()){
@@ -1701,7 +1728,7 @@ function resetForm(){
   if(!confirm('Reset entire form? All data will be cleared.')) return;
   document.getElementById('prodsContainer').innerHTML='';
   prodCount=0;
-  ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson'].forEach(id=>{
+  ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson','transportName'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
