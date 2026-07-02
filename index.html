@@ -50,6 +50,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 .fg textarea{resize:vertical;min-height:68px;line-height:1.5}
 .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(46,109,164,.1)}
 
+/* product photo gallery */
+.photo-gallery{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.photo-tile{position:relative;width:78px;height:58px;border-radius:6px;overflow:hidden;border:1.5px solid var(--border);background:#F3F4F6}
+.photo-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-tile .pt-existing-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(46,109,164,.88);color:#fff;font-size:8px;font-weight:700;text-align:center;padding:1px 0;letter-spacing:.3px;z-index:2}
+.photo-tile .pt-remove{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(185,28,28,.92);color:#fff;border:none;font-size:11px;line-height:16px;text-align:center;cursor:pointer;padding:0;z-index:3}
+.photo-tile a.pt-view-link{position:absolute;inset:0;z-index:1}
+
 /* combobox wrapper */
 .combo-wrap{position:relative}
 .combo-wrap input{padding-right:32px}
@@ -436,11 +444,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       </td>
     </tr>
   </table>
-  <div id="pdf-remarks-section" style="display:none;margin-top:4pt">
-    <div style="font-size:7.5pt;font-weight:700;color:#1A3C5E;text-transform:uppercase;margin:4pt 0 2pt;padding-bottom:2pt;border-bottom:1pt solid #1A3C5E">REMARKS</div>
-    <table style="width:100%;border-collapse:collapse;font-size:7pt" id="pdf-remarks-table"></table>
-  </div>
+  <!-- Per-product Remarks table removed — remarks now shown as "Other Comment" on each
+       product's dedicated photo page instead (see PHOTO PAGES section below). -->
   </div><!-- end page-break-inside:avoid wrapper -->
+
+  <!-- ═══════════════ PER-PRODUCT PHOTO PAGES (one page per product) ═══════════════ -->
+  <div id="pdf-photo-pages"></div>
+
 </div>
 <!-- END PRINT DOC -->
 
@@ -458,6 +468,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 </div>
 
 <div class="wrap">
+
+  <!-- EDIT MODE BANNER (shown only when loading an order via Edit) -->
+  <div id="editBanner" style="display:none;background:#FFFBEA;border:1.5px solid #FCD34D;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:none;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <span style="font-size:13px;font-weight:600;color:#92400E">✏️ Editing Order <span id="editBannerOrderNo" style="font-family:'DM Mono',monospace"></span> — Submitting will save these changes as a new entry for this order.</span>
+    <button type="button" onclick="cancelEditMode()" style="background:#92400E;color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">✕ Cancel Edit / New Order</button>
+  </div>
 
   <!-- ORDER INFO -->
   <div class="sl">Order Information</div>
@@ -657,7 +673,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6VZrzvgbGmlvsdEn1TQ-z5EwkE7-9kLBXSvekEn6liUwxbKQZ5RTBU2XEB1NxqF3QMA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKLe4j52LCh78dGB-Qyr7C8B6-X9MGOK3lVfKbxuQLvZ5tihsB93aCj_6p50Hnjmcp/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -1114,7 +1130,7 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>Emboss</label>
-          <select id="p${id}-emboss"><option value="NO">NO</option><option value="YES">YES</option><option value="NA">NA</option></select></div>
+          <select id="p${id}-emboss"><option value="NO">NO</option><option value="YES">YES</option><option value="NA">NA</option><option value="Decision Pending">Decision Pending</option></select></div>
       </div>
       <div class="fg"><label>Design Details</label>
         <div class="combo-wrap">
@@ -1143,10 +1159,21 @@ function addProduct(){
         <div class="fg"><label>GST %</label><input type="number" id="p${id}-gst" placeholder="e.g. 5" step="0.5" min="0" value="5" oninput="calcAll()"></div>
         <div class="fg"><label>Weight <small style="font-weight:400;text-transform:none;color:var(--muted)">(Packs×Pcs×Wt)</small></label><input type="number" id="p${id}-totalWeight" placeholder="auto" step="0.1" min="0" oninput="calcAll()" style="background:#EEF2F7;border-color:#D0DAE8"></div>
       </div>
-      <div class="fg" style="margin-top:10px"><label>Remarks</label><input type="text" id="p${id}-remarks" placeholder="Any special instructions for this product..." oninput="calcAll()"></div>
+      <div class="fg" style="margin-top:10px"><label>Remarks <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(shown as "Other Comment" on this product's photo page in the PDF)</span></label><input type="text" id="p${id}-remarks" placeholder="Any special instructions for this product..." oninput="calcAll()"></div>
+      <div class="shd">Product Photo &amp; Comments</div>
+      <div class="g2">
+        <div class="fg">
+          <label>Product Photos <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(optional — up to 10, shown as a 5×2 grid on this product's PDF page)</span></label>
+          <input type="file" accept="image/*" multiple id="p${id}-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px">
+          <div id="p${id}-photo-gallery" class="photo-gallery"></div>
+        </div>
+        <div class="fg"><label>Design Cost Comment</label>
+          <input type="text" id="p${id}-designCost" placeholder="e.g. ₹2/pc extra for custom jacquard design..." oninput="calcAll()">
+        </div>
+      </div>
       <div class="shd">Bags &amp; Trims</div>
       <table class="tt">
-        <thead><tr><th>Material</th><th>Supplied By</th><th>No. of Pcs</th><th style="text-align:right">Cost/Pc (₹)</th></tr></thead>
+        <thead><tr><th>Material</th><th>Supplied By</th><th>No. of Pcs</th><th style="text-align:right">Cost/Pc (₹)</th><th style="text-align:right">Discount%</th></tr></thead>
         <tbody>
           ${TRIMS.map(t=>`
           <tr>
@@ -1160,6 +1187,9 @@ function addProduct(){
             <td style="text-align:right">
               <input type="number" class="trim-pi" id="p${id}-${t.k}-cost" placeholder="0" step="0.5" min="0" value="0" disabled oninput="calcAll()">
             </td>
+            <td style="text-align:right">
+              <input type="number" class="trim-pi" id="p${id}-${t.k}-disc" placeholder="0" step="0.1" min="0" max="100" value="0" disabled oninput="calcAll()" style="width:64px">
+            </td>
           </tr>`).join('')}
           <tr id="p${id}-packCharge-row" style="background:#FFFBEA">
             <td style="font-weight:600;font-size:13px;color:#92400E" id="p${id}-packCharge-label">Bora Packing Charge</td>
@@ -1170,6 +1200,7 @@ function addProduct(){
             <td style="text-align:right">
               <input type="number" class="trim-pi" id="p${id}-packCharge" placeholder="0" step="0.5" min="0" value="0" oninput="calcAll()" style="background:#FFFBEA;border-color:#FCD34D">
             </td>
+            <td style="background:#FFFBEA"></td>
           </tr>
         </tbody>
       </table>
@@ -1188,19 +1219,119 @@ function addProduct(){
 function removeProd(id){
   const el=document.getElementById('prod-'+id);
   if(el){el.style.opacity='0';el.style.transition='.18s';setTimeout(()=>{el.remove();calcAll();},180);}
+  delete productPhotos[id];
+  delete existingProductPhotos[id];
 }
+
+// ═══════════════════════ PRODUCT PHOTO UPLOAD (multi-photo) ═══════════════
+// productPhotos[id]        = array of base64 dataURLs — NEWLY uploaded/resized photos this session
+// existingProductPhotos[id]= array of { fileId, url } — photos already saved on Drive from a
+//                             previous submission (populated only via the Edit flow)
+const productPhotos={};
+const existingProductPhotos={};
+const MAX_PHOTOS_PER_PRODUCT=10;
+
+function photoCount(id){
+  return (productPhotos[id]||[]).length + (existingProductPhotos[id]||[]).length;
+}
+
+function handlePhotoUpload(id, input){
+  const files=input.files ? Array.from(input.files) : [];
+  if(!files.length) return;
+  const remaining=MAX_PHOTOS_PER_PRODUCT-photoCount(id);
+  if(remaining<=0){ toast('⚠️ Max '+MAX_PHOTOS_PER_PRODUCT+' photos per product reached'); input.value=''; return; }
+  const toProcess=files.slice(0,remaining);
+  if(files.length>toProcess.length){ toast('⚠️ Only '+toProcess.length+' added — max '+MAX_PHOTOS_PER_PRODUCT+' photos per product'); }
+
+  if(!productPhotos[id]) productPhotos[id]=[];
+  let pending=toProcess.length;
+
+  toProcess.forEach(file=>{
+    if(!file.type.startsWith('image/')){ toast('⚠️ Skipped a non-image file'); pending--; if(pending===0){ input.value=''; renderPhotoGallery(id); } return; }
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      const img=new Image();
+      img.onload=function(){
+        // Resize to a max 1200px on the longer side & re-encode as JPEG — keeps the
+        // payload small enough for a smooth upload and safe under Apps Script limits.
+        const maxDim=1200;
+        let w=img.width, h=img.height;
+        if(w>h && w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; }
+        else if(h>=w && h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const dataUrl=canvas.toDataURL('image/jpeg',0.75);
+        productPhotos[id].push(dataUrl);
+        pending--;
+        if(pending===0){
+          input.value='';
+          renderPhotoGallery(id);
+          toast('📸 Photo(s) added — '+photoCount(id)+'/'+MAX_PHOTOS_PER_PRODUCT);
+          calcAll();
+        }
+      };
+      img.onerror=function(){ toast('⚠️ Could not read one of the images'); pending--; if(pending===0){ input.value=''; renderPhotoGallery(id); calcAll(); } };
+      img.src=ev.target.result;
+    };
+    reader.onerror=function(){ toast('⚠️ Failed to read a file'); pending--; if(pending===0){ input.value=''; renderPhotoGallery(id); calcAll(); } };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removePhotoAt(id, kind, idx){
+  if(kind==='new' && productPhotos[id]) productPhotos[id].splice(idx,1);
+  if(kind==='existing' && existingProductPhotos[id]) existingProductPhotos[id].splice(idx,1);
+  renderPhotoGallery(id);
+  calcAll();
+}
+
+// Backward-compat alias — clears ALL photos for a product (used by resetForm/applyOrderToForm)
+function removeProductPhoto(id){
+  delete productPhotos[id];
+  delete existingProductPhotos[id];
+  renderPhotoGallery(id);
+  calcAll();
+}
+
+function renderPhotoGallery(id){
+  const gal=document.getElementById('p'+id+'-photo-gallery');
+  if(!gal) return;
+  const news=productPhotos[id]||[];
+  const existing=existingProductPhotos[id]||[];
+  let html='';
+  existing.forEach((p,i)=>{
+    html+=`<div class="photo-tile">
+      <img src="https://drive.google.com/uc?export=view&id=${p.fileId}" onerror="this.closest('.photo-tile').style.background='#F3F4F6'">
+      <a class="pt-view-link" href="${p.url}" target="_blank" rel="noopener" title="View full photo"></a>
+      <button type="button" class="pt-remove" onclick="event.stopPropagation();removePhotoAt(${id},'existing',${i})" title="Remove">✕</button>
+      <div class="pt-existing-badge">SAVED</div>
+    </div>`;
+  });
+  news.forEach((dataUrl,i)=>{
+    html+=`<div class="photo-tile">
+      <img src="${dataUrl}">
+      <button type="button" class="pt-remove" onclick="removePhotoAt(${id},'new',${i})" title="Remove">✕</button>
+    </div>`;
+  });
+  gal.innerHTML=html;
+}
+
 function onSupp(id,key){
   const sel=document.getElementById('p'+id+'-'+key+'-supp');
   const inp=document.getElementById('p'+id+'-'+key+'-cost');
   const pcsInp=document.getElementById('p'+id+'-'+key+'-pcs');
+  const discInp=document.getElementById('p'+id+'-'+key+'-disc');
   if(sel.value==='seller'){
     inp.disabled=false;inp.style.background='#EFF6FF';inp.style.borderColor='#93C5FD';
     if(pcsInp){pcsInp.disabled=false;pcsInp.style.background='#EFF6FF';pcsInp.style.borderColor='#93C5FD';const autoVal=(key==='outer'||key==='bore')?(parseFloat(document.getElementById('p'+id+'-packs')?.value)||0):(parseFloat(document.getElementById('p'+id+'-qty')?.value)||0);pcsInp.value=autoVal;}
+    if(discInp){discInp.disabled=false;discInp.style.background='#EFF6FF';discInp.style.borderColor='#93C5FD';}
     // Auto-fill cost from Standard Items when Supplied By changes to SIHF
     autoFillTrimCost(id,key);
   } else {
     inp.disabled=true;inp.value=0;inp.style.background='';inp.style.borderColor='';
     if(pcsInp){pcsInp.disabled=true;pcsInp.value=0;pcsInp.style.background='';pcsInp.style.borderColor='';}
+    if(discInp){discInp.disabled=true;discInp.value=0;discInp.style.background='';discInp.style.borderColor='';}
   }
   calcAll();
 }
@@ -1367,9 +1498,11 @@ function getProd(id){
   TRIMS.forEach(t=>{
     const supp=document.getElementById('p'+id+'-'+t.k+'-supp')?.value||'na';
     const costPerPc=supp==='seller'?(n('p'+id+'-'+t.k+'-cost')):0;
+    const trimDisc=supp==='seller'?(n('p'+id+'-'+t.k+'-disc')):0;
+    const effectiveCostPerPc=costPerPc*(1-trimDisc/100);
     const trimPcs=supp==='seller'?(n('p'+id+'-'+t.k+'-pcs')):0;
-    trimsCostPerPc+=costPerPc; trimsCostTotal+=trimPcs*costPerPc;
-    trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc,pcs:trimPcs};
+    trimsCostPerPc+=effectiveCostPerPc; trimsCostTotal+=trimPcs*effectiveCostPerPc;
+    trimStatus[t.k]=supp; trimData[t.k]={supp,cost:costPerPc,disc:trimDisc,effectiveCost:effectiveCostPerPc,pcs:trimPcs};
   });
   const packChargePcs=n('p'+id+'-packCharge-pcs');
   const packChargeCostPc=n('p'+id+'-packCharge');
@@ -1387,7 +1520,8 @@ function getProd(id){
     itemCode:g('p'+id+'-itemCode'), fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
     dbsb:g('p'+id+'-dbsb'), ply:g('p'+id+'-ply'), sattan:g('p'+id+'-sattan'),
     moq:g('p'+id+'-moq'), emboss:g('p'+id+'-emboss'), design:g('p'+id+'-design'),
-    remarks:g('p'+id+'-remarks'),
+    remarks:g('p'+id+'-remarks'), designCostComment:g('p'+id+'-designCost'),
+    newPhotos:productPhotos[id]||[], existingPhotoFileIds:(existingProductPhotos[id]||[]).map(ep=>ep.fileId),
   };
 }
 
@@ -1480,7 +1614,7 @@ function updatePdfDoc(prods,grand){
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.emboss}</td>
       ${isRoll?naCell:`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700">${p.qty?Number(p.qty).toLocaleString('en-IN'):'—'}${p.packPcs?`<br><small style="color:#2E6DA4;font-size:5.5pt">${p.packPcs} pcs/${p.packType||'pack'}</small>`:''}</td>`}
       ${isRoll?`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A">${p.totalWeight?fmtN(p.totalWeight)+' KG':'Roll'}</td>`:`<td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center">${p.packs?(p.packs+' '+(p.packType||'')):(p.packType||'—')}${p.totalWeight?'<br><small style="color:#1B6B3A;font-size:5.5pt;font-weight:700">'+fmtN(p.totalWeight)+' KG</small>':''}</td>`}
-      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">${p.effectivePricePerKg?`₹${fmtN(p.effectivePricePerKg)}/KG${p.discount>0?`<br><small style="color:#D4870A;font-size:5.5pt">${fmtN(p.price)}-${p.discount}%</small>`:''}`:' —'}</td>
+      <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;white-space:nowrap">${p.price?`₹${fmtN(p.price)}/KG${p.discount>0?`<br><small style="color:#1B6B3A;font-size:5.5pt">Net: ₹${fmtN(p.effectivePricePerKg)}/KG</small>`:''}`:' —'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">${p.discount>0?p.discount+'%':'—'}</td>
       <td style="padding:4pt 3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1B6B3A;white-space:nowrap">${p.fabricCost?'₹'+fmtN(p.fabricCost):'—'}</td>
     </tr>`;
@@ -1500,9 +1634,11 @@ function updatePdfDoc(prods,grand){
   if(gt) gt.textContent=totalFabricCost?'₹'+Math.round(totalFabricCost).toLocaleString('en-IN'):'₹0';
 
   // Pack table — dynamic bore header based on packing types
+  // NOTE: "Box" packing type keeps the column labelled "Bore" (never shown as "Box").
+  // Only "Bale" packing type still gets its own special column label.
   const packTypes=[...new Set(prods.map(p=>p.packType).filter(Boolean))];
-  const boreHdrLabel=packTypes.length===1?((packTypes[0]==='Bale'||packTypes[0]==='Box')?packTypes[0]:'Bore'):
-    (packTypes.some(t=>t==='Bale'||t==='Box')?packTypes.map(t=>(t==='Bale'||t==='Box')?t:'Bore').filter((v,i,a)=>a.indexOf(v)===i).join('/'):'Bore');
+  const boreHdrLabel=packTypes.length===1?(packTypes[0]==='Bale'?'Bale':'Bore'):
+    (packTypes.some(t=>t==='Bale')?packTypes.map(t=>t==='Bale'?'Bale':'Bore').filter((v,i,a)=>a.indexOf(v)===i).join('/'):'Bore');
   const bth1=document.getElementById('pdf-bore-buyer-th');
   const bth2=document.getElementById('pdf-bore-seller-th');
   if(bth1) bth1.textContent=boreHdrLabel;
@@ -1511,7 +1647,7 @@ function updatePdfDoc(prods,grand){
   const pb=document.getElementById('pdf-pack-body');
   if(pb) pb.innerHTML=prods.map((p,i)=>{
     const bLbl=k=>{const v=p.trimStatus[k]; return v==='buyer'?'YES':'NO';};
-    const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.cost||0,pc=td?.pcs||0; if(v==='seller') return (c&&pc)?pc+'pc×₹'+c:'NO'; if(v==='foc') return 'FOC'; return 'NO';};
+    const sLbl=k=>{const v=p.trimStatus[k],td=p.trimData[k],c=td?.effectiveCost||0,pc=td?.pcs||0,d=td?.disc||0; if(v==='seller') return (c&&pc)?pc+'pc×₹'+fmtN(c)+(d>0?` (-${d}%)`:''):'NO'; if(v==='foc') return 'FOC'; return 'NO';};
     const pkgChgHtml=p.packCharge?`${p.packChargePcs?p.packChargePcs+'pc×₹'+fmtN(p.packChargeCostPc):'₹'+fmtN(p.packCharge)}<br><small style="font-size:5.5pt">${p.packType}</small>`:'—';
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
@@ -1538,18 +1674,42 @@ function updatePdfDoc(prods,grand){
   if(ttEl) ttEl.textContent='₹'+Math.round(totalTaxable).toLocaleString('en-IN');
   if(naEl) naEl.textContent='₹'+Math.round(netAmount).toLocaleString('en-IN');
 
-  // ── Remarks section below signatures ──
-  const remarksProds=prods.filter(p=>p.remarks&&p.remarks.trim());
-  const remarksSec=document.getElementById('pdf-remarks-section');
-  const remarksTbl=document.getElementById('pdf-remarks-table');
-  if(remarksSec&&remarksTbl){
-    if(remarksProds.length){
-      remarksSec.style.display='';
-      remarksTbl.innerHTML=remarksProds.map((p,i)=>`<tr style="${i%2===1?'background:#F8FAFC':''}">
-        <td style="padding:3pt 6pt;border:0.5pt solid #ccc;font-weight:700;color:#1A3C5E;width:20%">Product ${prods.indexOf(p)+1}: ${p.itemCode||p.fabric||'—'}</td>
-        <td style="padding:3pt 6pt;border:0.5pt solid #ccc">${p.remarks}</td>
-      </tr>`).join('');
-    } else { remarksSec.style.display='none'; remarksTbl.innerHTML=''; }
+  // ── Per-product Photo Pages (mirrors the server-generated PDF) ──
+  const photoPagesEl=document.getElementById('pdf-photo-pages');
+  if(photoPagesEl){
+    photoPagesEl.innerHTML=prods.map((pr,i)=>{
+      const title=`Product ${i+1}: ${esc(pr.itemCode||pr.fabric||('Item '+(i+1)))}`;
+      const newSrcs=productPhotos[pr.id]||[];
+      const existingSrcs=(existingProductPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/uc?export=view&id='+ep.fileId);
+      const allSrcs=[...existingSrcs,...newSrcs];
+      let imgHtml;
+      if(allSrcs.length){
+        imgHtml=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6pt">${allSrcs.map(src=>
+          `<div style="height:190pt;border:1pt solid #1A3C5E;overflow:hidden;background:#fff"><img src="${src}" style="width:100%;height:100%;object-fit:cover;display:block"></div>`
+        ).join('')}</div>`;
+      } else {
+        imgHtml=`<div style="width:100%;height:190pt;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-style:italic;font-size:9pt;background:#F8FAFC;border:1pt dashed #ccc">No photo uploaded for this product</div>`;
+      }
+      const designCost=pr.designCostComment?esc(pr.designCostComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
+      const otherComment=pr.remarks?esc(pr.remarks):'<span style="color:#9CA3AF;font-style:italic">—</span>';
+      return `<div style="page-break-before:always">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4pt;margin-bottom:6pt;border-bottom:2pt solid #D4870A">
+          <div style="font-size:13pt;font-weight:700;color:#1A3C5E">${title}</div>
+          <div style="font-size:8pt;color:#555">Order No.: ${document.getElementById('orderNo')?.value||'—'}</div>
+        </div>
+        <div style="width:100%;margin-bottom:8pt">${imgHtml}</div>
+        <div style="width:100%">
+          <div style="border:0.5pt solid #ccc;margin-bottom:6pt">
+            <div style="background:#1A3C5E;color:#fff;font-weight:700;font-size:8pt;padding:4pt 8pt">DESIGN COST COMMENT</div>
+            <div style="padding:6pt 8pt;font-size:8pt;min-height:16pt">${designCost}</div>
+          </div>
+          <div style="border:0.5pt solid #ccc">
+            <div style="background:#1B6B3A;color:#fff;font-weight:700;font-size:8pt;padding:4pt 8pt">OTHER COMMENT</div>
+            <div style="padding:6pt 8pt;font-size:8pt;min-height:16pt">${otherComment}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
   }
 
   // ── Signature images + timestamps into PDF print doc ──
@@ -1580,7 +1740,8 @@ function collectPayload(){
       design:p.design,packs:p.packs,packPcs:p.packPcs,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
       gstPct:p.gstPct,packType:p.packType,packCharge:p.packCharge,packChargePcs:p.packChargePcs,packChargeCostPc:p.packChargeCostPc,
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
-      remarks:p.remarks||'',
+      remarks:p.remarks||'', designCostComment:p.designCostComment||'',
+      newPhotos:p.newPhotos||[], existingPhotoFileIds:p.existingPhotoFileIds||[],
     });
   });
   return {
@@ -1634,6 +1795,11 @@ async function handleSubmit(){
     if(data.success){
       lastPdfUrl  = data.pdfUrl   || '';
       lastDriveUrl= data.driveUrl || '';
+
+      // Refresh dropdowns + Standard Items cache — picks up any brand-new Item Code(s)
+      // the server just auto-learned into the catalog, so they're instantly available
+      // for autocomplete if the exec adds another product in this same session.
+      if(APPS_SCRIPT_URL) fetchDrops();
 
       // Show success modal
       document.getElementById('modalOrderNo').textContent=data.orderNo;
@@ -1726,8 +1892,11 @@ function updateLocalDrops(payload){
 // ══════════════════════ RESET ════════════════════════════════════════════
 function resetForm(){
   if(!confirm('Reset entire form? All data will be cleared.')) return;
+  const banner=document.getElementById('editBanner'); if(banner) banner.style.display='none';
   document.getElementById('prodsContainer').innerHTML='';
   prodCount=0;
+  Object.keys(productPhotos).forEach(k=>delete productPhotos[k]);
+  Object.keys(existingProductPhotos).forEach(k=>delete existingProductPhotos[k]);
   ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson','transportName'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -1953,7 +2122,10 @@ function renderOrderList(orders){
       ${channel?'<div class="oh-meta-row"><span>🏷️ '+channel+(o.agencyName?' — '+esc(o.agencyName):'')+'</span></div>':''}
       <div class="oh-card-bottom">
         <div class="oh-total">${gt}</div>
-        ${pdfLink?'<a class="oh-pdf-btn" href="'+pdfLink+'" target="_blank" rel="noopener">📄 PDF</a>':'<span class="oh-pdf-na">No PDF</span>'}
+        <div style="display:flex;gap:6px">
+          <a class="oh-edit-btn" href="javascript:void(0)" onclick="editOrder('${oNo}')" title="Load this order into the form for editing" style="background:#2A5A8E;color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px">✏️ Edit</a>
+          ${pdfLink?'<a class="oh-pdf-btn" href="'+pdfLink+'" target="_blank" rel="noopener">📄 PDF</a>':'<span class="oh-pdf-na">No PDF</span>'}
+        </div>
       </div>
       <div class="oh-actions-row">
         ${waBuyerBtn}${waAgencyBtn}${mailBuyerBtn}${mailAgencyBtn}${getTotalSent(oNo)}
@@ -1961,6 +2133,173 @@ function renderOrderList(orders){
       ${savedAt?'<div class="oh-saved-at">Saved: '+savedAt+'</div>':''}
     </div>`;
   }).join('');
+}
+
+// ══════════════════════ EDIT ORDER (pre-fill form) ═══════════════════════
+async function editOrder(orderNo){
+  if(!confirm('Load Order '+orderNo+' into the form for editing?\n\nAny unsaved changes currently in the form will be replaced.')) return;
+  const url=getApiUrl();
+  if(!url){ toast('⚠️ APPS_SCRIPT_URL not set'); return; }
+  closeOrderHistory();
+  toast('⏳ Loading order '+orderNo+'…');
+  try{
+    const resp=await fetch(url+'?action=orderDetail&orderNo='+encodeURIComponent(orderNo));
+    const data=await resp.json();
+    if(!data.success || !data.order){ toast('❌ '+(data.error||'Could not load order')); return; }
+    applyOrderToForm(data.order);
+    toast('✅ Order '+orderNo+' loaded — make changes & Submit to save');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    toast('❌ Network error: '+err.message);
+  }
+}
+
+function cancelEditMode(){
+  if(!confirm('Discard edited data and start a fresh new order?')) return;
+  document.getElementById('editBanner').style.display='none';
+  resetFormSilent();
+  if(APPS_SCRIPT_URL) fetchDrops();  // re-fetch next order no
+}
+
+// resetForm() without the confirm() prompt — reused internally
+function resetFormSilent(){
+  document.getElementById('prodsContainer').innerHTML='';
+  prodCount=0;
+  Object.keys(productPhotos).forEach(k=>delete productPhotos[k]);
+  Object.keys(existingProductPhotos).forEach(k=>delete existingProductPhotos[k]);
+  ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson','transportName'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
+  const aw=document.getElementById('agencyWrap'); if(aw) aw.style.display='none';
+  addProduct(); syncMeta();
+}
+
+// Pre-fills the entire form (buyer info + all product cards) from a saved order payload.
+// Values are set DIRECTLY on the inputs rather than routed through auto-fill helpers like
+// onItemCodeSelect()/onPackTypeChange() — those helpers apply Standard Item defaults & reset
+// trims, which would silently overwrite the exact figures the order was actually saved with.
+function applyOrderToForm(o){
+  document.getElementById('prodsContainer').innerHTML='';
+  prodCount=0;
+  Object.keys(productPhotos).forEach(k=>delete productPhotos[k]);
+  Object.keys(existingProductPhotos).forEach(k=>delete existingProductPhotos[k]);
+
+  const setVal=(id,v)=>{const el=document.getElementById(id); if(el) el.value=(v===undefined||v===null)?'':v;};
+
+  setVal('orderNo', o.orderNo);
+  setVal('orderDate', o.orderDate);
+  document.getElementById('dON').textContent=o.orderNo||'—';
+  document.getElementById('dD').textContent=o.orderDate||'—';
+
+  const sc=document.getElementById('saleChannel'); if(sc) sc.value=o.saleChannel||'Direct Sale';
+  onSaleChannelChange();
+  setVal('agencyName', o.agencyName);
+  setVal('agencyContact', o.agencyContact);
+  setVal('agencyMobile', o.agencyMobile);
+  setVal('buyerName', o.buyerName);
+  setVal('contactPerson', o.contactPerson);
+  setVal('buyerMobile', o.buyerMobile);
+  setVal('buyerAddress', o.buyerAddress);
+  setVal('buyerGST', o.buyerGST);
+  setVal('payTerms', o.paymentTerms);
+  setVal('delivTerms', o.deliveryTerms);
+  setVal('transportName', o.transportName);
+
+  const products=(o.products&&o.products.length)?o.products:[];
+  if(!products.length){
+    addProduct();
+  } else {
+    products.forEach(x=>{
+      addProduct();
+      applyProductToCard(prodCount, x);
+    });
+  }
+
+  const banner=document.getElementById('editBanner');
+  if(banner){ banner.style.display='flex'; document.getElementById('editBannerOrderNo').textContent=o.orderNo||''; }
+
+  syncMeta();
+  calcAll();
+}
+
+function applyProductToCard(id, x){
+  const setVal=(sfx,v)=>{const el=document.getElementById('p'+id+'-'+sfx); if(el) el.value=(v===undefined||v===null)?'':v;};
+  const setSel=(sfx,v)=>{const el=document.getElementById('p'+id+'-'+sfx); if(el && v!==undefined && v!==null && v!=='') el.value=v;};
+
+  setVal('itemCode', x.itemCode);
+  setVal('fabric', x.fabric);
+  setVal('category', x.category);
+  setVal('size', x.size);
+  setVal('dbsb', x.dbsb);
+  setSel('ply', x.ply);
+  setVal('sattan', x.sattan);
+  setVal('moq', x.moq);
+  setSel('emboss', x.emboss);
+  setVal('design', x.design);
+  setVal('remarks', x.remarks);
+  setVal('designCost', x.designCostComment);
+  setVal('price', x.price);
+  setVal('discount', x.discount!==undefined?x.discount:0);
+  setVal('gst', x.gstPct!==undefined?x.gstPct:5);
+  setVal('weight', x.weight);
+
+  // Existing photos (from a prior submission) — can't be loaded into a <input type="file">
+  // for security reasons, so we show them as "SAVED" tiles in the gallery instead. If the
+  // user doesn't remove/replace them, existingPhotoFileIds tells the server to re-use the
+  // Drive copies already on file rather than losing them.
+  const photoUrls=Array.isArray(x.photoUrls)?x.photoUrls:(x.photoUrl?[x.photoUrl]:[]);
+  const photoFileIds=Array.isArray(x.photoFileIds)?x.photoFileIds:(x.photoFileId?[x.photoFileId]:[]);
+  productPhotos[id]=[];
+  existingProductPhotos[id]=photoFileIds.map((fid,i)=>({fileId:fid, url:photoUrls[i]||''}));
+  renderPhotoGallery(id);
+
+  // GSM vs KG label — tied only to GREY/WHITE FABRIC item code (payload doesn't store a
+  // separate isGSM flag, so we re-derive it the same way onItemCodeSelect() does)
+  const wLbl=document.getElementById('p'+id+'-weight-lbl');
+  const isGrey=(x.itemCode||'').toUpperCase()==='GREY/WHITE FABRIC';
+  if(wLbl) wLbl.textContent=isGrey?'GSM':'Final Weight (KG)';
+
+  // Packing Type — set directly, WITHOUT calling onPackTypeChange() (that resets trims
+  // to auto/default values and would overwrite the saved trim data below).
+  const pt=x.packType||'Bora';
+  const ptEl=document.getElementById('p'+id+'-packType');
+  if(ptEl) ptEl.value=pt;
+  const packsLbl=document.getElementById('p'+id+'-packs-lbl'); if(packsLbl) packsLbl.textContent='No. of '+pt;
+  const pcLbl=document.getElementById('p'+id+'-packCharge-label'); if(pcLbl) pcLbl.textContent=pt+' Packing Charge';
+
+  if(pt==='Roll'){
+    ['packs','packPcs','qty'].forEach(f=>{
+      const el=document.getElementById('p'+id+'-'+f);
+      if(el){el.type='text';el.value='NA';el.disabled=true;el.style.background='#F3F4F6';el.style.color='#9CA3AF';el.style.fontStyle='italic';el.style.textAlign='center';}
+    });
+    const twEl=document.getElementById('p'+id+'-totalWeight');
+    if(twEl){twEl.disabled=false;twEl.style.background='#EEF2F7';twEl.style.color='';}
+  } else {
+    setVal('packs', x.packs);
+    setVal('packPcs', x.packPcs);
+    setVal('qty', x.qty);
+  }
+  setVal('totalWeight', x.totalWeight);
+
+  // Trims — restore exact saved supplier/pcs/cost/discount, bypassing onSupp()'s auto-fill logic
+  const trims=x.trims||{};
+  TRIMS.forEach(t=>{
+    const td=trims[t.k]||{supp:'na',cost:0,pcs:0,disc:0};
+    const suppEl=document.getElementById('p'+id+'-'+t.k+'-supp');
+    const pcsEl=document.getElementById('p'+id+'-'+t.k+'-pcs');
+    const costEl=document.getElementById('p'+id+'-'+t.k+'-cost');
+    const discEl=document.getElementById('p'+id+'-'+t.k+'-disc');
+    if(suppEl) suppEl.value=td.supp||'na';
+    const enabled=(td.supp==='seller');
+    if(pcsEl){ pcsEl.value=td.pcs||0; pcsEl.disabled=!enabled; pcsEl.style.background=enabled?'#EFF6FF':''; pcsEl.style.borderColor=enabled?'#93C5FD':''; }
+    if(costEl){ costEl.value=td.cost||0; costEl.disabled=!enabled; costEl.style.background=enabled?'#EFF6FF':''; costEl.style.borderColor=enabled?'#93C5FD':''; }
+    if(discEl){ discEl.value=td.disc||0; discEl.disabled=!enabled; discEl.style.background=enabled?'#EFF6FF':''; discEl.style.borderColor=enabled?'#93C5FD':''; }
+  });
+
+  // Packing Charge row
+  setVal('packCharge-pcs', x.packChargePcs);
+  setVal('packCharge', x.packChargeCostPc);
 }
 
 function filterOrderHistory(){
