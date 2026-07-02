@@ -390,7 +390,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <table style="width:100%;border-collapse:collapse;margin-top:3pt;font-size:8pt">
     <tr style="background:#F0F7FF;-webkit-print-color-adjust:exact;print-color-adjust:exact">
       <td style="padding:5pt 8pt;border:0.5pt solid #ccc;text-align:right;font-weight:700;color:#1A3C5E;width:85%">Total Taxable Amount (Excl. GST)</td>
-      <td style="padding:5pt 8pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;font-size:9pt" id="pdf-total-taxable">₹0</td>
+      <td style="padding:5pt 8pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#1A3C5E;font-size:9pt" id="pdf-total-taxable">₹0.00</td>
     </tr>
     <tr style="background:#1A3C5E;-webkit-print-color-adjust:exact;print-color-adjust:exact">
       <td style="padding:6pt 8pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;color:#fff;width:85%">Net Amount (Incl. GST)</td>
@@ -673,7 +673,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKLe4j52LCh78dGB-Qyr7C8B6-X9MGOK3lVfKbxuQLvZ5tihsB93aCj_6p50Hnjmcp/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtEPVLMME7A8rcwzeIKd-bXF_Zxflx78avAbGIdt3LhY7LVtUH8lNTxzHInKx9--1_/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -1130,7 +1130,12 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>Emboss</label>
-          <select id="p${id}-emboss"><option value="NO">NO</option><option value="YES">YES</option><option value="NA">NA</option><option value="Decision Pending">Decision Pending</option></select></div>
+          <select id="p${id}-emboss" onchange="onEmbossChange(${id})"><option value="NO">NO</option><option value="YES">YES</option><option value="NA">NA</option><option value="Decision Pending">Decision Pending</option></select></div>
+      </div>
+      <div id="p${id}-emboss-photo-section" style="display:none;margin-top:10px;padding:10px 12px;background:#FFFBEA;border:1px solid #FCD34D;border-radius:8px">
+        <label style="display:block;font-size:11.5px;font-weight:600;color:#92400E;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">🎨 Emboss Design Photos <span style="font-size:10px;font-weight:400;text-transform:none">(upload the emboss design reference — added to this product's Product Photos on the PDF)</span></label>
+        <input type="file" accept="image/*" multiple id="p${id}-emboss-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px;background:#fff">
+        <div id="p${id}-emboss-photo-gallery" class="photo-gallery"></div>
       </div>
       <div class="fg"><label>Design Details</label>
         <div class="combo-wrap">
@@ -1163,7 +1168,7 @@ function addProduct(){
       <div class="shd">Product Photo &amp; Comments</div>
       <div class="g2">
         <div class="fg">
-          <label>Product Photos <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(optional — up to 10, shown as a 5×2 grid on this product's PDF page)</span></label>
+          <label>Product Photos <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(optional — up to 30; shown 10 per page (5×2 grid) — extra photos add more pages for this product)</span></label>
           <input type="file" accept="image/*" multiple id="p${id}-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px">
           <div id="p${id}-photo-gallery" class="photo-gallery"></div>
         </div>
@@ -1229,7 +1234,7 @@ function removeProd(id){
 //                             previous submission (populated only via the Edit flow)
 const productPhotos={};
 const existingProductPhotos={};
-const MAX_PHOTOS_PER_PRODUCT=10;
+const MAX_PHOTOS_PER_PRODUCT=30; // extra photos beyond 10 spill onto additional PDF pages for the same product
 
 function photoCount(id){
   return (productPhotos[id]||[]).length + (existingProductPhotos[id]||[]).length;
@@ -1295,8 +1300,12 @@ function removeProductPhoto(id){
 }
 
 function renderPhotoGallery(id){
-  const gal=document.getElementById('p'+id+'-photo-gallery');
-  if(!gal) return;
+  // Two possible gallery containers per product share the SAME underlying photo
+  // arrays (productPhotos[id]/existingProductPhotos[id]): the always-visible
+  // "Product Photo & Comments" gallery, and the conditional "Emboss Design
+  // Photos" gallery (shown only when Emboss=YES). Keep both in sync.
+  const gals=[document.getElementById('p'+id+'-photo-gallery'), document.getElementById('p'+id+'-emboss-photo-gallery')].filter(Boolean);
+  if(!gals.length) return;
   const news=productPhotos[id]||[];
   const existing=existingProductPhotos[id]||[];
   let html='';
@@ -1314,7 +1323,13 @@ function renderPhotoGallery(id){
       <button type="button" class="pt-remove" onclick="removePhotoAt(${id},'new',${i})" title="Remove">✕</button>
     </div>`;
   });
-  gal.innerHTML=html;
+  gals.forEach(gal=>gal.innerHTML=html);
+}
+
+function onEmbossChange(id){
+  const sel=document.getElementById('p'+id+'-emboss');
+  const sec=document.getElementById('p'+id+'-emboss-photo-section');
+  if(sec) sec.style.display=(sel && sel.value==='YES')?'block':'none';
 }
 
 function onSupp(id,key){
@@ -1667,32 +1682,49 @@ function updatePdfDoc(prods,grand){
 </tr>`;
 
   // ── Total Taxable & Net Amount below packing table ──
+  // Precision MUST exactly mirror the on-screen bill (bExGST/bGrand in calcAll()):
+  // Total Taxable = 2 decimals (fmt), Net Amount = whole rupee (Math.round) — these
+  // two intentionally use different rounding because that's what the on-screen bill does.
   const totalTaxable=prods.reduce((s,p)=>s+(p.exGST||0),0);
   const netAmount=prods.reduce((s,p)=>s+(p.amount||0),0);
   const ttEl=document.getElementById('pdf-total-taxable');
   const naEl=document.getElementById('pdf-net-amount');
-  if(ttEl) ttEl.textContent='₹'+Math.round(totalTaxable).toLocaleString('en-IN');
+  if(ttEl) ttEl.textContent=fmt(totalTaxable);
   if(naEl) naEl.textContent='₹'+Math.round(netAmount).toLocaleString('en-IN');
 
   // ── Per-product Photo Pages (mirrors the server-generated PDF) ──
   const photoPagesEl=document.getElementById('pdf-photo-pages');
   if(photoPagesEl){
-    photoPagesEl.innerHTML=prods.map((pr,i)=>{
-      const title=`Product ${i+1}: ${esc(pr.itemCode||pr.fabric||('Item '+(i+1)))}`;
+    const PHOTOS_PER_PAGE=10;
+    let allPagesHtml='';
+    prods.forEach((pr,i)=>{
+      const baseTitle=`Product ${i+1}: ${esc(pr.itemCode||pr.fabric||('Item '+(i+1)))}`;
       const newSrcs=productPhotos[pr.id]||[];
       const existingSrcs=(existingProductPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/uc?export=view&id='+ep.fileId);
       const allSrcs=[...existingSrcs,...newSrcs];
-      let imgHtml;
-      if(allSrcs.length){
-        imgHtml=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6pt">${allSrcs.map(src=>
-          `<div style="height:190pt;border:1pt solid #1A3C5E;overflow:hidden;background:#fff"><img src="${src}" style="width:100%;height:100%;object-fit:cover;display:block"></div>`
-        ).join('')}</div>`;
-      } else {
-        imgHtml=`<div style="width:100%;height:190pt;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-style:italic;font-size:9pt;background:#F8FAFC;border:1pt dashed #ccc">No photo uploaded for this product</div>`;
-      }
       const designCost=pr.designCostComment?esc(pr.designCostComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const otherComment=pr.remarks?esc(pr.remarks):'<span style="color:#9CA3AF;font-style:italic">—</span>';
-      return `<div style="page-break-before:always">
+
+      // Split into chunks of 10 — extra photos spill onto additional pages for this
+      // SAME product, each repeating the header (with a page indicator) + comments.
+      const chunks=[];
+      if(allSrcs.length){
+        for(let off=0; off<allSrcs.length; off+=PHOTOS_PER_PAGE) chunks.push(allSrcs.slice(off,off+PHOTOS_PER_PAGE));
+      } else {
+        chunks.push([]);
+      }
+
+      chunks.forEach((chunk,pageIdx)=>{
+        const title=baseTitle+(chunks.length>1?`  •  Page ${pageIdx+1} of ${chunks.length}`:'');
+        let imgHtml;
+        if(chunk.length){
+          imgHtml=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6pt">${chunk.map(src=>
+            `<div style="height:190pt;border:1pt solid #1A3C5E;overflow:hidden;background:#fff"><img src="${src}" style="width:100%;height:100%;object-fit:contain;display:block"></div>`
+          ).join('')}</div>`;
+        } else {
+          imgHtml=`<div style="width:100%;height:190pt;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-style:italic;font-size:9pt;background:#F8FAFC;border:1pt dashed #ccc">No photo uploaded for this product</div>`;
+        }
+        allPagesHtml+=`<div style="page-break-before:always">
         <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4pt;margin-bottom:6pt;border-bottom:2pt solid #D4870A">
           <div style="font-size:13pt;font-weight:700;color:#1A3C5E">${title}</div>
           <div style="font-size:8pt;color:#555">Order No.: ${document.getElementById('orderNo')?.value||'—'}</div>
@@ -1709,7 +1741,9 @@ function updatePdfDoc(prods,grand){
           </div>
         </div>
       </div>`;
-    }).join('');
+      });
+    });
+    photoPagesEl.innerHTML=allPagesHtml;
   }
 
   // ── Signature images + timestamps into PDF print doc ──
@@ -2236,6 +2270,7 @@ function applyProductToCard(id, x){
   setVal('sattan', x.sattan);
   setVal('moq', x.moq);
   setSel('emboss', x.emboss);
+  onEmbossChange(id);
   setVal('design', x.design);
   setVal('remarks', x.remarks);
   setVal('designCost', x.designCostComment);
