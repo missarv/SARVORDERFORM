@@ -282,7 +282,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <div style="font-size:7.5pt;color:#555;margin-top:2pt">Sanoli Road, 11K.M Stone, Near Kurar Village Trun, V.P.O Jalalpur-1, Distt. Panipat- 132103 (Haryana) | GST: 06ACSFS1161L1ZP | Mob:92158-00933 |Sarvindia.com</div>
     </div>
     <div style="text-align:right">
-      <div style="font-size:13pt;font-weight:700;color:#D4870A">ORDER CONFIRMATION</div>
+      <div style="font-size:13pt;font-weight:700;color:#D4870A">ORDER FORM</div>
       <div style="font-size:8pt;color:#2E6DA4;font-style:italic">www.sarvindia.com</div>
       <div style="font-size:7pt;color:#555;font-style:italic">Premium Blanket Manufacturer</div>
     </div>
@@ -416,7 +416,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       </td>
       <td style="vertical-align:top;padding:4pt 7pt 4pt 4pt;font-size:7pt;line-height:1.7;width:50%">
         4. Sizes &amp; weights subject to ±5% tolerance.<br>
-        5. Our responsibility ceases after goods leave the factory.<br>
+        5. Our responsibility ceases after goods leave our factory.<br>
         6. Material once sold will not be taken back under any circumstances.
       </td>
     </tr></table>
@@ -464,7 +464,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 <!-- ═══════════════════════════ SCREEN UI ════════════════════════════════ -->
 <div class="hdr">
   <div class="hdr-inner">
-    <div><h1>SARV INDIA HOME FURNISHING</h1><span>Sanoli Road, 11K.M Stone, Near Kurar, Jalalpur-1,Panipat-132103 (Haryana) | sarvindia.com</span></div>
+    <div><h1>SARV INDIA HOME FURNISHING</h1><span>Sanoli Road, 11K.M Stone, Near Kurar,Jalalpur-1,Panipat-132103(Haryana) | sarvindia.com</span></div>
     <div class="hdr-tag">ORDER FORM</div>
   </div>
   <div class="meta-bar">
@@ -689,7 +689,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw21zXdqzfwu_lPQKCH6XVluCIv0MqGLif6h57ze4kNWTSmT-I2YRPYSNXuIbEf6WQE/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeoo2AzKwA7oqCbjWTM3l8dVrRM2fugaion-rZGO2m_BgsTeA-A9IlXveXoqqXmTNS/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -1348,7 +1348,7 @@ function renderPhotoGallery(id, section){
   let html='';
   existing.forEach((p,i)=>{
     html+=`<div class="photo-tile">
-      <img src="https://drive.google.com/uc?export=view&id=${p.fileId}" onerror="this.closest('.photo-tile').style.background='#F3F4F6'">
+      <img src="https://drive.google.com/thumbnail?id=${p.fileId}&sz=w200" onerror="this.closest('.photo-tile').style.background='#F3F4F6'">
       <a class="pt-view-link" href="${p.url}" target="_blank" rel="noopener" title="View full photo"></a>
       <button type="button" class="pt-remove" onclick="event.stopPropagation();removePhotoAt(${id},'${section}','existing',${i})" title="Remove">✕</button>
       <div class="pt-existing-badge">SAVED</div>
@@ -1796,10 +1796,15 @@ function updatePdfDoc(prods,grand){
       // PDF combines BOTH sections into one "Product Photos" gallery — only the on-screen
       // upload galleries are kept separate (emboss designs shown first, then product photos).
       const embossNewSrcs=embossPhotos[pr.id]||[];
-      const embossExistingSrcs=(existingEmbossPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/uc?export=view&id='+ep.fileId);
+      const embossExistingSrcs=(existingEmbossPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/thumbnail?id='+ep.fileId+'&sz=w400');
       const newSrcs=productPhotos[pr.id]||[];
-      const existingSrcs=(existingProductPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/uc?export=view&id='+ep.fileId);
-      const allSrcs=[...embossExistingSrcs,...embossNewSrcs,...existingSrcs,...newSrcs];
+      const existingSrcs=(existingProductPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/thumbnail?id='+ep.fileId+'&sz=w400');
+      // Each photo tagged with its source — emboss-sourced tiles get a permanent
+      // "Emboss Image" caption on the PDF, matching buildOrderHtml() server-side.
+      const allSrcs=[
+        ...[...embossExistingSrcs,...embossNewSrcs].map(src=>({src,tag:'Emboss Image'})),
+        ...[...existingSrcs,...newSrcs].map(src=>({src,tag:''}))
+      ];
       const labelTagComment=pr.labelTagComment?esc(pr.labelTagComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const designCost=pr.designCostComment?esc(pr.designCostComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const otherComment=pr.remarks?esc(pr.remarks):'<span style="color:#9CA3AF;font-style:italic">—</span>';
@@ -1817,8 +1822,12 @@ function updatePdfDoc(prods,grand){
         const title=baseTitle+(chunks.length>1?`  •  Page ${pageIdx+1} of ${chunks.length}`:'');
         let imgHtml;
         if(chunk.length){
-          imgHtml=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6pt">${chunk.map(src=>
-            `<div style="height:190pt;border:1pt solid #1A3C5E;overflow:hidden;background:#fff"><img src="${src}" style="width:100%;height:100%;object-fit:contain;display:block"></div>`
+          const TILE_H=190, CAP_H=12, IMG_H=TILE_H-CAP_H;
+          imgHtml=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6pt">${chunk.map(photo=>
+            `<div style="height:${TILE_H}pt;border:1pt solid #1A3C5E;overflow:hidden;background:#fff;display:flex;flex-direction:column">
+              <div style="height:${IMG_H}pt;overflow:hidden"><img src="${photo.src}" style="width:100%;height:100%;object-fit:contain;display:block"></div>
+              <div style="height:${CAP_H}pt;line-height:${CAP_H}pt;font-size:6.5pt;font-weight:700;color:#1A3C5E;text-align:center;border-top:0.5pt solid #eee;background:${photo.tag?'#FFF8E1':'#fff'}">${photo.tag?esc(photo.tag):''}</div>
+            </div>`
           ).join('')}</div>`;
         } else {
           imgHtml=`<div style="width:100%;height:190pt;display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-style:italic;font-size:9pt;background:#F8FAFC;border:1pt dashed #ccc">No photo uploaded for this product</div>`;
