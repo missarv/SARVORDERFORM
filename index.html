@@ -213,6 +213,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 .oh-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px}
 .oh-status.saved{background:#E8F5E9;color:#2E7D32}
 .oh-status.pending{background:#FFF3E0;color:#E65100}
+.oh-status.sent-to-party{background:#E3F2FD;color:#1565C0}
+.oh-status.confirmed{background:#E0F7F0;color:#00796B}
+.oh-status.hold{background:#FFF3E0;color:#E65100}
+.oh-status.cancel{background:#FFEBEE;color:#C62828}
+.oh-status.closed{background:#F3F4F6;color:#555}
+.oh-status-select{font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px;border:none;cursor:pointer;outline:none}
+.oh-status-select:disabled{opacity:.6;cursor:wait}
 .oh-buyer{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;grid-column:1/-1}
 .oh-meta{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
 .oh-meta b{color:var(--text);font-weight:600}
@@ -277,7 +284,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     <div style="text-align:right">
       <div style="font-size:13pt;font-weight:700;color:#D4870A">ORDER CONFIRMATION</div>
       <div style="font-size:8pt;color:#2E6DA4;font-style:italic">www.sarvindia.com</div>
-      <div style="font-size:7pt;color:#555;font-style:italic">Premium Mink Blanket Manufacturer</div>
+      <div style="font-size:7pt;color:#555;font-style:italic">Premium Blanket Manufacturer</div>
     </div>
   </div>
 
@@ -457,13 +464,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 <!-- ═══════════════════════════ SCREEN UI ════════════════════════════════ -->
 <div class="hdr">
   <div class="hdr-inner">
-    <div><h1>SARV INDIA HOME FURNISHING</h1><span>Sanoli Road, 11K.M Stone, Near Kurar,Jalalpur-1,Panipat-132103 (Haryana) | sarvindia.com</span></div>
+    <div><h1>SARV INDIA HOME FURNISHING</h1><span>Sanoli Road, 11K.M Stone, Near Kurar, Jalalpur-1,Panipat-132103 (Haryana) | sarvindia.com</span></div>
     <div class="hdr-tag">ORDER FORM</div>
   </div>
   <div class="meta-bar">
     <span>Order: <b id="dON">—</b></span>
     <span>Date: <b id="dD">—</b></span>
-    <span>GST: <b>: 06ACSFS1161L1ZP</b></span>
+    <span>GST: <b>06ACSFS1161L1ZP</b></span>
   </div>
 </div>
 
@@ -636,6 +643,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     </div>
     <div class="oh-search">
       <input type="text" id="ohSearch" placeholder="Search by order no, buyer, GSTIN, date..." oninput="filterOrderHistory()">
+      <select id="ohStatusFilter" onchange="filterOrderHistory()" style="margin-top:6px;width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;color:var(--navy);font-weight:600">
+        <option value="">All Statuses</option>
+        <option value="saved">Saved</option>
+        <option value="sent-to-party">Sent to Party</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="hold">Hold</option>
+        <option value="cancel">Cancel</option>
+        <option value="closed">Closed</option>
+      </select>
     </div>
     <div class="oh-count" id="ohCount">—</div>
     <div class="oh-body" id="ohBody">
@@ -673,7 +689,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfIuzvaUM50wg8WE0_Jv5ADKlujSQSNwQW86t4fdhfBCE8ayai5r4qNu8DCvQ-z64K/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw21zXdqzfwu_lPQKCH6XVluCIv0MqGLif6h57ze4kNWTSmT-I2YRPYSNXuIbEf6WQE/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -1135,7 +1151,7 @@ function addProduct(){
       </div>
       <div id="p${id}-emboss-photo-section" style="display:none;margin-top:10px;padding:10px 12px;background:#FFFBEA;border:1px solid #FCD34D;border-radius:8px">
         <label style="display:block;font-size:11.5px;font-weight:600;color:#92400E;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">🎨 Emboss Design Photos <span style="font-size:10px;font-weight:400;text-transform:none">(upload the emboss design reference — added to this product's Product Photos on the PDF)</span></label>
-        <input type="file" accept="image/*" multiple id="p${id}-emboss-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px;background:#fff">
+        <input type="file" accept="image/*" multiple id="p${id}-emboss-photo-input" onchange="handlePhotoUpload(${id},this,'emboss')" style="padding:7px;font-size:12px;background:#fff">
         <button type="button" onclick="toggleEmbossCatalog(${id})" style="margin-top:8px;background:#92400E;color:#fff;border:none;padding:7px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📚 Select from Emboss Designs Catalog</button>
         <div id="p${id}-emboss-catalog" style="display:none;margin-top:8px;max-height:220px;overflow-y:auto;border:1px solid #FCD34D;border-radius:8px;padding:8px;background:#fff"></div>
         <div id="p${id}-emboss-photo-gallery" class="photo-gallery"></div>
@@ -1171,7 +1187,7 @@ function addProduct(){
       <div class="shd">Product Photo &amp; Comments</div>
       <div class="fg">
         <label>Product Photos <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(optional — up to 30; shown 10 per page (5×2 grid) — extra photos add more pages for this product)</span></label>
-        <input type="file" accept="image/*" multiple id="p${id}-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px">
+        <input type="file" accept="image/*" multiple id="p${id}-photo-input" onchange="handlePhotoUpload(${id},this,'product')" style="padding:7px;font-size:12px">
         <div id="p${id}-photo-gallery" class="photo-gallery"></div>
       </div>
       <div class="g2" style="margin-top:11px">
@@ -1232,33 +1248,51 @@ function removeProd(id){
   if(el){el.style.opacity='0';el.style.transition='.18s';setTimeout(()=>{el.remove();calcAll();},180);}
   delete productPhotos[id];
   delete existingProductPhotos[id];
+  delete embossPhotos[id];
+  delete existingEmbossPhotos[id];
 }
 
-// ═══════════════════════ PRODUCT PHOTO UPLOAD (multi-photo) ═══════════════
-// productPhotos[id]        = array of base64 dataURLs — NEWLY uploaded/resized photos this session
-// existingProductPhotos[id]= array of { fileId, url } — photos already saved on Drive from a
-//                             previous submission (populated only via the Edit flow)
+// ═══════════════════════ PRODUCT PHOTO UPLOAD (multi-photo, 2 INDEPENDENT galleries) ═══
+// Product Photos and Emboss Design Photos are deliberately SEPARATE pools — a photo
+// uploaded in one gallery must NEVER appear in the other on screen. Each has its own
+// "new upload" array + "existing/carried-over" array:
+//   productPhotos[id] / existingProductPhotos[id]   → "Product Photo & Comments" section only
+//   embossPhotos[id]  / existingEmbossPhotos[id]    → "Emboss Design Photos" section only
+// Both pools still get COMBINED server-side into one "Product Photos" gallery on the PDF
+// (that requirement hasn't changed) — only the on-screen galleries are kept apart.
 const productPhotos={};
 const existingProductPhotos={};
-const MAX_PHOTOS_PER_PRODUCT=30; // extra photos beyond 10 spill onto additional PDF pages for the same product
+const embossPhotos={};
+const existingEmbossPhotos={};
+const MAX_PHOTOS_PER_PRODUCT=30; // per section — extra photos beyond 10 spill onto additional PDF pages
 
-function photoCount(id){
-  return (productPhotos[id]||[]).length + (existingProductPhotos[id]||[]).length;
+function sectionState(section){
+  return section==='emboss'
+    ? {news:embossPhotos, existing:existingEmbossPhotos, galleryId:s=>'p'+s+'-emboss-photo-gallery'}
+    : {news:productPhotos, existing:existingProductPhotos, galleryId:s=>'p'+s+'-photo-gallery'};
 }
 
-function handlePhotoUpload(id, input){
+function photoCount(id, section){
+  const st=sectionState(section);
+  return (st.news[id]||[]).length + (st.existing[id]||[]).length;
+}
+
+function handlePhotoUpload(id, input, section){
+  section=section||'product';
+  const st=sectionState(section);
   const files=input.files ? Array.from(input.files) : [];
   if(!files.length) return;
-  const remaining=MAX_PHOTOS_PER_PRODUCT-photoCount(id);
-  if(remaining<=0){ toast('⚠️ Max '+MAX_PHOTOS_PER_PRODUCT+' photos per product reached'); input.value=''; return; }
+  const remaining=MAX_PHOTOS_PER_PRODUCT-photoCount(id,section);
+  if(remaining<=0){ toast('⚠️ Max '+MAX_PHOTOS_PER_PRODUCT+' photos reached for this section'); input.value=''; return; }
   const toProcess=files.slice(0,remaining);
-  if(files.length>toProcess.length){ toast('⚠️ Only '+toProcess.length+' added — max '+MAX_PHOTOS_PER_PRODUCT+' photos per product'); }
+  if(files.length>toProcess.length){ toast('⚠️ Only '+toProcess.length+' added — max '+MAX_PHOTOS_PER_PRODUCT+' photos per section'); }
 
-  if(!productPhotos[id]) productPhotos[id]=[];
+  if(!st.news[id]) st.news[id]=[];
   let pending=toProcess.length;
+  const finish=()=>{ input.value=''; renderPhotoGallery(id,section); calcAll(); };
 
   toProcess.forEach(file=>{
-    if(!file.type.startsWith('image/')){ toast('⚠️ Skipped a non-image file'); pending--; if(pending===0){ input.value=''; renderPhotoGallery(id); } return; }
+    if(!file.type.startsWith('image/')){ toast('⚠️ Skipped a non-image file'); pending--; if(pending===0) finish(); return; }
     const reader=new FileReader();
     reader.onload=function(ev){
       const img=new Image();
@@ -1273,63 +1307,60 @@ function handlePhotoUpload(id, input){
         canvas.width=w; canvas.height=h;
         canvas.getContext('2d').drawImage(img,0,0,w,h);
         const dataUrl=canvas.toDataURL('image/jpeg',0.75);
-        productPhotos[id].push(dataUrl);
+        st.news[id].push(dataUrl);
         pending--;
         if(pending===0){
-          input.value='';
-          renderPhotoGallery(id);
-          toast('📸 Photo(s) added — '+photoCount(id)+'/'+MAX_PHOTOS_PER_PRODUCT);
-          calcAll();
+          finish();
+          toast('📸 Photo(s) added — '+photoCount(id,section)+'/'+MAX_PHOTOS_PER_PRODUCT);
         }
       };
-      img.onerror=function(){ toast('⚠️ Could not read one of the images'); pending--; if(pending===0){ input.value=''; renderPhotoGallery(id); calcAll(); } };
+      img.onerror=function(){ toast('⚠️ Could not read one of the images'); pending--; if(pending===0) finish(); };
       img.src=ev.target.result;
     };
-    reader.onerror=function(){ toast('⚠️ Failed to read a file'); pending--; if(pending===0){ input.value=''; renderPhotoGallery(id); calcAll(); } };
+    reader.onerror=function(){ toast('⚠️ Failed to read a file'); pending--; if(pending===0) finish(); };
     reader.readAsDataURL(file);
   });
 }
 
-function removePhotoAt(id, kind, idx){
-  if(kind==='new' && productPhotos[id]) productPhotos[id].splice(idx,1);
-  if(kind==='existing' && existingProductPhotos[id]) existingProductPhotos[id].splice(idx,1);
-  renderPhotoGallery(id);
+function removePhotoAt(id, section, kind, idx){
+  const st=sectionState(section);
+  if(kind==='new' && st.news[id]) st.news[id].splice(idx,1);
+  if(kind==='existing' && st.existing[id]) st.existing[id].splice(idx,1);
+  renderPhotoGallery(id,section);
   calcAll();
 }
 
-// Backward-compat alias — clears ALL photos for a product (used by resetForm/applyOrderToForm)
+// Clears ALL photos for a product in BOTH sections — used by resetForm/removeProd/applyOrderToForm
 function removeProductPhoto(id){
-  delete productPhotos[id];
-  delete existingProductPhotos[id];
-  renderPhotoGallery(id);
+  delete productPhotos[id]; delete existingProductPhotos[id];
+  delete embossPhotos[id];  delete existingEmbossPhotos[id];
+  renderPhotoGallery(id,'product');
+  renderPhotoGallery(id,'emboss');
   calcAll();
 }
 
-function renderPhotoGallery(id){
-  // Two possible gallery containers per product share the SAME underlying photo
-  // arrays (productPhotos[id]/existingProductPhotos[id]): the always-visible
-  // "Product Photo & Comments" gallery, and the conditional "Emboss Design
-  // Photos" gallery (shown only when Emboss=YES). Keep both in sync.
-  const gals=[document.getElementById('p'+id+'-photo-gallery'), document.getElementById('p'+id+'-emboss-photo-gallery')].filter(Boolean);
-  if(!gals.length) return;
-  const news=productPhotos[id]||[];
-  const existing=existingProductPhotos[id]||[];
+function renderPhotoGallery(id, section){
+  const st=sectionState(section);
+  const gal=document.getElementById(st.galleryId(id));
+  if(!gal) return;
+  const news=st.news[id]||[];
+  const existing=st.existing[id]||[];
   let html='';
   existing.forEach((p,i)=>{
     html+=`<div class="photo-tile">
       <img src="https://drive.google.com/uc?export=view&id=${p.fileId}" onerror="this.closest('.photo-tile').style.background='#F3F4F6'">
       <a class="pt-view-link" href="${p.url}" target="_blank" rel="noopener" title="View full photo"></a>
-      <button type="button" class="pt-remove" onclick="event.stopPropagation();removePhotoAt(${id},'existing',${i})" title="Remove">✕</button>
+      <button type="button" class="pt-remove" onclick="event.stopPropagation();removePhotoAt(${id},'${section}','existing',${i})" title="Remove">✕</button>
       <div class="pt-existing-badge">SAVED</div>
     </div>`;
   });
   news.forEach((dataUrl,i)=>{
     html+=`<div class="photo-tile">
       <img src="${dataUrl}">
-      <button type="button" class="pt-remove" onclick="removePhotoAt(${id},'new',${i})" title="Remove">✕</button>
+      <button type="button" class="pt-remove" onclick="removePhotoAt(${id},'${section}','new',${i})" title="Remove">✕</button>
     </div>`;
   });
-  gals.forEach(gal=>gal.innerHTML=html);
+  gal.innerHTML=html;
 }
 
 function onEmbossChange(id){
@@ -1340,11 +1371,12 @@ function onEmbossChange(id){
 
 // ═══════════════════ EMBOSS DESIGNS CATALOG PICKER ═════════════════════════
 // EMBOSS_DESIGNS is fetched once at page load from the "Emboss Designs" sheet
-// (see fetchDrops()). Selecting a catalog design just adds its Drive fileId
-// into existingProductPhotos[id] — the SAME mechanism used when Editing an
-// order restores previously-saved photos. No new upload/photo-handling logic
-// needed: the server already knows how to re-fetch a Drive fileId and embed
-// it in the PDF (savePhotosToDrive()'s existingPhotoFileIds path).
+// (see fetchDrops()). Selecting a catalog design adds its Drive fileId into
+// existingEmbossPhotos[id] — the Emboss section's OWN "existing photo" pool,
+// kept separate from existingProductPhotos so it never bleeds into the
+// Product Photos gallery on screen. Server-side re-hydration (fetching a Drive
+// fileId and embedding it in the PDF) works identically regardless of which
+// section the fileId came from — no new server logic needed for the catalog itself.
 let EMBOSS_DESIGNS=[];
 
 function toggleEmbossCatalog(id){
@@ -1376,10 +1408,10 @@ function addSelectedEmbossDesigns(id){
   EMBOSS_DESIGNS.forEach((d,i)=>{
     const cb=document.getElementById('p'+id+'-ecat-'+i);
     if(cb && cb.checked){
-      if(!existingProductPhotos[id]) existingProductPhotos[id]=[];
-      const already=existingProductPhotos[id].some(p=>p.fileId===d.fileId);
-      if(!already && photoCount(id)<MAX_PHOTOS_PER_PRODUCT){
-        existingProductPhotos[id].push({fileId:d.fileId, url:d.previewUrl});
+      if(!existingEmbossPhotos[id]) existingEmbossPhotos[id]=[];
+      const already=existingEmbossPhotos[id].some(p=>p.fileId===d.fileId);
+      if(!already && photoCount(id,'emboss')<MAX_PHOTOS_PER_PRODUCT){
+        existingEmbossPhotos[id].push({fileId:d.fileId, url:d.previewUrl});
         added++;
       } else {
         skipped++;
@@ -1387,7 +1419,7 @@ function addSelectedEmbossDesigns(id){
       cb.checked=false;
     }
   });
-  if(added){ renderPhotoGallery(id); calcAll(); toast('📚 Added '+added+' design(s) from catalog'+(skipped?(' — '+skipped+' skipped (duplicate or limit reached)'):'')); }
+  if(added){ renderPhotoGallery(id,'emboss'); calcAll(); toast('📚 Added '+added+' design(s) from catalog'+(skipped?(' — '+skipped+' skipped (duplicate or limit reached)'):'')); }
   else toast(skipped?'⚠️ Selected design(s) already added or photo limit reached':'⚠️ Select at least one design first');
   const catEl=document.getElementById('p'+id+'-emboss-catalog');
   if(catEl) catEl.style.display='none';
@@ -1598,6 +1630,7 @@ function getProd(id){
     moq:g('p'+id+'-moq'), emboss:g('p'+id+'-emboss'), design:g('p'+id+'-design'),
     remarks:g('p'+id+'-remarks'), designCostComment:g('p'+id+'-designCost'), labelTagComment:g('p'+id+'-labelTagComment'),
     newPhotos:productPhotos[id]||[], existingPhotoFileIds:(existingProductPhotos[id]||[]).map(ep=>ep.fileId),
+    newEmbossPhotos:embossPhotos[id]||[], existingEmbossPhotoFileIds:(existingEmbossPhotos[id]||[]).map(ep=>ep.fileId),
   };
 }
 
@@ -1760,9 +1793,13 @@ function updatePdfDoc(prods,grand){
     let allPagesHtml='';
     prods.forEach((pr,i)=>{
       const baseTitle=`Product ${i+1}: ${esc(pr.itemCode||pr.fabric||('Item '+(i+1)))}`;
+      // PDF combines BOTH sections into one "Product Photos" gallery — only the on-screen
+      // upload galleries are kept separate (emboss designs shown first, then product photos).
+      const embossNewSrcs=embossPhotos[pr.id]||[];
+      const embossExistingSrcs=(existingEmbossPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/uc?export=view&id='+ep.fileId);
       const newSrcs=productPhotos[pr.id]||[];
       const existingSrcs=(existingProductPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/uc?export=view&id='+ep.fileId);
-      const allSrcs=[...existingSrcs,...newSrcs];
+      const allSrcs=[...embossExistingSrcs,...embossNewSrcs,...existingSrcs,...newSrcs];
       const labelTagComment=pr.labelTagComment?esc(pr.labelTagComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const designCost=pr.designCostComment?esc(pr.designCostComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const otherComment=pr.remarks?esc(pr.remarks):'<span style="color:#9CA3AF;font-style:italic">—</span>';
@@ -1842,6 +1879,7 @@ function collectPayload(){
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
       remarks:p.remarks||'', designCostComment:p.designCostComment||'', labelTagComment:p.labelTagComment||'',
       newPhotos:p.newPhotos||[], existingPhotoFileIds:p.existingPhotoFileIds||[],
+      newEmbossPhotos:p.newEmbossPhotos||[], existingEmbossPhotoFileIds:p.existingEmbossPhotoFileIds||[],
     });
   });
   return {
@@ -1997,6 +2035,8 @@ function resetForm(){
   prodCount=0;
   Object.keys(productPhotos).forEach(k=>delete productPhotos[k]);
   Object.keys(existingProductPhotos).forEach(k=>delete existingProductPhotos[k]);
+  Object.keys(embossPhotos).forEach(k=>delete embossPhotos[k]);
+  Object.keys(existingEmbossPhotos).forEach(k=>delete existingEmbossPhotos[k]);
   ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson','transportName'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -2020,6 +2060,7 @@ function openOrderHistory(){
   const panel=document.getElementById('ohPanel');
   panel.classList.add('open');
   document.getElementById('ohSearch').value='';
+  const sf=document.getElementById('ohStatusFilter'); if(sf) sf.value='';
   if(!ohCache) fetchOrderList();
   else renderOrderList(ohCache);
 }
@@ -2160,6 +2201,53 @@ function buildMailUrl(o,target){
   return 'mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
 }
 
+// ═══════════════════ ORDER STATUS (dropdown + update) ══════════════════════
+const STATUS_OPTIONS=['Saved','Sent to Party','Confirmed','Hold','Cancel','Closed'];
+const STATUS_COLORS={
+  'Saved':{bg:'#E8F5E9',fg:'#2E7D32'},
+  'Sent to Party':{bg:'#E3F2FD',fg:'#1565C0'},
+  'Confirmed':{bg:'#E0F7F0',fg:'#00796B'},
+  'Hold':{bg:'#FFF3E0',fg:'#E65100'},
+  'Cancel':{bg:'#FFEBEE',fg:'#C62828'},
+  'Closed':{bg:'#F3F4F6',fg:'#555'}
+};
+
+function buildStatusSelect(o){
+  const cur=o.status||'Saved';
+  let opts=[...STATUS_OPTIONS];
+  if(cur && !opts.includes(cur)) opts=[cur,...opts]; // defensive: show legacy/unexpected status values too, don't silently hide them
+  const c=STATUS_COLORS[cur]||{bg:'#F3F4F6',fg:'#555'};
+  const optsHtml=opts.map(s=>`<option value="${esc(s)}" ${s===cur?'selected':''}>${esc(s)}</option>`).join('');
+  return `<select class="oh-status-select" style="background:${c.bg};color:${c.fg}" onchange="updateOrderStatus(this,${o.rowNum},'${o.orderNo}')" onclick="event.stopPropagation()">${optsHtml}</select>`;
+}
+
+async function updateOrderStatus(selectEl, rowNum, orderNo){
+  const newStatus=selectEl.value;
+  const url=getApiUrl();
+  if(!url){ toast('⚠️ APPS_SCRIPT_URL not set'); return; }
+  const prevBg=selectEl.style.background, prevFg=selectEl.style.color;
+  selectEl.disabled=true;
+  try{
+    const resp=await fetch(url,{method:'POST',body:JSON.stringify({action:'updateStatus',rowNum:rowNum,status:newStatus})});
+    const data=await resp.json();
+    if(data.success){
+      const c=STATUS_COLORS[newStatus]||{bg:'#F3F4F6',fg:'#555'};
+      selectEl.style.background=c.bg; selectEl.style.color=c.fg;
+      const card=selectEl.closest('.oh-card');
+      if(card) card.dataset.status=newStatus.toLowerCase().replace(/\s+/g,'-');
+      toast('✅ Status updated to "'+newStatus+'" for '+orderNo);
+    } else {
+      selectEl.style.background=prevBg; selectEl.style.color=prevFg;
+      toast('❌ '+(data.error||'Could not update status — refresh Order History and try again'));
+    }
+  }catch(err){
+    selectEl.style.background=prevBg; selectEl.style.color=prevFg;
+    toast('❌ Network error: '+err.message);
+  } finally {
+    selectEl.disabled=false;
+  }
+}
+
 function renderOrderList(orders){
   const body=document.getElementById('ohBody');
   const countEl=document.getElementById('ohCount');
@@ -2180,7 +2268,8 @@ function renderOrderList(orders){
     const totalQty=o.totalQty?Number(o.totalQty).toLocaleString('en-IN'):'—';
     const totalProds=o.totalProducts||'—';
     const pdfLink=o.pdfLink||'';
-    const statusBadge=status?`<span class="oh-status ${status.toLowerCase().replace(/\s+/g,'-')}">${status}</span>`:'';
+    const statusSlug=(status||'saved').toLowerCase().replace(/\s+/g,'-');
+    const statusSelectHtml=buildStatusSelect(o);
 
     // WhatsApp & Mail buttons
     const buyerMob=sanitizePhone(o.mobile);
@@ -2208,10 +2297,10 @@ function renderOrderList(orders){
       ?`<a class="oh-act-btn oh-mail-agency" href="javascript:void(0)" onclick="trackSend('${oNo}','mailAgency','${escUrl(mailAgencyUrl)}')" title="Email agency">✉ Agency${getSentBadge(oNo,'mailAgency')}</a>`
       :'';
 
-    return `<div class="oh-card" data-search="${(oNo+' '+buyer+' '+dt+' '+channel+' '+status+' '+(o.agencyName||'')).toLowerCase()}">
+    return `<div class="oh-card" data-search="${(oNo+' '+buyer+' '+dt+' '+channel+' '+status+' '+(o.agencyName||'')).toLowerCase()}" data-status="${statusSlug}">
       <div class="oh-card-top">
         <div class="oh-orderNo">${oNo}</div>
-        ${statusBadge}
+        ${statusSelectHtml}
       </div>
       <div class="oh-buyer">${buyer}${o.contact?' <small style="color:var(--muted);font-weight:400">('+esc(o.contact)+')</small>':''}</div>
       <div class="oh-meta-row">
@@ -2267,6 +2356,8 @@ function resetFormSilent(){
   prodCount=0;
   Object.keys(productPhotos).forEach(k=>delete productPhotos[k]);
   Object.keys(existingProductPhotos).forEach(k=>delete existingProductPhotos[k]);
+  Object.keys(embossPhotos).forEach(k=>delete embossPhotos[k]);
+  Object.keys(existingEmbossPhotos).forEach(k=>delete existingEmbossPhotos[k]);
   ['agencyName','agencyContact','agencyMobile','buyerName','buyerMobile','buyerAddress','buyerGST','payTerms','delivTerms','contactPerson','transportName'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
@@ -2284,6 +2375,8 @@ function applyOrderToForm(o){
   prodCount=0;
   Object.keys(productPhotos).forEach(k=>delete productPhotos[k]);
   Object.keys(existingProductPhotos).forEach(k=>delete existingProductPhotos[k]);
+  Object.keys(embossPhotos).forEach(k=>delete embossPhotos[k]);
+  Object.keys(existingEmbossPhotos).forEach(k=>delete existingEmbossPhotos[k]);
 
   const setVal=(id,v)=>{const el=document.getElementById(id); if(el) el.value=(v===undefined||v===null)?'':v;};
 
@@ -2349,12 +2442,19 @@ function applyProductToCard(id, x){
   // Existing photos (from a prior submission) — can't be loaded into a <input type="file">
   // for security reasons, so we show them as "SAVED" tiles in the gallery instead. If the
   // user doesn't remove/replace them, existingPhotoFileIds tells the server to re-use the
-  // Drive copies already on file rather than losing them.
+  // Drive copies already on file rather than losing them. Product and Emboss sections are
+  // restored from SEPARATE stored fields so they land back in the correct gallery.
   const photoUrls=Array.isArray(x.photoUrls)?x.photoUrls:(x.photoUrl?[x.photoUrl]:[]);
   const photoFileIds=Array.isArray(x.photoFileIds)?x.photoFileIds:(x.photoFileId?[x.photoFileId]:[]);
   productPhotos[id]=[];
   existingProductPhotos[id]=photoFileIds.map((fid,i)=>({fileId:fid, url:photoUrls[i]||''}));
-  renderPhotoGallery(id);
+  renderPhotoGallery(id,'product');
+
+  const embossPhotoUrls=Array.isArray(x.embossPhotoUrls)?x.embossPhotoUrls:[];
+  const embossPhotoFileIds=Array.isArray(x.embossPhotoFileIds)?x.embossPhotoFileIds:[];
+  embossPhotos[id]=[];
+  existingEmbossPhotos[id]=embossPhotoFileIds.map((fid,i)=>({fileId:fid, url:embossPhotoUrls[i]||''}));
+  renderPhotoGallery(id,'emboss');
 
   // GSM vs KG label — tied only to GREY/WHITE FABRIC item code (payload doesn't store a
   // separate isGSM flag, so we re-derive it the same way onItemCodeSelect() does)
@@ -2406,15 +2506,18 @@ function applyProductToCard(id, x){
 
 function filterOrderHistory(){
   const q=document.getElementById('ohSearch').value.trim().toLowerCase();
+  const statusFilter=document.getElementById('ohStatusFilter').value;
   const cards=document.querySelectorAll('#ohBody .oh-card');
   let visible=0;
   cards.forEach(card=>{
-    const match=!q||card.dataset.search.includes(q);
+    const matchText=!q||card.dataset.search.includes(q);
+    const matchStatus=!statusFilter||card.dataset.status===statusFilter;
+    const match=matchText&&matchStatus;
     card.style.display=match?'':'none';
     if(match) visible++;
   });
   document.getElementById('ohCount').textContent=visible+' order'+(visible!==1?'s':'')+
-    (q?' (filtered)':'');
+    ((q||statusFilter)?' (filtered)':'');
 }
 </script>
 </body>
