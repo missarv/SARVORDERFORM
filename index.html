@@ -457,13 +457,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 <!-- ═══════════════════════════ SCREEN UI ════════════════════════════════ -->
 <div class="hdr">
   <div class="hdr-inner">
-    <div><h1>SARV INDIA HOME FURNISHING</h1><span>Plot 166, Sector-25, HUDA, Panipat | sarvindia.com</span></div>
+    <div><h1>SARV INDIA HOME FURNISHING</h1><span>Sanoli Road, 11K.M Stone, Near Kurar,Jalalpur-1,Panipat-132103 (Haryana) | sarvindia.com</span></div>
     <div class="hdr-tag">ORDER FORM</div>
   </div>
   <div class="meta-bar">
     <span>Order: <b id="dON">—</b></span>
     <span>Date: <b id="dD">—</b></span>
-    <span>GST: <b>06ADEPB4329A1ZC</b></span>
+    <span>GST: <b>: 06ACSFS1161L1ZP</b></span>
   </div>
 </div>
 
@@ -583,7 +583,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <li>Prices are Ex-Factory Panipat. GST @ 5% applicable.</li>
       <li>Any dispute subject to Panipat (HR) Jurisdiction only.</li>
       <li>Sizes &amp; weights subject to ±5% tolerance.</li>
-      <li>Our responsibility ceases after goods leave the factory.</li>
+      <li>Our responsibility ceases after goods leave our factory.</li>
       <li>Material once sold will not be taken back under any circumstances.</li>
     </ul>
   </div>
@@ -673,7 +673,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtEPVLMME7A8rcwzeIKd-bXF_Zxflx78avAbGIdt3LhY7LVtUH8lNTxzHInKx9--1_/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfIuzvaUM50wg8WE0_Jv5ADKlujSQSNwQW86t4fdhfBCE8ayai5r4qNu8DCvQ-z64K/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
@@ -836,6 +836,7 @@ async function fetchDrops(){
     if(j.standardItems){ STANDARD_ITEMS=j.standardItems; DROPS.itemCode=Object.keys(STANDARD_ITEMS); refreshAllCombos(); }
     if(j.buyerDetails){ BUYER_DETAILS=j.buyerDetails; const bKeys=Object.keys(BUYER_DETAILS); if(bKeys.length){ bKeys.forEach(b=>{ if(!DROPS.buyerName) DROPS.buyerName=[]; if(!DROPS.buyerName.includes(b)) DROPS.buyerName.push(b); }); refreshAllCombos(); } }
     if(j.agencyDetails){ AGENCY_DETAILS=j.agencyDetails; const aKeys=Object.keys(AGENCY_DETAILS); if(aKeys.length){ aKeys.forEach(a=>{ if(!DROPS.agencyName) DROPS.agencyName=[]; if(!DROPS.agencyName.includes(a)) DROPS.agencyName.push(a); }); refreshAllCombos(); } }
+    if(Array.isArray(j.embossDesigns)) EMBOSS_DESIGNS=j.embossDesigns;
     if(j.nextOrderNo){
       document.getElementById('orderNo').value=j.nextOrderNo;
       document.getElementById('dON').textContent=j.nextOrderNo;
@@ -1135,6 +1136,8 @@ function addProduct(){
       <div id="p${id}-emboss-photo-section" style="display:none;margin-top:10px;padding:10px 12px;background:#FFFBEA;border:1px solid #FCD34D;border-radius:8px">
         <label style="display:block;font-size:11.5px;font-weight:600;color:#92400E;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">🎨 Emboss Design Photos <span style="font-size:10px;font-weight:400;text-transform:none">(upload the emboss design reference — added to this product's Product Photos on the PDF)</span></label>
         <input type="file" accept="image/*" multiple id="p${id}-emboss-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px;background:#fff">
+        <button type="button" onclick="toggleEmbossCatalog(${id})" style="margin-top:8px;background:#92400E;color:#fff;border:none;padding:7px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📚 Select from Emboss Designs Catalog</button>
+        <div id="p${id}-emboss-catalog" style="display:none;margin-top:8px;max-height:220px;overflow-y:auto;border:1px solid #FCD34D;border-radius:8px;padding:8px;background:#fff"></div>
         <div id="p${id}-emboss-photo-gallery" class="photo-gallery"></div>
       </div>
       <div class="fg"><label>Design Details</label>
@@ -1166,11 +1169,14 @@ function addProduct(){
       </div>
       <div class="fg" style="margin-top:10px"><label>Remarks <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(shown as "Other Comment" on this product's photo page in the PDF)</span></label><input type="text" id="p${id}-remarks" placeholder="Any special instructions for this product..." oninput="calcAll()"></div>
       <div class="shd">Product Photo &amp; Comments</div>
-      <div class="g2">
-        <div class="fg">
-          <label>Product Photos <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(optional — up to 30; shown 10 per page (5×2 grid) — extra photos add more pages for this product)</span></label>
-          <input type="file" accept="image/*" multiple id="p${id}-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px">
-          <div id="p${id}-photo-gallery" class="photo-gallery"></div>
+      <div class="fg">
+        <label>Product Photos <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none">(optional — up to 30; shown 10 per page (5×2 grid) — extra photos add more pages for this product)</span></label>
+        <input type="file" accept="image/*" multiple id="p${id}-photo-input" onchange="handlePhotoUpload(${id},this)" style="padding:7px;font-size:12px">
+        <div id="p${id}-photo-gallery" class="photo-gallery"></div>
+      </div>
+      <div class="g2" style="margin-top:11px">
+        <div class="fg"><label>Label &amp; Tag Comment</label>
+          <input type="text" id="p${id}-labelTagComment" placeholder="e.g. Buyer's own brand label to be stitched..." oninput="calcAll()">
         </div>
         <div class="fg"><label>Design Cost Comment</label>
           <input type="text" id="p${id}-designCost" placeholder="e.g. ₹2/pc extra for custom jacquard design..." oninput="calcAll()">
@@ -1330,6 +1336,61 @@ function onEmbossChange(id){
   const sel=document.getElementById('p'+id+'-emboss');
   const sec=document.getElementById('p'+id+'-emboss-photo-section');
   if(sec) sec.style.display=(sel && sel.value==='YES')?'block':'none';
+}
+
+// ═══════════════════ EMBOSS DESIGNS CATALOG PICKER ═════════════════════════
+// EMBOSS_DESIGNS is fetched once at page load from the "Emboss Designs" sheet
+// (see fetchDrops()). Selecting a catalog design just adds its Drive fileId
+// into existingProductPhotos[id] — the SAME mechanism used when Editing an
+// order restores previously-saved photos. No new upload/photo-handling logic
+// needed: the server already knows how to re-fetch a Drive fileId and embed
+// it in the PDF (savePhotosToDrive()'s existingPhotoFileIds path).
+let EMBOSS_DESIGNS=[];
+
+function toggleEmbossCatalog(id){
+  const el=document.getElementById('p'+id+'-emboss-catalog');
+  if(!el) return;
+  const opening=(el.style.display==='none'||!el.style.display);
+  if(opening && !el.dataset.built){
+    el.innerHTML=renderEmbossCatalogPicker(id);
+    el.dataset.built='1';
+  }
+  el.style.display=opening?'block':'none';
+}
+
+function renderEmbossCatalogPicker(id){
+  if(!EMBOSS_DESIGNS.length){
+    return '<div style="font-size:12px;color:#888;padding:6px">No designs found yet in the "Emboss Designs" catalog sheet. Add Design Name + Image URL rows there, then reload this page.</div>';
+  }
+  const items=EMBOSS_DESIGNS.map((d,i)=>`
+    <label style="display:flex;align-items:center;gap:8px;padding:5px 3px;border-bottom:1px solid #F3F4F6;cursor:pointer">
+      <input type="checkbox" id="p${id}-ecat-${i}" value="${i}">
+      <img src="${d.previewUrl}" style="width:44px;height:33px;object-fit:cover;border-radius:4px;border:1px solid #eee;background:#F3F4F6" onerror="this.style.visibility='hidden'">
+      <span style="font-size:12px;color:#333">${esc(d.name)}</span>
+    </label>`).join('');
+  return items+`<button type="button" onclick="addSelectedEmbossDesigns(${id})" style="margin-top:8px;background:#1A3C5E;color:#fff;border:none;padding:7px 12px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer">+ Add Selected</button>`;
+}
+
+function addSelectedEmbossDesigns(id){
+  let added=0, skipped=0;
+  EMBOSS_DESIGNS.forEach((d,i)=>{
+    const cb=document.getElementById('p'+id+'-ecat-'+i);
+    if(cb && cb.checked){
+      if(!existingProductPhotos[id]) existingProductPhotos[id]=[];
+      const already=existingProductPhotos[id].some(p=>p.fileId===d.fileId);
+      if(!already && photoCount(id)<MAX_PHOTOS_PER_PRODUCT){
+        existingProductPhotos[id].push({fileId:d.fileId, url:d.previewUrl});
+        added++;
+      } else {
+        skipped++;
+      }
+      cb.checked=false;
+    }
+  });
+  if(added){ renderPhotoGallery(id); calcAll(); toast('📚 Added '+added+' design(s) from catalog'+(skipped?(' — '+skipped+' skipped (duplicate or limit reached)'):'')); }
+  else toast(skipped?'⚠️ Selected design(s) already added or photo limit reached':'⚠️ Select at least one design first');
+  const catEl=document.getElementById('p'+id+'-emboss-catalog');
+  if(catEl) catEl.style.display='none';
 }
 
 function onSupp(id,key){
@@ -1535,7 +1596,7 @@ function getProd(id){
     itemCode:g('p'+id+'-itemCode'), fabric:g('p'+id+'-fabric'), category:g('p'+id+'-category'), size:g('p'+id+'-size'),
     dbsb:g('p'+id+'-dbsb'), ply:g('p'+id+'-ply'), sattan:g('p'+id+'-sattan'),
     moq:g('p'+id+'-moq'), emboss:g('p'+id+'-emboss'), design:g('p'+id+'-design'),
-    remarks:g('p'+id+'-remarks'), designCostComment:g('p'+id+'-designCost'),
+    remarks:g('p'+id+'-remarks'), designCostComment:g('p'+id+'-designCost'), labelTagComment:g('p'+id+'-labelTagComment'),
     newPhotos:productPhotos[id]||[], existingPhotoFileIds:(existingProductPhotos[id]||[]).map(ep=>ep.fileId),
   };
 }
@@ -1702,6 +1763,7 @@ function updatePdfDoc(prods,grand){
       const newSrcs=productPhotos[pr.id]||[];
       const existingSrcs=(existingProductPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/uc?export=view&id='+ep.fileId);
       const allSrcs=[...existingSrcs,...newSrcs];
+      const labelTagComment=pr.labelTagComment?esc(pr.labelTagComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const designCost=pr.designCostComment?esc(pr.designCostComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const otherComment=pr.remarks?esc(pr.remarks):'<span style="color:#9CA3AF;font-style:italic">—</span>';
 
@@ -1731,13 +1793,17 @@ function updatePdfDoc(prods,grand){
         </div>
         <div style="width:100%;margin-bottom:8pt">${imgHtml}</div>
         <div style="width:100%">
-          <div style="border:0.5pt solid #ccc;margin-bottom:6pt">
-            <div style="background:#1A3C5E;color:#fff;font-weight:700;font-size:8pt;padding:4pt 8pt">DESIGN COST COMMENT</div>
-            <div style="padding:6pt 8pt;font-size:8pt;min-height:16pt">${designCost}</div>
+          <div style="border:0.5pt solid #ccc;margin-bottom:4pt;page-break-inside:avoid">
+            <div style="background:#6B4E9E;color:#fff;font-weight:700;font-size:7.5pt;padding:3pt 8pt;line-height:1.2">LABEL & TAG COMMENT</div>
+            <div style="padding:3pt 8pt;font-size:7.5pt;line-height:1.25;min-height:12pt">${labelTagComment}</div>
           </div>
-          <div style="border:0.5pt solid #ccc">
-            <div style="background:#1B6B3A;color:#fff;font-weight:700;font-size:8pt;padding:4pt 8pt">OTHER COMMENT</div>
-            <div style="padding:6pt 8pt;font-size:8pt;min-height:16pt">${otherComment}</div>
+          <div style="border:0.5pt solid #ccc;margin-bottom:4pt;page-break-inside:avoid">
+            <div style="background:#1A3C5E;color:#fff;font-weight:700;font-size:7.5pt;padding:3pt 8pt;line-height:1.2">DESIGN COST COMMENT</div>
+            <div style="padding:3pt 8pt;font-size:7.5pt;line-height:1.25;min-height:12pt">${designCost}</div>
+          </div>
+          <div style="border:0.5pt solid #ccc;page-break-inside:avoid">
+            <div style="background:#1B6B3A;color:#fff;font-weight:700;font-size:7.5pt;padding:3pt 8pt;line-height:1.2">OTHER COMMENT</div>
+            <div style="padding:3pt 8pt;font-size:7.5pt;line-height:1.25;min-height:12pt">${otherComment}</div>
           </div>
         </div>
       </div>`;
@@ -1774,7 +1840,7 @@ function collectPayload(){
       design:p.design,packs:p.packs,packPcs:p.packPcs,qty:p.qty,price:p.price,discount:p.discount,effectivePricePerKg:p.effectivePricePerKg,pricePerPc:p.pricePerPc,
       gstPct:p.gstPct,packType:p.packType,packCharge:p.packCharge,packChargePcs:p.packChargePcs,packChargeCostPc:p.packChargeCostPc,
       trims:p.trimData,trimsCostPerPc:p.trimsCostPerPc.toFixed(2),trimsCostTotal:p.trimsCostTotal.toFixed(2),
-      remarks:p.remarks||'', designCostComment:p.designCostComment||'',
+      remarks:p.remarks||'', designCostComment:p.designCostComment||'', labelTagComment:p.labelTagComment||'',
       newPhotos:p.newPhotos||[], existingPhotoFileIds:p.existingPhotoFileIds||[],
     });
   });
@@ -2274,6 +2340,7 @@ function applyProductToCard(id, x){
   setVal('design', x.design);
   setVal('remarks', x.remarks);
   setVal('designCost', x.designCostComment);
+  setVal('labelTagComment', x.labelTagComment);
   setVal('price', x.price);
   setVal('discount', x.discount!==undefined?x.discount:0);
   setVal('gst', x.gstPct!==undefined?x.gstPct:5);
