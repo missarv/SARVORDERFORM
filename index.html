@@ -6,7 +6,7 @@
 <title>SARV INDIA — Order Form</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════ TOKENS ═══════════════════════ */
+/* ═══════════════════════   TOKENS ═══════════════════════ */
 :root{
   --navy:#1A3C5E;--blue:#2E6DA4;--lblue:#D6E8F7;
   --amber:#D4870A;--green:#1B6B3A;--lgreen:#E6F4EC;
@@ -272,18 +272,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 </style>
 </head>
 <body>
-
-<!-- LOGIN SCREEN -->
-<div id="loginScreen" style="position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1A3C5E 0%,#2A5A8E 100%);display:flex;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:16px;padding:36px 32px 28px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.25);text-align:center">
-    <div style="font-size:22px;font-weight:800;color:#1A3C5E;margin-bottom:4px">SARV INDIA</div>
-    <div style="font-size:12px;color:#777;margin-bottom:22px">Order Management System</div>
-    <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:10px 12px;border:1.5px solid #D0DAE8;border-radius:8px;font-size:14px;margin-bottom:10px;box-sizing:border-box" autofocus>
-    <input type="password" id="loginPass" placeholder="Password" style="width:100%;padding:10px 12px;border:1.5px solid #D0DAE8;border-radius:8px;font-size:14px;margin-bottom:14px;box-sizing:border-box" onkeydown="if(event.key==='Enter')doLogin()">
-    <button onclick="doLogin()" id="loginBtn" style="width:100%;padding:11px;background:#1A3C5E;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.3px">Login</button>
-    <div id="loginError" style="color:#C62828;font-size:12px;font-weight:600;margin-top:10px;min-height:18px"></div>
-  </div>
-</div>
 
 <!-- ═══════════════════ PRINT DOCUMENT (hidden on screen) ════════════════ -->
 <div id="printDoc" style="display:none">
@@ -634,8 +622,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 
 <!-- BOTTOM -->
 <div class="bnav">
-  <span id="userBadge" style="display:none;background:#E3F2FD;color:#1565C0;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;align-items:center;gap:4px;white-space:nowrap">👤</span>
-  <button id="logoutBtn" onclick="logout()" style="display:none;background:#FFEBEE;color:#C62828;border:none;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🚪 Logout</button>
   <button class="btn-reset" onclick="resetForm()">↺</button>
   <button class="btn-history" onclick="openOrderHistory()">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v2H2zM2 7h12v2H2zM2 11h8v2H2z" fill="white"/></svg>
@@ -703,108 +689,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNujMlAoORNQ7C3WtCK35KJgXF6IEEOYzGK6hvo6ahZU4pAcWb8v6tg94rnrCB5DKQaQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbARa1ePbiJbsxEZnIvpRa77rl40NDohGyCwudPVgAoM43myec6aMq6P7K0RngJqPK/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
-let loggedInUser=null;
 const LS_URL='sihf_url', LS_SEQ='sihf_seq', LS_DROPS='sihf_drops'; let STANDARD_ITEMS={};
 let prodCount=0, lastPdfUrl='', lastDriveUrl='', suppressCombo=false;
 let BUYER_DETAILS={}, AGENCY_DETAILS={};
 
-// ═══════════════════════════ LOGIN ═════════════════════════════════════
-async function doLogin(){
-  const user=document.getElementById('loginUser').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  const errEl=document.getElementById('loginError');
-  const btn=document.getElementById('loginBtn');
-  if(!user||!pass){ errEl.textContent='Please enter both username and password'; return; }
-  const url=getApiUrl();
-  if(!url){ errEl.textContent='APPS_SCRIPT_URL not configured'; return; }
-  btn.disabled=true; btn.textContent='Logging in...'; errEl.textContent='';
-  try{
-    const resp=await fetch(url,{method:'POST',body:JSON.stringify({action:'login',username:user,password:pass})});
-    const data=await resp.json();
-    if(data.success){
-      loggedInUser={username:data.username,role:data.role};
-      document.getElementById('loginScreen').style.display='none';
-      applyRoleRestrictions();
-      toast('✅ Welcome, '+data.username+' ('+data.role+')');
-    } else {
-      errEl.textContent=data.error||'Login failed';
-    }
-  }catch(err){
-    errEl.textContent='Network error: '+err.message;
-  }finally{
-    btn.disabled=false; btn.textContent='Login';
-  }
-}
-
-// ══════════════════════════════ ROLE-BASED ACCESS ══════════════════════════
-// ┌──────────────────────────────────────────────────────────────────────────┐
-// │  ROLE             │ CREATE │ EDIT │ STATUS │ VIEW │ DELETE │ USERS      │
-// │───────────────────│────────│──────│────────│──────│────────│────────────│
-// │  admin            │  ✅    │  ✅  │  ✅    │  ✅  │  ✅    │  ✅       │
-// │  manager          │  ✅    │  ✅  │  ✅    │  ✅  │  ❌    │  ❌       │
-// │  executive        │  ✅    │  ✅  │  ❌    │  ✅  │  ❌    │  ❌       │
-// │  data_entry       │  ✅    │  ❌  │  ❌    │  ✅  │  ❌    │  ❌       │
-// │  viewer           │  ❌    │  ❌  │  ❌    │  ✅  │  ❌    │  ❌       │
-// └──────────────────────────────────────────────────────────────────────────┘
-//
-// CREATE   = submit new orders
-// EDIT     = load & resubmit existing orders
-// STATUS   = change order status (Sent to Party, Confirmed, Hold, etc.)
-// VIEW     = open Order History, view PDFs
-// DELETE   = (reserved for future — no UI for this yet)
-// USERS    = (manage Users sheet directly — admin only, no UI, sheet-level)
-
-const ROLE_PERMISSIONS = {
-  admin:      { create:true,  edit:true,  status:true,  view:true },
-  manager:    { create:true,  edit:true,  status:true,  view:true },
-  executive:  { create:true,  edit:true,  status:false, view:true },
-  data_entry: { create:true,  edit:false, status:false, view:true },
-  viewer:     { create:false, edit:false, status:false, view:true }
-};
-
-function canDo(action){
-  if(!loggedInUser) return false;
-  const perms=ROLE_PERMISSIONS[loggedInUser.role]||ROLE_PERMISSIONS['viewer'];
-  return !!perms[action];
-}
-
-function applyRoleRestrictions(){
-  if(!loggedInUser) return;
-  const role=loggedInUser.role||'viewer';
-
-  // Show logged-in user badge in the header
-  const userBadge=document.getElementById('userBadge');
-  if(userBadge){
-    userBadge.textContent='👤 '+loggedInUser.username+' ('+role+')';
-    userBadge.style.display='inline-flex';
-  }
-  const logoutBtn=document.getElementById('logoutBtn');
-  if(logoutBtn) logoutBtn.style.display='inline-flex';
-
-  // Viewer: hide submit + reset, disable all inputs
-  if(!canDo('create')){
-    const submit=document.getElementById('btnSubmit'); if(submit) submit.style.display='none';
-    const reset=document.querySelectorAll('.btn-reset'); reset.forEach(b=>b.style.display='none');
-    // Disable the entire form's inputs/selects for viewers (read-only mode)
-    document.querySelectorAll('.wrap input, .wrap select, .wrap textarea').forEach(el=>{
-      el.disabled=true; el.style.opacity='0.7';
-    });
-    document.querySelectorAll('.wrap button').forEach(el=>{
-      if(!el.classList.contains('btn-history')) { el.disabled=true; el.style.opacity='0.5'; }
-    });
-  }
-}
-
-function logout(){
-  loggedInUser=null;
-  document.getElementById('loginScreen').style.display='flex';
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
-  document.getElementById('loginError').textContent='';
-}
 // Default dropdown data (used if Sheet not connected)
 let DROPS = {
   itemCode:      [],
@@ -821,7 +712,7 @@ let DROPS = {
   design:        ["5 New Designs Single Matching Each Design","3 New Designs","Custom Design"],
 };
 
-const TRIMS=[{k:'label',n:'Label'},{k:'tag',n:'Tag'},{k:'bag',n:'Bag'},{k:'bore',n:'Bore'},{k:'inner',n:'Inner Box'},{k:'outer',n:'Outer Box'}];
+const TRIMS=[{k:'label',n:'Label / Tag'},{k:'bag',n:'Bag'},{k:'bore',n:'Bore'},{k:'inner',n:'Inner Box'},{k:'outer',n:'Outer Box'}];
 const SUPP=[{v:'na',l:'NA'},{v:'buyer',l:'Buyer Supplied'},{v:'seller',l:'SIHF Supplied'},{v:'foc',l:'SIHF (FOC)'}];
 const fmt=n=>'₹'+Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtN=n=>Number(n.toFixed(2)).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -1140,7 +1031,7 @@ function onItemCodeSelect(id, code){
   if(ppEl && item.packPcs){ ppEl.value=item.packPcs; calcPackQty(id); }
   // Auto-fill trim Cost/Pc from Standard Items (after suppliers are set so cost inputs are enabled)
   const curPt=document.getElementById('p'+id+'-packType')?.value||'Bora';
-  const trimPriceMap={label:'labelPrice',tag:'tagPrice',bag:'bagPrice',bore:(curPt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
+  const trimPriceMap={label:'labelPrice',bag:'bagPrice',bore:(curPt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
   Object.keys(trimPriceMap).forEach(k=>{
     const priceKey=trimPriceMap[k];
     if(item[priceKey]){
@@ -1238,7 +1129,7 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>Ply</label>
-          <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option><option value="NA">NA</option></select></div>
+          <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option><option value="3 PLY">3 PLY (Triple)</option><option value="NA">NA</option></select></div>
         <div class="fg"><label>Sattan</label>
           <div class="combo-wrap">
             <input type="text" id="p${id}-sattan" placeholder='e.g. 5" PREMIUM' autocomplete="off"
@@ -1556,7 +1447,7 @@ function autoFillTrimCost(id,key){
   const itemCode=document.getElementById('p'+id+'-itemCode')?.value;
   const item=STANDARD_ITEMS[itemCode]; if(!item) return;
   const pt=document.getElementById('p'+id+'-packType')?.value||'Bora';
-  const trimPriceMap={label:'labelPrice',tag:'tagPrice',bag:'bagPrice',bore:(pt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
+  const trimPriceMap={label:'labelPrice',bag:'bagPrice',bore:(pt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
   const priceKey=trimPriceMap[key];
   if(priceKey && item[priceKey]){
     const costEl=document.getElementById('p'+id+'-'+key+'-cost');
@@ -1675,7 +1566,7 @@ function onPackTypeChange(id){
     const ppEl=document.getElementById('p'+id+'-packPcs');
     if(ppEl && !ppEl.disabled && item.packPcs){ ppEl.value=item.packPcs; calcPackQty(id); }
     // 2) Trim Cost/Pc & No. of Pcs (after suppliers are set so cost inputs are enabled)
-    const trimPriceMap={label:'labelPrice',tag:'tagPrice',bag:'bagPrice',bore:(pt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
+    const trimPriceMap={label:'labelPrice',bag:'bagPrice',bore:(pt==='Bale'?'balePrice':'borePrice'),inner:'innerPrice',outer:'outerPrice'};
     Object.keys(trimPriceMap).forEach(k=>{
       const priceKey=trimPriceMap[k];
       if(item[priceKey]){
@@ -1869,8 +1760,8 @@ function updatePdfDoc(prods,grand){
     const pkgChgHtml=p.packCharge?`${p.packChargePcs?p.packChargePcs+'pc×₹'+fmtN(p.packChargeCostPc):'₹'+fmtN(p.packCharge)}<br><small style="font-size:5.5pt">${p.packType}</small>`:'—';
     return `<tr style="${i%2===1?'background:#F8FAFC':''}">
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center">${i+1}</td>
-      ${['label','tag','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${bLbl(k)==='YES'?'#1B6B3A':'#999'}">${bLbl(k)}</td>`).join('')}
-      ${['label','tag','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${sLbl(k)!=='NO'?'#1B6B3A':'#999'}">${sLbl(k)}</td>`).join('')}
+      ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${bLbl(k)==='YES'?'#1B6B3A':'#999'}">${bLbl(k)}</td>`).join('')}
+      ${['label','bag','bore','inner','outer'].map(k=>`<td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-size:7pt;color:${sLbl(k)!=='NO'?'#1B6B3A':'#999'}">${sLbl(k)}</td>`).join('')}
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#D4870A">₹${p.trimsCostTotal?fmtN(p.trimsCostTotal):'0'}</td>
       <td style="padding:3pt;border:0.5pt solid #ccc;text-align:center;font-weight:700;color:#92400E">${pkgChgHtml}</td>
     </tr>`;
@@ -2017,7 +1908,6 @@ function collectPayload(){
     transportName: document.getElementById('transportName').value||'',
     products:      prods,
     summary:{exGST:totalExGST.toFixed(2),gst:totalGst.toFixed(2),grandTotal:Math.round(totalExGST+totalGst).toString()},
-    isEdit: document.getElementById('editBanner').style.display==='flex',
     signatures:{
       buyer:    getSigData('sigBuyer'),
       prepared: getSigData('sigPrepared'),
@@ -2031,7 +1921,6 @@ function collectPayload(){
 
 // ═══════════════════════ HANDLE SUBMIT ═══════════════════════════════════
 async function handleSubmit(){
-  if(!canDo('create')){ toast('⚠️ Your role ('+loggedInUser.role+') does not have Submit permission'); return; }
   const url=getApiUrl();
   if(!url){ toast('⚠️ Set APPS_SCRIPT_URL in HTML file'); return; }
   const payload=collectPayload();
@@ -2338,12 +2227,10 @@ function buildStatusSelect(o){
   if(cur && !opts.includes(cur)) opts=[cur,...opts]; // defensive: show legacy/unexpected status values too, don't silently hide them
   const c=STATUS_COLORS[cur]||{bg:'#F3F4F6',fg:'#555'};
   const optsHtml=opts.map(s=>`<option value="${esc(s)}" ${s===cur?'selected':''}>${esc(s)}</option>`).join('');
-  const disabled=!canDo('status')?'disabled':'';
-  return `<select class="oh-status-select" style="background:${c.bg};color:${c.fg}" onchange="updateOrderStatus(this,${o.rowNum},'${o.orderNo}')" onclick="event.stopPropagation()" ${disabled}>${optsHtml}</select>`;
+  return `<select class="oh-status-select" style="background:${c.bg};color:${c.fg}" onchange="updateOrderStatus(this,${o.rowNum},'${o.orderNo}')" onclick="event.stopPropagation()">${optsHtml}</select>`;
 }
 
 async function updateOrderStatus(selectEl, rowNum, orderNo){
-  if(!canDo('status')){ toast('⚠️ Your role ('+loggedInUser.role+') does not have Status-change permission'); return; }
   const newStatus=selectEl.value;
   const url=getApiUrl();
   if(!url){ toast('⚠️ APPS_SCRIPT_URL not set'); return; }
@@ -2434,7 +2321,7 @@ function renderOrderList(orders){
       <div class="oh-card-bottom">
         <div class="oh-total">${gt}</div>
         <div style="display:flex;gap:6px">
-          ${canDo('edit')?`<a class="oh-edit-btn" href="javascript:void(0)" onclick="editOrder('${oNo}')" title="Load this order into the form for editing" style="background:#2A5A8E;color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px">✏️ Edit</a>`:''}
+          <a class="oh-edit-btn" href="javascript:void(0)" onclick="editOrder('${oNo}')" title="Load this order into the form for editing" style="background:#2A5A8E;color:#fff;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px">✏️ Edit</a>
           ${pdfLink?'<a class="oh-pdf-btn" href="'+pdfLink+'" target="_blank" rel="noopener">📄 PDF</a>':'<span class="oh-pdf-na">No PDF</span>'}
         </div>
       </div>
@@ -2448,7 +2335,6 @@ function renderOrderList(orders){
 
 // ══════════════════════ EDIT ORDER (pre-fill form) ═══════════════════════
 async function editOrder(orderNo){
-  if(!canDo('edit')){ toast('⚠️ Your role ('+loggedInUser.role+') does not have Edit permission'); return; }
   if(!confirm('Load Order '+orderNo+' into the form for editing?\n\nAny unsaved changes currently in the form will be replaced.')) return;
   const url=getApiUrl();
   if(!url){ toast('⚠️ APPS_SCRIPT_URL not set'); return; }
