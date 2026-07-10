@@ -359,7 +359,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">DB/SB</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Ply</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Sattan</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Design Details</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Design Type</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">MOQ</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Emboss</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Qty</th>
@@ -384,18 +384,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     <thead>
       <tr>
         <th rowspan="2" style="background:#1A3C5E;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:3%;-webkit-print-color-adjust:exact;print-color-adjust:exact">SR</th>
-        <th colspan="5" style="background:#2E6DA4;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY BUYER</th>
-        <th colspan="5" style="background:#1B6B3A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY SELLER</th>
+        <th colspan="6" style="background:#2E6DA4;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY BUYER</th>
+        <th colspan="6" style="background:#1B6B3A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">ITEMS SUPPLIED BY SELLER</th>
         <th rowspan="2" style="background:#D4870A;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%;-webkit-print-color-adjust:exact;print-color-adjust:exact">Trims Cost</th>
         <th rowspan="2" style="background:#92400E;color:#fff;padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:8%;-webkit-print-color-adjust:exact;print-color-adjust:exact">Pkg Charge</th>
       </tr>
       <tr>
-        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label/Tag</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label</th>
+        <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Tag</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact" id="pdf-bore-buyer-th">Bore</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
         <th style="background:#D6E8F7;color:#1A3C5E;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Outer Box</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Label</th>
+        <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Tag</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Bag</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact" id="pdf-bore-seller-th">Bore</th>
         <th style="background:#E6F4EC;color:#1B6B3A;padding:3pt;border:0.5pt solid #ccc;font-size:6.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact">Inner Box</th>
@@ -572,8 +574,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <div class="sum-title">Bags &amp; Trims — Supplied By</div>
   <div style="overflow-x:auto">
     <table class="sum-tbl">
-      <thead><tr><th>Product</th><th>Label</th><th>Bag</th><th>Bore/Bale</th><th>Inner Box</th><th>Outer Box</th><th>Trims/Pc</th></tr></thead>
-      <tbody id="bagsTbody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;font-size:12px">Add a product to see summary</td></tr></tbody>
+      <thead><tr><th>Product</th><th>Label</th><th>Tag</th><th>Bag</th><th>Bore/Bale</th><th>Inner Box</th><th>Outer Box</th><th>Trims/Pc</th></tr></thead>
+      <tbody id="bagsTbody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:14px;font-size:12px">Add a product to see summary</td></tr></tbody>
     </table>
   </div>
 
@@ -703,7 +705,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbsTwJYj6a-ze0ppZ7aSFuTSDjLXgZrQ0VDy0yzxmhGQQmITMesO-E3KTl6lGVlyYd8Q/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpLT7mEDYrK4TZOR8lpnTE5wmPwdxaIn4vXTtE5usbULXMFmIbE52FUt0vNd2KYY5wzg/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 let loggedInUser=null;
@@ -1238,7 +1240,7 @@ function addProduct(){
           </div>
         </div>
         <div class="fg"><label>Ply</label>
-          <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option><option value="3 PLY">3 PLY (TRIPLE)</option><option value="NA">NA</option></select></div>
+          <select id="p${id}-ply"><option value="SP">SP (Single)</option><option value="DP">DP (Double)</option><option value="NA">NA</option></select></div>
         <div class="fg"><label>Sattan</label>
           <div class="combo-wrap">
             <input type="text" id="p${id}-sattan" placeholder='e.g. 5" PREMIUM' autocomplete="off"
@@ -1265,7 +1267,7 @@ function addProduct(){
         <div id="p${id}-emboss-catalog" style="display:none;margin-top:8px;max-height:220px;overflow-y:auto;border:1px solid #FCD34D;border-radius:8px;padding:8px;background:#fff"></div>
         <div id="p${id}-emboss-photo-gallery" class="photo-gallery"></div>
       </div>
-      <div class="fg"><label>Design Details</label>
+      <div class="fg"><label>Design Type</label>
         <div class="combo-wrap">
           <input type="text" id="p${id}-design" placeholder="e.g. 5 New Designs Single Matching" value="ASSORTED" autocomplete="off"
             oninput="filterCombo('p${id}-design');calcAll()" onfocus="openCombo('p${id}-design')" onblur="delayClose('p${id}-design')">
@@ -1769,11 +1771,11 @@ function calcAll(){
 
 function updateBagsTable(prods){
   const tb=document.getElementById('bagsTbody');
-  if(!prods.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;font-size:12px">Add a product to see summary</td></tr>';return;}
+  if(!prods.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:14px;font-size:12px">Add a product to see summary</td></tr>';return;}
   const b=v=>({buyer:'<span class="bd-y">Buyer</span>',seller:'<span class="bd-y">SIHF</span>',foc:'<span class="bd-f">FOC</span>'}[v]||'<span class="bd-n">—</span>');
   tb.innerHTML=prods.map(p=>`<tr>
     <td><b>${p.fabric||'Prod #'+p.id}</b><br><span style="font-size:11px;color:var(--muted)">${p.qty} pcs</span></td>
-    <td>${b(p.trimStatus.label)}</td><td>${b(p.trimStatus.bag)}</td>
+    <td>${b(p.trimStatus.label)}</td><td>${b(p.trimStatus.tag)}</td><td>${b(p.trimStatus.bag)}</td>
     <td>${b(p.trimStatus.bore)}</td><td>${b(p.trimStatus.inner)}</td>
     <td>${b(p.trimStatus.outer)}</td>
     <td><b style="font-family:'DM Mono',monospace;color:var(--navy)">${fmt(p.trimsCostTotal)}</b></td>
@@ -1879,7 +1881,7 @@ function updatePdfDoc(prods,grand){
   const totalPackCharge=prods.reduce((s,p)=>s+(p.packCharge||0),0);
   const pf=document.getElementById('pdf-pack-foot');
   if(pf) pf.innerHTML=`<tr style="background:#1A3C5E;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-  <td colspan="11" style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:8.5pt">TOTAL</td>
+  <td colspan="13" style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:right;font-weight:700;font-size:8.5pt">TOTAL</td>
   <td style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt">₹${fmtN(totalTrims)}</td>
   <td style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;text-align:center;font-weight:700;font-size:9pt">₹${fmtN(totalPackCharge)}</td>
 </tr>`;
