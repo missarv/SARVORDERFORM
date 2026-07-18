@@ -294,7 +294,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <div style="font-size:7.5pt;color:#555;margin-top:2pt">Sanoli Road, 11K.M Stone, Near Kurar Village Trun, V.P.O Jalalpur-1, Distt. Panipat- 132103 (Haryana) | GST: 06ACSFS1161L1ZP | Mob:92158-00933 |Sarvindia.com</div>
     </div>
     <div style="text-align:right">
-      <div style="font-size:13pt;font-weight:700;color:#D4870A">PERFORMA INVOICE</div>
+      <div style="font-size:13pt;font-weight:700;color:#D4870A">ORDER FORM</div>
       <div style="font-size:8pt;color:#2E6DA4;font-style:italic">www.sarvindia.com</div>
       <div style="font-size:7pt;color:#555;font-style:italic">Premium Blanket Manufacturer</div>
     </div>
@@ -556,7 +556,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
       <div class="fg"><label>Mobile No.</label><input type="tel" id="buyerMobile" placeholder="+91 XXXXXXXXXX" oninput="syncMeta()"></div>
       <div class="fg"><label>Contact Person Name</label><input type="text" id="contactPerson" placeholder="Contact Person Name" oninput="syncMeta()"></div>
       <div class="fg"><label>Address</label><textarea id="buyerAddress" placeholder="Complete billing address..." oninput="syncMeta()"></textarea></div>
-      <div class="fg"><label>GSTIN</label><input type="text" id="buyerGST" placeholder="15-digit GSTIN" oninput="syncMeta();onGSTInput(this.value)"></div>
+      <div class="fg"><label>GSTIN</label><input type="text" id="buyerGST" placeholder="15-digit GSTIN" oninput="syncMeta();onGSTInput(this.value);autoDetectState()"></div>
+      <div class="fg" style="display:flex;align-items:center;gap:8px;margin-top:2px">
+        <input type="checkbox" id="outOfHaryana" onchange="syncMeta()" style="width:16px;height:16px;accent-color:#1A3C5E;cursor:pointer">
+        <label for="outOfHaryana" style="margin:0;cursor:pointer;font-size:12px;font-weight:600;color:#1A3C5E;text-transform:none;letter-spacing:0">Out of Haryana <span style="font-weight:400;color:#888">(IGST instead of CGST+SGST on PDF)</span></label>
+      </div>
       <div class="fg"><label>Transport Name</label><input type="text" id="transportName" placeholder="e.g. XYZ Transport" oninput="syncMeta()"></div>
     </div>
   </div>
@@ -705,7 +709,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzY8LdYd2YnxWg9ABvtLSmXzg-LNBHOc_mYaqS1pmvM6_i6zOSK31mrP1m6PHsL6DJ7aA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhc-TcFgRsSiUrCG2iiCLlwtaKecgmcQwpgbBrzJhMCYdPWcSRMNMNrf78KFuus3i8BQ/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 let loggedInUser=null;
@@ -1052,8 +1056,23 @@ function selectCombo(fieldId, val){
 
 // ══════════════ GST → AUTO-FILL BUYER DETAILS ═══════════════════════════
 let _lastGSTMatch='';
+// Auto-detect intra/inter-state from GSTIN prefix — Haryana = 06.
+// If buyer's GSTIN starts with something other than 06, auto-check "Out of Haryana."
+// User can always manually override the checkbox (e.g., if GSTIN isn't entered yet
+// but they know the buyer is from another state).
+function autoDetectState(){
+  const gst=(document.getElementById('buyerGST')?.value||'').trim();
+  const cb=document.getElementById('outOfHaryana');
+  if(!cb) return;
+  if(gst.length>=2){
+    const stateCode=gst.substring(0,2);
+    cb.checked=(stateCode!=='06');
+  }
+}
+
 function onGSTInput(gst){
   gst=(gst||'').trim().toUpperCase();
+  autoDetectState(); // auto-toggle the checkbox based on GSTIN prefix
   if(gst.length!==15||gst===_lastGSTMatch) return;
 
   // 1) Local lookup first — check saved BUYER_DETAILS
@@ -1903,19 +1922,21 @@ function updatePdfDoc(prods,grand){
     const PHOTOS_PER_PAGE=10;
     let allPagesHtml='';
     prods.forEach((pr,i)=>{
-      const baseTitle=`Product ${i+1}: ${esc(pr.itemCode||pr.fabric||('Item '+(i+1)))}`;
-      // PDF combines BOTH sections into one "Product Photos" gallery — only the on-screen
-      // upload galleries are kept separate (emboss designs shown first, then product photos).
       const embossNewSrcs=embossPhotos[pr.id]||[];
       const embossExistingSrcs=(existingEmbossPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/thumbnail?id='+ep.fileId+'&sz=w400');
       const newSrcs=productPhotos[pr.id]||[];
       const existingSrcs=(existingProductPhotos[pr.id]||[]).map(ep=>'https://drive.google.com/thumbnail?id='+ep.fileId+'&sz=w400');
-      // Each photo tagged with its source — emboss-sourced tiles get a permanent
-      // "Emboss Image" caption on the PDF, matching buildOrderHtml() server-side.
       const allSrcs=[
         ...[...embossExistingSrcs,...embossNewSrcs].map(src=>({src,tag:'Emboss Image'})),
         ...[...existingSrcs,...newSrcs].map(src=>({src,tag:''}))
       ];
+      // ⚡ Skip this product's photo page(s) if there are NO photos AND NO comments
+      const hasLT=pr.labelTagComment&&pr.labelTagComment.trim();
+      const hasDC=pr.designCostComment&&pr.designCostComment.trim();
+      const hasRM=pr.remarks&&pr.remarks.trim();
+      if(!allSrcs.length && !hasLT && !hasDC && !hasRM) return;
+
+      const baseTitle=`Product ${i+1}: ${esc(pr.itemCode||pr.fabric||('Item '+(i+1)))}`;
       const labelTagComment=pr.labelTagComment?esc(pr.labelTagComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const designCost=pr.designCostComment?esc(pr.designCostComment):'<span style="color:#9CA3AF;font-style:italic">—</span>';
       const otherComment=pr.remarks?esc(pr.remarks):'<span style="color:#9CA3AF;font-style:italic">—</span>';
@@ -2014,6 +2035,7 @@ function collectPayload(){
     buyerMobile:   document.getElementById('buyerMobile').value,
     buyerAddress:  document.getElementById('buyerAddress').value,
     buyerGST:      document.getElementById('buyerGST').value,
+    outOfHaryana:  document.getElementById('outOfHaryana').checked,
     paymentTerms:  document.getElementById('payTerms').value,
     deliveryTerms: document.getElementById('delivTerms').value,
     transportName: document.getElementById('transportName').value||'',
@@ -2523,6 +2545,7 @@ function applyOrderToForm(o){
   setVal('payTerms', o.paymentTerms);
   setVal('delivTerms', o.deliveryTerms);
   setVal('transportName', o.transportName);
+  const oohCb=document.getElementById('outOfHaryana'); if(oohCb) oohCb.checked=!!o.outOfHaryana;
 
   const products=(o.products&&o.products.length)?o.products:[];
   if(!products.length){
@@ -2647,4 +2670,3 @@ function filterOrderHistory(){
 </script>
 </body>
 </html>
-
