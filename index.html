@@ -1594,10 +1594,7 @@ function calcPackQty(id){
   const pcsPerPack=parseFloat(document.getElementById('p'+id+'-packPcs')?.value)||0;
   const qtyEl=document.getElementById('p'+id+'-qty');
   if(qtyEl) qtyEl.value=packs*pcsPerPack;
-  // Auto-update packCharge pcs = No. of Packs
-  const pcPcsEl=document.getElementById('p'+id+'-packCharge-pcs');
-  if(pcPcsEl) pcPcsEl.value=packs;
-  // Auto-update trim pcs: bore/outer = packs, label/bag = qty
+  // Auto-update trim pcs: bore/outer = packs, label/tag/bag/inner = qty
   const qty=packs*pcsPerPack;
   ['bore','outer'].forEach(k=>{
     const supp=document.getElementById('p'+id+'-'+k+'-supp')?.value;
@@ -1606,7 +1603,7 @@ function calcPackQty(id){
       if(pcsEl && !pcsEl.disabled) pcsEl.value=packs;
     }
   });
-  ['label','bag'].forEach(k=>{
+  ['label','tag','bag','inner'].forEach(k=>{
     const supp=document.getElementById('p'+id+'-'+k+'-supp')?.value;
     if(supp==='seller'){
       const pcsEl=document.getElementById('p'+id+'-'+k+'-pcs');
@@ -1682,12 +1679,9 @@ function onPackTypeChange(id){
   // Update "No. of {PackType}" label
   const packsLbl=document.getElementById('p'+id+'-packs-lbl');
   if(packsLbl) packsLbl.textContent='No. of '+pt;
-  // Update packing charge label & auto-fill pcs = No. of Packs
+  // Update packing charge label
   const lbl=document.getElementById('p'+id+'-packCharge-label');
   if(lbl) lbl.textContent=pt+' Packing Charge';
-  const packs=(pt==='Roll')?1:(parseFloat(document.getElementById('p'+id+'-packs')?.value)||0);
-  const pcPcsEl=document.getElementById('p'+id+'-packCharge-pcs');
-  if(pcPcsEl) pcPcsEl.value=packs;
 
   // ── Auto-fill from Standard Items on Pack Type change ──
   const itemCode=document.getElementById('p'+id+'-itemCode')?.value;
