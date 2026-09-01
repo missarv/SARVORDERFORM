@@ -710,7 +710,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║  PASTE YOUR WEB APP URL BELOW (between the quotes) — ONE TIME SETUP    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhc-TcFgRsSiUrCG2iiCLlwtaKecgmcQwpgbBrzJhMCYdPWcSRMNMNrf78KFuus3i8BQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUodr8Yx8w2fVg063NoOvs78Lz2tT0Q0ybOh-Jt_aUBxmTim3HJrLt0C6_jcszOSpwqQ/exec';
 
 // ═══════════════════════════════ STATE ═══════════════════════════════════
 let loggedInUser=null;
@@ -2073,10 +2073,12 @@ async function handleSubmit(){
       lastPdfUrl  = data.pdfUrl   || '';
       lastDriveUrl= data.driveUrl || '';
 
-      // Refresh dropdowns + Standard Items cache — picks up any brand-new Item Code(s)
-      // the server just auto-learned into the catalog, so they're instantly available
-      // for autocomplete if the exec adds another product in this same session.
+      // Refresh dropdowns + Standard Items cache
       if(APPS_SCRIPT_URL) fetchDrops();
+
+      // Auto-refresh Order History — invalidate cache and re-fetch if panel is open
+      ohCache=null;
+      if(document.getElementById('ohPanel').classList.contains('open')) fetchOrderList();
 
       // Show success modal
       document.getElementById('modalOrderNo').textContent=data.orderNo;
@@ -2376,6 +2378,10 @@ async function updateOrderStatus(selectEl, rowNum, orderNo){
       selectEl.style.background=c.bg; selectEl.style.color=c.fg;
       const card=selectEl.closest('.oh-card');
       if(card) card.dataset.status=newStatus.toLowerCase().replace(/\s+/g,'-');
+      if(ohCache){
+        const entry=ohCache.find(o=>String(o.rowNum)===String(rowNum));
+        if(entry) entry.status=newStatus;
+      }
       toast('✅ Status updated to "'+newStatus+'" for '+orderNo);
     } else {
       selectEl.style.background=prevBg; selectEl.style.color=prevFg;
