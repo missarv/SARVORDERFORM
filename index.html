@@ -286,6 +286,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   </div>
 </div>
 
+<!-- ✍️ FIRST-LOGIN SIGNATURE MODAL -->
+<div id="sigOnboardModal" style="position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:18px;padding:28px 24px 22px;width:100%;max-width:600px;box-shadow:0 12px 40px rgba(0,0,0,.3);text-align:center">
+    <div style="font-size:22px;margin-bottom:4px">✍️</div>
+    <div style="font-size:16px;font-weight:700;color:#1A3C5E;margin-bottom:4px" id="sigOnboardTitle">Save Your Signature</div>
+    <div style="font-size:12px;color:#6B7280;margin-bottom:14px" id="sigOnboardDesc">Draw your signature once — it will auto-fill on all PDFs you generate.</div>
+    <canvas id="sigOnboardCanvas" width="560" height="220"
+      style="width:100%;height:220px;border:1.5px solid #CBD5E1;border-radius:10px;cursor:crosshair;touch-action:none;background:#FAFBFC;display:block;margin:0 auto"></canvas>
+    <div style="display:flex;justify-content:flex-end;margin-top:5px;margin-bottom:12px">
+      <button type="button" onclick="clearOnboardSig()" style="font-size:11px;color:#DC2626;background:none;border:none;cursor:pointer;text-decoration:underline">✕ Clear</button>
+    </div>
+    <button type="button" id="sigOnboardSaveBtn" onclick="saveOnboardSig()"
+      style="width:100%;padding:11px;background:#1B6B3A;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">
+      💾 Save Signature
+    </button>
+    <button type="button" onclick="skipOnboardSig()"
+      style="width:100%;padding:8px;background:transparent;border:1.5px solid #CBD5E1;color:#6B7280;border-radius:9px;font-size:12px;cursor:pointer">
+      Skip for now
+    </button>
+    <div id="sigOnboardErr" style="font-size:11px;color:#DC2626;margin-top:8px;min-height:16px"></div>
+  </div>
+</div>
+
 <!-- ═══════════════════ PRINT DOCUMENT (hidden on screen) ════════════════ -->
 <div id="printDoc" style="display:none">
 
@@ -360,7 +383,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">DB/SB</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Ply</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Sattan</th>
-        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%">Design Type</th>
+        <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:9%"> Packing Assortment</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:5%">MOQ</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:4%">Emboss</th>
         <th style="padding:4pt 3pt;border:0.5pt solid #1A3C5E;width:6%">Qty</th>
@@ -588,6 +611,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
   <div class="bill">
     <div class="bill-ttl">Final Bill Summary</div>
     <div class="bill-row"><span class="bill-rl">Total Value (Excl. GST)</span><span class="bill-rv" id="bExGST">₹0.00</span></div>
+    <div class="bill-row"><span class="bill-rl">Grand Total Weight</span><span class="bill-rv" id="bWeight">0.00 kg</span></div>
     <div class="bill-row"><span class="bill-rl" id="bGSTLabel">GST</span><span class="bill-rv" id="bGST">₹0.00</span></div>
     <div id="bProdRows"></div>
     <div class="bill-tot">
@@ -614,34 +638,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);pad
     </ul>
   </div>
 
-  <!-- SIGNATURES -->
-  <div class="sl">Acknowledgement &amp; Signatures</div>
-  <div class="sig-row">
-    <div class="sig-box">
-      <canvas class="sig-canvas" id="sigBuyer" width="400" height="100"></canvas>
-      <div class="sig-actions"><button class="sig-clear" type="button" onclick="clearSig('sigBuyer')">✕ Clear</button></div>
-      <div class="sig-lbl">Buyer's Signature</div>
-      <div class="sig-ts" id="sigBuyer-ts"></div>
-    </div>
-    <div class="sig-box">
-      <canvas class="sig-canvas" id="sigPrepared" width="400" height="100"></canvas>
-      <div class="sig-actions"><button class="sig-clear" type="button" onclick="clearSig('sigPrepared')">✕ Clear</button></div>
-      <div class="sig-lbl">Prepared By (SIHF)</div>
-      <div class="sig-ts" id="sigPrepared-ts"></div>
-    </div>
-    <div class="sig-box">
-      <canvas class="sig-canvas" id="sigAuth" width="400" height="100"></canvas>
-      <div class="sig-actions"><button class="sig-clear" type="button" onclick="clearSig('sigAuth')">✕ Clear</button></div>
-      <div class="sig-lbl">Authorised Signatory</div>
-      <div class="sig-ts" id="sigAuth-ts"></div>
-    </div>
-  </div>
+  <!-- SIGNATURES: Removed from UI — signatures are now drawn once on first login
+       and stored per-user in the Users sheet. They auto-fill in the PDF based on role:
+       admin  → fills "Authorised Sign (Sarv India)"
+       others → fills "Prepared By (SIHF)"
+  -->
 
 </div><!-- end .wrap -->
 
 <!-- BOTTOM -->
 <div class="bnav">
   <span id="userBadge" style="display:none;background:#E3F2FD;color:#1565C0;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;align-items:center;gap:4px;white-space:nowrap">👤</span>
+  <button id="resignBtn" onclick="showResignModal()" style="display:none;background:#FFF8E1;color:#92400E;border:none;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">✍️ My Signature</button>
   <button id="logoutBtn" onclick="logout()" style="display:none;background:#FFEBEE;color:#C62828;border:none;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🚪 Logout</button>
   <button class="btn-reset" onclick="resetForm()">↺</button>
   <button class="btn-history" onclick="openOrderHistory()">
@@ -736,6 +744,8 @@ async function doLogin(){
       document.getElementById('loginScreen').style.display='none';
       applyRoleRestrictions();
       toast('✅ Welcome, '+data.username+' ('+data.role+')');
+      // After login: fetch saved signature; show onboard pad if not yet saved
+      fetchAndCheckUserSig(data.username);
     } else {
       errEl.textContent=data.error||'Login failed';
     }
@@ -790,6 +800,8 @@ function applyRoleRestrictions(){
   }
   const logoutBtn=document.getElementById('logoutBtn');
   if(logoutBtn) logoutBtn.style.display='inline-flex';
+  const resignBtn=document.getElementById('resignBtn');
+  if(resignBtn) resignBtn.style.display='inline-flex';
 
   // Viewer: hide submit + reset, disable all inputs
   if(!canDo('create')){
@@ -807,6 +819,9 @@ function applyRoleRestrictions(){
 
 function logout(){
   loggedInUser=null;
+  _userSigData = '';
+  const resignBtnL = document.getElementById('resignBtn');
+  if(resignBtnL) resignBtnL.style.display='none';
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('loginUser').value='';
   document.getElementById('loginPass').value='';
@@ -856,10 +871,8 @@ window.onload=function(){
   addProduct();
   syncMeta();
 
-  // Init signature pads
-  initSigPad('sigBuyer');
-  initSigPad('sigPrepared');
-  initSigPad('sigAuth');
+  // Onboard signature pad init (modal canvas — drawn once on first login)
+  initOnboardSigPad();
 
   // fetch order no + dropdowns from sheet
   if(APPS_SCRIPT_URL) fetchDrops();
@@ -869,6 +882,166 @@ window.onload=function(){
 document.addEventListener('click',function(e){
   if(e.target.matches('input[type="number"]')) e.target.select();
 });
+
+// ═══════════════════ USER SIGNATURE — ONBOARD & STORAGE ════════════════
+// Stored per-user in GAS "Users" sheet col 5. Fetched after login, shown
+// as a first-time pad if missing. Auto-fills correct PDF slot on submit:
+//   admin role  → "Authorised Sign (Sarv India)"
+//   other roles → "Prepared By (SIHF)"
+let _userSigData = '';         // base64 PNG loaded from the Users sheet
+const _onboardPad = { drawing:false, hasData:false, ctx:null };
+
+// Binds drawing events ONCE (safe to call multiple times — skips if already bound)
+function initOnboardSigPad(){
+  const canvas = document.getElementById('sigOnboardCanvas');
+  if(!canvas || _onboardPad._bound) return;
+  const ctx = canvas.getContext('2d');
+  _onboardPad.ctx = ctx;
+  _onboardPad._bound = true;
+
+  function pos(e){ const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e; return {x:t.clientX-r.left,y:t.clientY-r.top}; }
+  function start(e){ e.preventDefault(); _onboardPad.drawing=true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
+  function move(e){ if(!_onboardPad.drawing) return; e.preventDefault(); const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); _onboardPad.hasData=true; }
+  function end(e){ if(_onboardPad.drawing){ e.preventDefault(); _onboardPad.drawing=false; } }
+  canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',move);
+  canvas.addEventListener('mouseup',end);     canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+}
+
+// Resizes canvas to actual rendered size — MUST run AFTER modal is display:flex
+function _resizeSigCanvas(){
+  const canvas = document.getElementById('sigOnboardCanvas');
+  if(!canvas) return;
+  const ctx = _onboardPad.ctx || canvas.getContext('2d');
+  _onboardPad.ctx = ctx;
+  const dpr = window.devicePixelRatio||1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = rect.width  * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  canvas.style.width  = rect.width  + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.strokeStyle = '#1A3C5E'; ctx.lineWidth = 2.2;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+}
+
+function clearOnboardSig(){
+  const canvas = document.getElementById('sigOnboardCanvas');
+  if(!canvas||!_onboardPad.ctx) return;
+  const dpr = window.devicePixelRatio||1;
+  _onboardPad.ctx.clearRect(0, 0, canvas.width/dpr, canvas.height/dpr);
+  _onboardPad.hasData = false;
+  document.getElementById('sigOnboardErr').textContent = '';
+}
+
+async function saveOnboardSig(){
+  if(!_onboardPad.hasData){
+    document.getElementById('sigOnboardErr').textContent = 'Please draw your signature first.';
+    return;
+  }
+  const canvas = document.getElementById('sigOnboardCanvas');
+  const dataUrl = canvas.toDataURL('image/png');
+  const btn = document.getElementById('sigOnboardSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  document.getElementById('sigOnboardErr').textContent = '';
+  try {
+    const url = getApiUrl();
+    const resp = await fetch(url, { method:'POST', body: JSON.stringify({
+      action: 'saveSignature',
+      username: loggedInUser.username,
+      signatureData: dataUrl
+    })});
+    const data = await resp.json();
+    if(data.success){
+      _userSigData = dataUrl;
+      document.getElementById('sigOnboardModal').style.display = 'none';
+      toast('✅ Signature saved!');
+    } else {
+      document.getElementById('sigOnboardErr').textContent = data.error || 'Save failed.';
+    }
+  } catch(err) {
+    document.getElementById('sigOnboardErr').textContent = 'Network error: ' + err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 Save Signature';
+  }
+}
+
+function skipOnboardSig(){
+  document.getElementById('sigOnboardModal').style.display = 'none';
+  toast('⚠️ Signature skipped — PDFs will have blank signature');
+}
+
+function showResignModal(){
+  // Header button — if sig exists show ghost preview, else blank pad
+  _openSigModal(!!_userSigData);
+}
+
+// Core function: opens the signature modal.
+// hasExisting=true  → pre-loads the saved signature image as a reference overlay
+// hasExisting=false → blank canvas, title says "Draw Your Signature"
+function _openSigModal(hasExisting){
+  const title = document.getElementById('sigOnboardTitle');
+  const desc  = document.getElementById('sigOnboardDesc');
+  if(hasExisting){
+    if(title) title.textContent = 'Update Your Signature';
+    if(desc)  desc.textContent  = 'Your saved signature is shown faintly below. Redraw on top or clear and draw fresh — click Save to update.';
+  } else {
+    if(title) title.textContent = 'Draw Your Signature';
+    if(desc)  desc.textContent  = 'Draw your signature below — it will auto-fill on all PDFs based on your role.';
+  }
+
+  // ⚡ Show modal FIRST so canvas gets real dimensions from layout
+  document.getElementById('sigOnboardModal').style.display = 'flex';
+
+  // Resize canvas now that it's visible (getBoundingClientRect works)
+  _resizeSigCanvas();
+  initOnboardSigPad();   // bind events (only once, idempotent)
+  clearOnboardSig();     // clear after resize so canvas is fresh
+
+  // Ghost overlay of existing sig (if updating)
+  if(hasExisting && _userSigData){
+    const canvas = document.getElementById('sigOnboardCanvas');
+    const ctx = _onboardPad.ctx;
+    if(canvas && ctx){
+      const img = new Image();
+      img.onload = function(){
+        const dpr = window.devicePixelRatio||1;
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.drawImage(img, 0, 0, canvas.width/dpr, canvas.height/dpr);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      };
+      img.src = _userSigData;
+    }
+  }
+}
+
+async function fetchAndCheckUserSig(username){
+  const url = getApiUrl();
+  if(!url){
+    // No API URL — open blank pad so user can still draw
+    _openSigModal(false);
+    return;
+  }
+  try {
+    const resp = await fetch(url + '?action=getSignature&username=' + encodeURIComponent(username), { redirect:'follow' });
+    const data = await resp.json();
+    if(data.success && data.signatureData){
+      // ✅ Signature already saved — load silently, NO modal
+      _userSigData = data.signatureData;
+    } else {
+      // ✅ First login / no sig yet — show blank draw pad
+      _openSigModal(false);
+    }
+  } catch(err) {
+    console.warn('Sig fetch error:', err);
+    // Network hiccup — open blank pad so user can draw
+    _openSigModal(false);
+  }
+}
 
 // ═══════════════════ SIGNATURE PAD ═════════════════════════════════════
 const sigPads={};
@@ -1287,7 +1460,7 @@ function addProduct(){
         <div id="p${id}-emboss-catalog" style="display:none;margin-top:8px;max-height:220px;overflow-y:auto;border:1px solid #FCD34D;border-radius:8px;padding:8px;background:#fff"></div>
         <div id="p${id}-emboss-photo-gallery" class="photo-gallery"></div>
       </div>
-      <div class="fg"><label>Design Type</label>
+      <div class="fg"><label>Packing Assortment</label>
         <div class="combo-wrap">
           <input type="text" id="p${id}-design" placeholder="e.g. 5 New Designs Single Matching" value="ASSORTED" autocomplete="off"
             oninput="filterCombo('p${id}-design');calcAll()" onfocus="openCombo('p${id}-design')" onblur="delayClose('p${id}-design')">
@@ -1761,15 +1934,15 @@ function getProd(id){
 
 function calcAll(){
   const cards=document.querySelectorAll('.product-card');
-  let grandEx=0, grandGst=0, pwRows=''; const prods=[];
+  let grandEx=0, grandGst=0, grandWeight=0, pwRows=''; const prods=[];
   cards.forEach(c=>{
     const id=c.id.replace('prod-',''); const p=getProd(id);
-    grandEx+=p.exGST; grandGst+=p.gstAmt; prods.push(p);
+    grandEx+=p.exGST; grandGst+=p.gstAmt; grandWeight+=(p.totalWeight||0); prods.push(p);
     const set=(s,v)=>{const el=document.getElementById(s);if(el)el.textContent=v;};
     set('p'+id+'-ppkg', fmt(p.effectivePricePerKg)+'/KG'+(p.discount>0?' (-'+p.discount+'%)':''));
     set('p'+id+'-ppc',fmt(p.finalPricePerQty));
     set('p'+id+'-ptot',fmt(p.amount));
-    pwRows+=`<div class="bill-row"><span class="bill-rl">${p.fabric||'Prod #'+id} (${p.qty} pcs × ${fmt(p.finalPricePerQty)}/qty)</span><span class="bill-rv">${fmt(p.amount)}</span></div>`;
+    pwRows+=`<div class="bill-row"><span class="bill-rl">${p.fabric||'Prod #'+id} (${p.qty} pcs × ${fmt(p.finalPricePerQty)}/pcs)</span><span class="bill-rv">${fmt(p.amount)}</span></div>`;
   });
   const grand=grandEx+grandGst;
   const gstPcts=[...new Set(prods.map(p=>p.gstPct))];
@@ -1778,6 +1951,7 @@ function calcAll(){
   document.getElementById('bExGST').textContent=fmt(grandEx);
   document.getElementById('bGST').textContent  =fmt(grandGst);
   document.getElementById('bGrand').textContent='₹'+Math.round(grand).toLocaleString('en-IN');
+  document.getElementById('bWeight').textContent=fmtN(grandWeight)+' kg';
   document.getElementById('bProdRows').innerHTML=pwRows;
   updateBagsTable(prods);
   updatePdfDoc(prods,grand);
@@ -1985,19 +2159,32 @@ function updatePdfDoc(prods,grand){
     photoPagesEl.innerHTML=allPagesHtml;
   }
 
-  // ── Signature images + timestamps into PDF print doc ──
-  const sigMap=[['sigBuyer','pdf-sig-buyer','pdf-sig-buyer-date'],['sigPrepared','pdf-sig-prepared','pdf-sig-prepared-date'],['sigAuth','pdf-sig-auth','pdf-timestamp']];
-  sigMap.forEach(([canvasId,imgId,dateId])=>{
-    const data=getSigData(canvasId);
-    const img=document.getElementById(imgId);
-    if(img){
-      if(data){ img.src=data; img.style.display='block'; }
-      else{ img.src=''; img.style.display='none'; }
-    }
-    const pad=sigPads[canvasId];
-    const dateEl=document.getElementById(dateId);
-    if(dateEl){ dateEl.textContent=pad&&pad.timestamp?('Date: '+pad.timestamp):'Date: ___________'; }
-  });
+  // ── Signature images into PDF print doc — role-based routing ──
+  // admin → fills Authorised Sign; everyone else → fills Prepared By
+  const isAdmin = loggedInUser && loggedInUser.role === 'admin';
+  const nowTs = (()=>{ const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); })();
+
+  // Prepared By slot
+  const prepImg  = document.getElementById('pdf-sig-prepared');
+  const prepDate = document.getElementById('pdf-sig-prepared-date');
+  if(prepImg){
+    if(!isAdmin && _userSigData){ prepImg.src=_userSigData; prepImg.style.display='block'; }
+    else{ prepImg.src=''; prepImg.style.display='none'; }
+  }
+  if(prepDate){ prepDate.textContent = !isAdmin && _userSigData ? 'Date: '+nowTs : 'Date: ___________'; }
+
+  // Authorised Sign slot
+  const authImg  = document.getElementById('pdf-sig-auth');
+  const authDate = document.getElementById('pdf-timestamp');
+  if(authImg){
+    if(isAdmin && _userSigData){ authImg.src=_userSigData; authImg.style.display='block'; }
+    else{ authImg.src=''; authImg.style.display='none'; }
+  }
+  if(authDate){ authDate.textContent = isAdmin && _userSigData ? 'Date: '+nowTs : 'Date: ___________'; }
+
+  // Buyer sig slot always blank (buyer signs physical copy)
+  const buyerImg = document.getElementById('pdf-sig-buyer');
+  if(buyerImg){ buyerImg.src=''; buyerImg.style.display='none'; }
 }
 
 // ═══════════════════════ COLLECT PAYLOAD ════════════════════════════════
@@ -2037,14 +2224,23 @@ function collectPayload(){
     products:      prods,
     summary:{exGST:totalExGST.toFixed(2),gst:totalGst.toFixed(2),grandTotal:Math.round(totalExGST+totalGst).toString()},
     isEdit: document.getElementById('editBanner').style.display==='flex',
-    signatures:{
-      buyer:    getSigData('sigBuyer'),
-      prepared: getSigData('sigPrepared'),
-      auth:     getSigData('sigAuth'),
-      buyerTs:    sigPads.sigBuyer?.timestamp||'',
-      preparedTs: sigPads.sigPrepared?.timestamp||'',
-      authTs:     sigPads.sigAuth?.timestamp||''
-    },
+    signatures:(()=>{
+      // Role-based: admin → fills authSig, else → fills preparedSig
+      // GAS buildOrderHtml reads signatures.role to route correctly
+      const isAdm = loggedInUser && loggedInUser.role === 'admin';
+      const nowTs = (()=>{ const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); })();
+      return {
+        buyer:      '',                          // buyer signs physical copy
+        prepared:   isAdm ? '' : _userSigData,  // non-admin → Prepared By
+        auth:       isAdm ? _userSigData : '',   // admin → Authorised Sign
+        preparedTs: isAdm ? '' : nowTs,
+        authTs:     isAdm ? nowTs : '',
+        buyerTs:    '',
+        userSig:    _userSigData,                // GAS also uses this directly
+        userSigTs:  nowTs,
+        role:       loggedInUser ? loggedInUser.role : ''
+      };
+    })(),
   };
 }
 
@@ -2121,8 +2317,7 @@ function closeModal(){
   });
   const sc=document.getElementById('saleChannel'); if(sc) sc.value='Direct Sale';
   const aw=document.getElementById('agencyWrap'); if(aw) aw.style.display='none';
-  // Clear signature pads
-  clearSig('sigBuyer'); clearSig('sigPrepared'); clearSig('sigAuth');
+  // (Signature pads are per-user, stored in sheet — not reset on form clear)
   addProduct(); syncMeta();
   if(APPS_SCRIPT_URL) fetchDrops();
 }
