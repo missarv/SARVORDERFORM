@@ -889,6 +889,7 @@ document.addEventListener('click',function(e){
 //   admin role  → "Authorised Sign (Sarv India)"
 //   other roles → "Prepared By (SIHF)"
 let _userSigData = '';         // base64 PNG loaded from the Users sheet
+let _editOriginalSignatures = null;  // preserved from loaded order during Edit flow
 const _onboardPad = { drawing:false, hasData:false, ctx:null };
 
 // Binds drawing events ONCE (safe to call multiple times — skips if already bound)
@@ -2159,30 +2160,25 @@ function updatePdfDoc(prods,grand){
     photoPagesEl.innerHTML=allPagesHtml;
   }
 
-  // ── Signature images into PDF print doc — role-based routing ──
-  // admin → fills Authorised Sign; everyone else → fills Prepared By
-  const isAdmin = loggedInUser && loggedInUser.role === 'admin';
-  const nowTs = (()=>{ const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); })();
+  // ── Signature images into PDF print doc — uses merged prepared/auth from collectPayload ──
+  const sigPayload = collectPayload().signatures;
 
-  // Prepared By slot
   const prepImg  = document.getElementById('pdf-sig-prepared');
   const prepDate = document.getElementById('pdf-sig-prepared-date');
   if(prepImg){
-    if(!isAdmin && _userSigData){ prepImg.src=_userSigData; prepImg.style.display='block'; }
+    if(sigPayload.prepared){ prepImg.src=sigPayload.prepared; prepImg.style.display='block'; }
     else{ prepImg.src=''; prepImg.style.display='none'; }
   }
-  if(prepDate){ prepDate.textContent = !isAdmin && _userSigData ? 'Date: '+nowTs : 'Date: ___________'; }
+  if(prepDate){ prepDate.textContent = sigPayload.preparedTs ? 'Date: '+sigPayload.preparedTs : 'Date: ___________'; }
 
-  // Authorised Sign slot
   const authImg  = document.getElementById('pdf-sig-auth');
   const authDate = document.getElementById('pdf-timestamp');
   if(authImg){
-    if(isAdmin && _userSigData){ authImg.src=_userSigData; authImg.style.display='block'; }
+    if(sigPayload.auth){ authImg.src=sigPayload.auth; authImg.style.display='block'; }
     else{ authImg.src=''; authImg.style.display='none'; }
   }
-  if(authDate){ authDate.textContent = isAdmin && _userSigData ? 'Date: '+nowTs : 'Date: ___________'; }
+  if(authDate){ authDate.textContent = sigPayload.authTs ? 'Date: '+sigPayload.authTs : 'Date: ___________'; }
 
-  // Buyer sig slot always blank (buyer signs physical copy)
   const buyerImg = document.getElementById('pdf-sig-buyer');
   if(buyerImg){ buyerImg.src=''; buyerImg.style.display='none'; }
 }
@@ -2225,20 +2221,49 @@ function collectPayload(){
     summary:{exGST:totalExGST.toFixed(2),gst:totalGst.toFixed(2),grandTotal:Math.round(totalExGST+totalGst).toString()},
     isEdit: document.getElementById('editBanner').style.display==='flex',
     signatures:(()=>{
-      // Role-based: admin → fills authSig, else → fills preparedSig
-      // GAS buildOrderHtml reads signatures.role to route correctly
+      // ═══ DUAL-SIGNATURE MERGE LOGIC ═══
+      // New order by data_entry  → prepared = their sig, auth = blank
+      // New order by admin       → prepared = blank, auth = their sig
+      // Edit by admin (of data_entry's order) → prepared = ORIGINAL saver's sig (preserved), auth = admin's sig
+      // Edit by anyone else      → prepared = their sig (or original), auth = original auth (if any)
       const isAdm = loggedInUser && loggedInUser.role === 'admin';
+      const isEdit = document.getElementById('editBanner').style.display === 'flex';
       const nowTs = (()=>{ const d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); })();
+      const orig = _editOriginalSignatures || {};
+
+      let prepared = '', preparedTs = '', auth = '', authTs = '';
+
+      if(isEdit){
+        // EDIT mode — merge original + current user
+        if(isAdm){
+          // Admin editing → keep original Prepared By, add own Authorised Sign
+          prepared   = orig.prepared || '';
+          preparedTs = orig.preparedTs || '';
+          auth       = _userSigData;
+          authTs     = _userSigData ? nowTs : '';
+        } else {
+          // Non-admin editing → update Prepared By with own sig, keep original Authorised
+          prepared   = _userSigData;
+          preparedTs = _userSigData ? nowTs : '';
+          auth       = orig.auth || '';
+          authTs     = orig.authTs || '';
+        }
+      } else {
+        // NEW order — single user
+        if(isAdm){
+          auth     = _userSigData;
+          authTs   = _userSigData ? nowTs : '';
+        } else {
+          prepared   = _userSigData;
+          preparedTs = _userSigData ? nowTs : '';
+        }
+      }
+
       return {
-        buyer:      '',                          // buyer signs physical copy
-        prepared:   isAdm ? '' : _userSigData,  // non-admin → Prepared By
-        auth:       isAdm ? _userSigData : '',   // admin → Authorised Sign
-        preparedTs: isAdm ? '' : nowTs,
-        authTs:     isAdm ? nowTs : '',
-        buyerTs:    '',
-        userSig:    _userSigData,                // GAS also uses this directly
-        userSigTs:  nowTs,
-        role:       loggedInUser ? loggedInUser.role : ''
+        buyer: '', buyerTs: '',
+        prepared: prepared, preparedTs: preparedTs,
+        auth: auth, authTs: authTs,
+        role: loggedInUser ? loggedInUser.role : ''
       };
     })(),
   };
@@ -2695,6 +2720,7 @@ function cancelEditMode(){
 
 // resetForm() without the confirm() prompt — reused internally
 function resetFormSilent(){
+  _editOriginalSignatures = null;
   document.getElementById('prodsContainer').innerHTML='';
   prodCount=0;
   Object.keys(productPhotos).forEach(k=>delete productPhotos[k]);
@@ -2752,6 +2778,9 @@ function applyOrderToForm(o){
       applyProductToCard(prodCount, x);
     });
   }
+
+  // Preserve original signatures so Edit-merge can combine them with current user's sig
+  _editOriginalSignatures = o.signatures || null;
 
   const banner=document.getElementById('editBanner');
   if(banner){ banner.style.display='flex'; document.getElementById('editBannerOrderNo').textContent=o.orderNo||''; }
